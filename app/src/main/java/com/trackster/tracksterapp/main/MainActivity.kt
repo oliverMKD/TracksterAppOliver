@@ -51,7 +51,7 @@ class MainActivity : BaseMainActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        bottomNavImageList = listOf(menuButtonHome, menuButtonEvents, menuButtonNotifications, menuButtonUser)
-        setNavigationEvents()
+//        setNavigationEvents()
 
         mHistory = findViewById(R.id.menuButtonEvents)
         mHistory!!.setOnClickListener(this)
