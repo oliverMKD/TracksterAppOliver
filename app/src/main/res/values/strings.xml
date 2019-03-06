@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Trackster App</string>
+    <string name="username">username</string>
+    <string name="password">password</string>
+    <string name="login_with_fb">LogIn with Fb</string>
+    <string name="login_with_google">Login with Google</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="general_error_no_internet">error</string>
+    <string name="general_error_title">error</string>
+    <string name="general_error_message">error</string>
+    <string name="general_error_button">error</string>
+    <string name="login">LOGIN</string>
+    <string name="facebook_app_id">1729367163976511</string>
+    <string name="fb_login_protocol_scheme">fb1729367163976511</string>
+    <string name="enter_your_phone_number">Enter your phone number</string>
+    <string name="enter_recived_sms">enter recived SMS</string>
+    <string name="validate">Validate</string>
+    <string name="Continue">Continue</string>
+    <string name="general_success_title">Success</string>
+    <string name="image_view_content_description">Image View</string>
+    <string name="no_items">No items</string>
+    <string name="no_items_home_feed">No Items</string>
+
+
+</resources>

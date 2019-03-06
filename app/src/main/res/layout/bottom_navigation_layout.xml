@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="3dp"
+    android:background="@drawable/shadow_backgound"
+    android:padding="2dp">
+
+    <ImageView
+        android:id="@+id/menuButtonHome"
+        style="@style/bottomMenuIcons"
+        android:layout_width="@dimen/bottom_navigation_icon_size_new"
+        android:layout_height="@dimen/bottom_navigation_icon_size_new"
+        android:contentDescription="@string/image_view_content_description"
+        android:padding="@dimen/bottom_navigation_icon_padding"
+        android:src="@drawable/load"
+        android:tint="@color/colorGrayLight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/menuButtonEvents"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/menuButtonEvents"
+        style="@style/bottomMenuIcons"
+        android:layout_width="@dimen/bottom_navigation_icon_size_new"
+        android:layout_height="@dimen/bottom_navigation_icon_size_new"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="@string/image_view_content_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/menuButtonNotifications"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/menuButtonHome"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_history" />
+
+
+
+    <ImageView
+        android:id="@+id/menuButtonNotifications"
+        style="@style/bottomMenuIcons"
+        android:layout_width="@dimen/bottom_navigation_icon_size_new"
+        android:layout_height="@dimen/bottom_navigation_icon_size_new"
+        android:contentDescription="@string/image_view_content_description"
+        android:src="@drawable/ic_location"
+        android:tint="@color/colorGrayLight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/menuButtonUser"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/menuButtonEvents"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/menuButtonUser"
+        style="@style/bottomMenuIcons"
+        android:layout_width="@dimen/bottom_navigation_icon_size_new"
+        android:layout_height="@dimen/bottom_navigation_icon_size_new"
+        android:contentDescription="@string/image_view_content_description"
+        android:src="@drawable/ic_user"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/menuButtonNotifications"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+
+
+
+</android.support.constraint.ConstraintLayout>

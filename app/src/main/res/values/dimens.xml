@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bottom_navigation_menu_height">41dp</dimen>
+    <dimen name="bottom_navigation_icon_size_new">50dp</dimen>
+    <dimen name="bottom_navigation_icon_padding">12dp</dimen>
+</resources>

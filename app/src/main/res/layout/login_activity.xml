@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".ui.login.LoginActivity"
+>
+    <Button
+            android:id="@+id/kopceSledno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/login"
+    />
+    <Button
+            android:id="@+id/kopceValidate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/validate"
+            android:visibility="gone"
+    />
+    <EditText
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/login_buttons"
+            android:hint="@string/enter_your_phone_number"
+            android:id="@+id/phone_number_after_FB"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="invisible"
+            />
+    <EditText
+            app:layout_constraintTop_toBottomOf="@+id/phone_number_after_FB"
+            style="@style/login_buttons"
+            android:hint="@string/enter_recived_sms"
+            android:id="@+id/SMS_after_FB"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
+    />
+    <RelativeLayout
+            android:id="@+id/userNameLayout"
+            style="@style/width_match_height_wrap"
+            android:layout_marginLeft="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passwordLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/social_login_bg"
+            app:layout_constraintHorizontal_bias="0.4">
+
+        <EditText
+                android:id="@+id/login_password"
+                style="@style/login_buttons"
+                android:layout_centerVertical="true"
+                android:hint="@string/password"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:textAllCaps="true"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:id="@+id/passwordLayout"
+            style="@style/width_match_height_wrap"
+            android:layout_marginLeft="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/userNameLayout"
+            app:layout_constraintTop_toBottomOf="@+id/login_with_fb_button"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/social_login_bg"
+            app:layout_constraintVertical_bias="0.0">
+
+        <EditText
+                android:id="@+id/login_username"
+                android:hint="phone number"
+                style="@style/login_buttons"
+                android:layout_centerVertical="true"
+                android:textAllCaps="true"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:id="@+id/login_with_fb_button"
+            style="@style/width_match_height_wrap"
+            android:layout_marginLeft="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="200dp"
+            android:background="@drawable/social_login_bg"
+            app:layout_constraintHorizontal_bias="0.4"
+            app:layout_constraintVertical_bias="0.237">
+
+        <ImageView
+                android:id="@+id/social_fb_logo_iv"
+                style="@style/width_wrap_height_wrap"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/facebook_logo"/>
+
+        <TextView
+                android:id="@+id/login_with_fb_textView"
+                style="@style/login_buttons"
+                android:text="@string/login_with_fb"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/social_fb_logo_iv"
+                android:paddingEnd="8dp"
+                android:textAllCaps="true"/>
+    </RelativeLayout>
+
+    <ProgressBar
+            android:id="@+id/login_progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
+
+</android.support.constraint.ConstraintLayout>
