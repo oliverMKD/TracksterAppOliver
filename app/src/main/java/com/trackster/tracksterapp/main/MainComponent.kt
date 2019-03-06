@@ -3,8 +3,6 @@ package com.trackster.tracksterapp.main
 import com.trackster.tracksterapp.base.AppComponent
 import com.trackster.tracksterapp.base.BaseMainViewFragment
 import com.trackster.tracksterapp.base.FragmentScope
-import com.trackster.tracksterapp.main.fragments.LoadsFragment
-import com.trackster.tracksterapp.main.fragments.SettingsFragment
 import dagger.Component
 
 @FragmentScope
@@ -13,9 +11,9 @@ interface MainComponent {
 
     fun injectFragment(baseMainViewFragment: BaseMainViewFragment)
 
-    fun injectSettingsfragment(settingsFragment: SettingsFragment )
-
-    fun injectLoadsFragment ( loadsFragment: LoadsFragment)
+//    fun injectSettingsfragment(settingsFragment: SettingsFragment )
+//
+//    fun injectLoadsFragment ( loadsFragment: LoadsFragment)
 //
 //    fun injectFragment(eventsFragment: EventsFragment)
 //

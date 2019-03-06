@@ -24,11 +24,11 @@ class LoadsHistoryActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        messagesList.add(0, (Shipment("Da vidime sto ke vrakja API-to za istorija", "", "", 100)))
-        messagesList.add(1, (Shipment("Da vidime sto ke vrakja API-to za istorija", "sofer2", "golem paket", 100)))
-        messagesList.add(2, (Shipment("Da vidime sto ke vrakja API-to za istorija", "sofer3", "golem paket", 100)))
-        messagesList.add(3, (Shipment("Da vidime sto ke vrakja API-to za istorija", "sofer4", "golem paket", 100)))
-        messagesList.add(4, (Shipment("Da vidime sto ke vrakja API-to za istorija", "sofer5", "golem paket", 100)))
+        messagesList.add(0, (Shipment("Da vidime sto ke vrakja API-to za istorija", "", "Da vidime sto ke vrakja API-to za istorija", 100)))
+        messagesList.add(1, (Shipment("Da vidime sto ke vrakja API-to za istorija", "sofer2", "Da vidime sto ke vrakja API-to za istorija", 100)))
+        messagesList.add(2, (Shipment("Da vidime sto ke vrakja API-to za istorija", "sofer3", "Da vidime sto ke vrakja API-to za istorija", 100)))
+        messagesList.add(3, (Shipment("Da vidime sto ke vrakja API-to za istorija", "sofer4", "Da vidime sto ke vrakja API-to za istorija", 100)))
+        messagesList.add(4, (Shipment("Da vidime sto ke vrakja API-to za istorija", "sofer5", "Da vidime sto ke vrakja API-to za istorija", 100)))
         recyclerView.adapter = adapter
         adapter.setData(messagesList)
     }
