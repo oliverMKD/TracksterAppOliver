@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         mHistory = findViewById(R.id.menuButtonEventsNew)
         mLocation = findViewById(R.id.menuButtonNotificationsNew)
         mSettings = findViewById(R.id.menuButtonUserNew)
+
         mHistory.setOnClickListener (this@MainActivity)
         recyclerView = findViewById(R.id.recyclerView)
         adapter = LoadsRecyclerAdapter(this)
