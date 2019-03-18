@@ -1,17 +1,13 @@
 package com.trackster.tracksterapp.adapters
 
-import android.support.design.widget.CoordinatorLayout.Behavior.setTag
-import android.R
 import android.content.Context
-import android.widget.CheckBox
-import android.content.Context.LAYOUT_INFLATER_SERVICE
-import android.support.v4.content.ContextCompat.getSystemService
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.BaseExpandableListAdapter
+import android.widget.CheckBox
+import android.widget.TextView
 import com.trackster.tracksterapp.listeners.TotalListener
 
 
@@ -23,7 +19,7 @@ class ExpandListAdapter(internal var mContext: Context) : BaseExpandableListAdap
      *  Raw Data
      */
     internal var testChildData = arrayOf("10", "20", "30", "40", "50")
-    internal var testgroupData = arrayOf("Apple", "Banana", "Mango", "Orange", "Pineapple", "Strawberry")
+    internal var testgroupData = arrayOf("Flatbed", "Dryvan", "Reefer")
     internal var selectedChildCheckBoxStates: ArrayList<ArrayList<Boolean>> = ArrayList()
     internal var selectedParentCheckBoxesState: ArrayList<Boolean> = ArrayList()
 

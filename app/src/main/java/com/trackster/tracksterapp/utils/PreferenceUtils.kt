@@ -6,6 +6,7 @@ import android.preference.PreferenceManager
 import android.text.TextUtils
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.trackster.tracksterapp.network.responce.InitialAccessToken
 import java.util.*
@@ -15,6 +16,8 @@ object PreferenceUtils {
 
     private const val KEY_AUTH_TOKEN = "auth_token"
     private const val KEY_USER_ID = "user_id"
+    private const val KEY_CURRENT_LOCATION = "Current location"
+    private const val KEY_CHAT_ID = "chat_id"
 
     private fun getPreferences(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -60,10 +63,19 @@ object PreferenceUtils {
     fun saveAuthorizationToken(context: Context, token: String) {
         getPreferences(context)[KEY_AUTH_TOKEN] = token
     }
+
+    fun getAuthorizationToken(context: Context): String = getPreferences(context).getString(KEY_AUTH_TOKEN, "") as String
+
+
     fun saveUserId(context: Context, id: String) {
         getPreferences(context)[KEY_USER_ID] = id
     }
     fun getUserId(context: Context): String = getPreferences(context).getString(KEY_USER_ID, "") as String
+
+    fun saveCurrentLocation(context: Context, location: LatLng) {
+        getPreferences(context)[KEY_CURRENT_LOCATION] = location
+    }
+
 
 //    fun clearAuthorizationToken(context: Context) {
 //        getPreferences(context)[KEY_AUTH_TOKEN] = ""

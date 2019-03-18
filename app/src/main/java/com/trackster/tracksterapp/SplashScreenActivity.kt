@@ -2,6 +2,7 @@ package com.trackster.tracksterapp
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -25,7 +26,8 @@ class SplashScreenActivity : AppCompatActivity() {
     internal val mRunnable: Runnable = Runnable {
         if (!isFinishing) {
 
-            checkIfUserIsLogged()
+            startActivity(Intent(this@SplashScreenActivity, LoginActivity::class.java))
+//            checkIfUserIsLogged()
         }
     }
 
@@ -54,7 +56,7 @@ class SplashScreenActivity : AppCompatActivity() {
     }
     private fun checkIfUserIsLogged(){
         val userId = PreferenceUtils.getUserId(this)
-        if(userId!=null && userId.isNotEmpty()){
+        if(userId.isNotEmpty()){
             startActivity(Intent(this@SplashScreenActivity, TrailerActivity::class.java))
 
         } else{
@@ -72,7 +74,7 @@ class SplashScreenActivity : AppCompatActivity() {
                 md.update(signature.toByteArray())
                 Log.d("KeyHash:",""+ Base64.encodeToString(md.digest(), Base64.DEFAULT))
             }
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: NameNotFoundException) {
 
         } catch (e: NoSuchAlgorithmException) {
 

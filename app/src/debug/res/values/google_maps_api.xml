@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=89:99:6D:07:73:27:FF:A6:FB:3B:44:41:77:4F:33:EE:4F:0E:5B:6A%3Bcom.trackster.tracksterapp.ui.login.maps
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    89:99:6D:07:73:27:FF:A6:FB:3B:44:41:77:4F:33:EE:4F:0E:5B:6A
+
+    SHA-1 certificate fingerprint:
+    89:99:6D:07:73:27:FF:A6:FB:3B:44:41:77:4F:33:EE:4F:0E:5B:6A
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">AIzaSyAAiXz26AXC1vFu6e2dl1TIi9hZEEiI22Y</string>
+</resources>

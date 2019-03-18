@@ -9,4 +9,5 @@
     <color name="colorPurpleLight">#590480</color>
     <color name="colorDark">#392B4A</color>
     <color name="black">#000000</color>
+    <color name="gray">#a9a9a9</color>
 </resources>

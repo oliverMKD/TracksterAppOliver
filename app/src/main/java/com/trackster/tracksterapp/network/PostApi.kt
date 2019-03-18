@@ -1,10 +1,14 @@
 package com.trackster.tracksterapp.network
 
 import android.content.Context
+import com.google.android.gms.maps.model.LatLng
+import com.trackster.tracksterapp.model.Trailers
 import com.trackster.tracksterapp.model.User
+import com.trackster.tracksterapp.model.WeighStation
 import com.trackster.tracksterapp.network.connectivity.ConnectivityInterceptor
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
 import com.trackster.tracksterapp.network.requests.LoginRequest
+import com.trackster.tracksterapp.network.responce.ChatResponse
 import com.trackster.tracksterapp.network.responce.InitialAccessToken
 import io.reactivex.Observable
 import okhttp3.OkHttpClient
@@ -12,13 +16,11 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.Headers
-import retrofit2.http.POST
 import com.trackster.tracksterapp.utils.BASE_URL
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Response
+import retrofit2.http.*
 import java.lang.reflect.Type
 
 
@@ -33,6 +35,20 @@ interface PostApi {
     @Headers("Content-Type: application/json")
     @POST("auth/facebook/")
     fun loginFB(@Body fbLoginRequest: FbLoginRequest): Observable<Response<User>>
+
+
+    @GET("weigh-stations/circle")
+    fun getWeighStations(@Header("x-auth-token") authorization : String,@Header("Content-Type") format : String, @Query ("centar") centar : LatLng,
+                         @Query ("radius") radius : Int ): Observable<WeighStation>
+
+    @GET("/admin/trailers")
+    fun getTrailers(@Header("x-auth-token") authorization : String): Observable<ArrayList<Trailers>>
+
+    @GET("/chats")
+    fun getChats(@Header("x-auth-token") authorization : String): Observable<ArrayList<ChatResponse>>
+
+    @GET("/chats/{chatId}")
+    fun getChatById(@Header("x-auth-token") authorization : String, @Path("chatId") chatId : String): Observable<ChatResponse>
 
 
     companion object Factory {

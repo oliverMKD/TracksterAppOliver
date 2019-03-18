@@ -43,6 +43,7 @@
             app:layout_constraintTop_toBottomOf="@+id/phone_number_after_FB"
             style="@style/login_buttons"
             android:hint="@string/enter_recived_sms"
+            android:inputType="text"
             android:id="@+id/SMS_after_FB"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
@@ -66,10 +67,11 @@
                 android:id="@+id/login_password"
                 style="@style/login_buttons"
                 android:layout_centerVertical="true"
+                android:autofillHints="@string/password"
                 android:hint="@string/password"
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
-                android:textAllCaps="true"/>
+                />
     </RelativeLayout>
 
     <RelativeLayout
@@ -87,10 +89,12 @@
 
         <EditText
                 android:id="@+id/login_username"
-                android:hint="phone number"
+                android:inputType="text"
+                android:hint="@string/phone_number"
+                android:autofillHints="@string/phone_number"
                 style="@style/login_buttons"
                 android:layout_centerVertical="true"
-                android:textAllCaps="true"/>
+                />
     </RelativeLayout>
 
     <RelativeLayout

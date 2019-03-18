@@ -20,6 +20,8 @@
     <string name="image_view_content_description">Image View</string>
     <string name="no_items">No items</string>
     <string name="no_items_home_feed">No Items</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="phone_number">phone number</string>
 
 
 </resources>
