@@ -50,6 +50,11 @@ interface PostApi {
     @GET("/chats/{chatId}")
     fun getChatById(@Header("x-auth-token") authorization : String, @Path("chatId") chatId : String): Observable<ChatResponse>
 
+    @GET("/admin/trailers/default")
+    fun getDefaultTrailers(@Header("x-auth-token") authorization : String): Observable<ArrayList<Trailers>>
+
+    @GET("/admin/trailers/others")
+    fun getOtherTrailers(@Header("x-auth-token") authorization : String): Observable<ArrayList<Trailers>>
 
     companion object Factory {
         fun create(context: Context): PostApi {
