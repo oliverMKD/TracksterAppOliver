@@ -9,7 +9,7 @@
 
 >
     <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
+                    android:layout_height="match_parent" android:id="@+id/relativeLayout">
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:tools="http://schemas.android.com/tools"
@@ -32,7 +32,7 @@
 
     <ImageView android:layout_width="wrap_content"
                android:layout_height="wrap_content"
-               android:background="@drawable/TruckLogo"
+               android:background="@drawable/trucklogo"
                android:layout_marginTop="76dp"
                app:layout_constraintStart_toStartOf="parent"
                app:layout_constraintTop_toTopOf="parent"
@@ -42,13 +42,26 @@
                android:id="@+id/imageView"
                app:layout_constraintHorizontal_bias="0.485"/>
 
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:text="VALIDATE"
+              android:textColor="@color/White"
+              android:textStyle="bold"
+              android:textSize="28sp"
+              android:id="@+id/validate_phone"
+              android:visibility="gone"
+              app:layout_constraintTop_toBottomOf="@+id/imageView"
+              android:layout_marginTop="35dp"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintHorizontal_bias="0.498"/>
+
 
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
               android:text="LOGIN"
               android:textColor="@color/White"
               android:textStyle="bold"
               android:textSize="28sp"
-              android:id="@+id/textView"
+              android:id="@+id/logintext"
               app:layout_constraintTop_toBottomOf="@+id/imageView"
               android:layout_marginTop="35dp"
               app:layout_constraintStart_toStartOf="parent"
@@ -60,6 +73,7 @@
               android:text="INPUT PHONE NUMBER "
               android:textColor="@color/White"
               android:textStyle="bold"
+
               android:textAllCaps="true"
               android:textSize="12dp"
               android:layout_marginStart="56dp"
@@ -77,12 +91,12 @@
             android:layout_height="50dp"
 
             android:background="@drawable/forma1"
-            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/logintext"
             android:layout_marginTop="60dp"
             app:layout_constraintEnd_toEndOf="parent"
 
             app:layout_constraintStart_toStartOf="parent"
-            />
+    />
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -91,9 +105,25 @@
               android:textColor="@color/White"
               android:textStyle="bold"
               android:textSize="12dp"
+              android:id="@+id/passtext"
+              app:layout_constraintStart_toStartOf="parent"
+              android:layout_marginBottom="8dp"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintHorizontal_bias="0.185"
+              app:layout_constraintBottom_toTopOf="@+id/inputpassword"/>
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="RECEIVED SMS CODE "
+              android:id="@+id/smstext"
+              android:visibility="gone"
+              android:textAllCaps="true"
+              android:textColor="@color/White"
+              android:textStyle="bold"
+              android:textSize="12dp"
 
               app:layout_constraintStart_toStartOf="parent"
-android:layout_marginBottom="8dp"
+              android:layout_marginBottom="8dp"
               app:layout_constraintEnd_toEndOf="parent"
               app:layout_constraintHorizontal_bias="0.185"
               app:layout_constraintBottom_toTopOf="@+id/inputpassword"/>
@@ -112,6 +142,16 @@ android:layout_marginBottom="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintHorizontal_bias="0.505"/>
 
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:text="Resend Code?"
+              android:textSize="15sp"
+              android:textColor="@color/White"
+              android:visibility="gone"
+              android:id="@+id/resendCode"
+              app:layout_constraintEnd_toEndOf="@+id/relativeLayout"
+              app:layout_constraintStart_toStartOf="@+id/relativeLayout" android:layout_marginStart="8dp"
+              app:layout_constraintHorizontal_bias="0.818" app:layout_constraintTop_toBottomOf="@+id/inputpassword"/>
+
 
     <Button
             android:id="@+id/loginBtn"
@@ -128,6 +168,23 @@ android:layout_marginBottom="8dp"
 
             app:layout_constraintStart_toStartOf="parent"/>
 
+    <Button
+            android:id="@+id/validatebtn"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="VALIDATE MY ACCOUNT"
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:textColor="@color/DarkSlateGray"
+            android:background="@drawable/login_btn_style"
+            android:layout_marginTop="64dp"
+            app:layout_constraintTop_toBottomOf="@+id/inputpassword"
+
+            app:layout_constraintEnd_toEndOf="parent"
+
+            app:layout_constraintStart_toStartOf="parent"/>
+
+
     <View
             android:layout_width="120dp"
             android:layout_height="2dp"
@@ -136,8 +193,10 @@ android:layout_marginBottom="8dp"
             app:layout_constraintEnd_toEndOf="parent"
 
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.174" app:layout_constraintTop_toBottomOf="@+id/loginBtn"
-            android:layout_marginTop="44dp" android:id="@+id/view2"/>
+            app:layout_constraintHorizontal_bias="0.174"
+            app:layout_constraintTop_toBottomOf="@+id/loginBtn"
+            android:layout_marginTop="44dp"
+            android:id="@+id/view2"/>
 
 
     <View
@@ -146,10 +205,11 @@ android:layout_marginBottom="8dp"
             android:background="@color/White"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.829" app:layout_constraintTop_toBottomOf="@+id/loginBtn"
-            android:layout_marginTop="44dp" android:id="@+id/view"/>
+            app:layout_constraintHorizontal_bias="0.829"
+            app:layout_constraintTop_toBottomOf="@+id/loginBtn"
+            android:layout_marginTop="44dp"
+            android:id="@+id/view"/>
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -160,16 +220,16 @@ android:layout_marginBottom="8dp"
               android:textStyle="bold"
               android:layout_marginTop="36dp"
               app:layout_constraintTop_toBottomOf="@+id/loginBtn"
-
+              android:id="@+id/or"
               app:layout_constraintEnd_toStartOf="@+id/view"
               app:layout_constraintStart_toEndOf="@+id/view2"
-              />
+    />
 
 
     <ImageView android:layout_width="50dp"
                android:layout_height="50dp"
                android:background="@drawable/fcbtn"
-android:id="@+id/fbtn"
+               android:id="@+id/fbtn"
                android:layout_marginTop="68dp"
                app:layout_constraintTop_toBottomOf="@+id/loginBtn"
                app:layout_constraintStart_toStartOf="parent"

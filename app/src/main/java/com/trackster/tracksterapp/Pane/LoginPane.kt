@@ -3,12 +3,16 @@ package com.trackster.tracksterapp.Pane
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.media.Image
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -27,6 +31,7 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
 import com.trackster.tracksterapp.network.requests.LoginRequestWithPhone
+import com.trackster.tracksterapp.network.requests.ValidatePhoneRequest
 import com.trackster.tracksterapp.ui.login.trailer.TrailerActivity
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -37,10 +42,20 @@ import java.util.*
 
 class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
 
-
+    private var logintext1: TextView? = null
+    private var passstext: TextView? = null
+    private var smstext: TextView? = null
+    private var or: TextView? = null
+    private var view1: View? = null
+    private var view2: View? = null
+    private var fcb: ImageView? = null
+    private var resendcode: TextView? = null
+    private var validatetext1: TextView? = null
+    private var loginbtn: Button? = null
+    private var validatebtn: Button? = null
     lateinit var apiService: PostApi
-    var phone1 = findViewById<EditText>(R.id.phonenumber)
-
+    private var phone1: EditText? = null
+    private var code1: EditText? = null
     private lateinit var map: GoogleMap
     private lateinit var lastLocation: Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -60,7 +75,28 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         mapFragment.getMapAsync(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        logintext1 = findViewById<TextView>(R.id.logintext)
+        validatetext1 = findViewById<TextView>(R.id.validate_phone)
+        resendcode = findViewById<TextView>(R.id.resendCode)
 
+        passstext = findViewById<TextView>(R.id.passtext)
+        smstext = findViewById<TextView>(R.id.smstext)
+        fcb = findViewById<ImageView>(R.id.fbtn)
+        or = findViewById<TextView>(R.id.or)
+
+        view1 = findViewById<View>(R.id.view2)
+        view2 = findViewById<View>(R.id.view)
+
+        phone1 = findViewById<EditText>(R.id.phonenumber)
+        code1 = findViewById<EditText>(R.id.inputpassword)
+
+        loginbtn = findViewById(R.id.loginBtn)
+        loginbtn!!.setOnClickListener(this)
+
+        validatebtn = findViewById(R.id.validatebtn)
+        validatebtn!!.setOnClickListener(this)
+
+        fcb!!.setOnClickListener(this)
 
     }
 
@@ -111,11 +147,13 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
     override fun onClick(p0: View?) {
 
-      when (p0?.id){
-          R.id.loginBtn-> getPhoneNumber()
-          R.id.fbtn->loginFB()
+        when (p0?.id) {
+            R.id.loginBtn -> getPhoneNumber()
+            R.id.fbtn -> loginFB()
 
-      }
+            R.id.validatebtn -> validatePhone()
+
+        }
     }
 
 
@@ -123,16 +161,35 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
         val number = phone1?.text.toString()
         authenticateUserWithPhone(number)
+        logintext1!!.visibility = View.INVISIBLE
+        validatetext1!!.visibility = View.VISIBLE
+        validatebtn!!.visibility = View.VISIBLE
+        loginbtn!!.visibility = View.INVISIBLE
+        passstext!!.visibility = View.INVISIBLE
+        smstext!!.visibility = View.VISIBLE
+        or!!.visibility=View.INVISIBLE
+        view2!!.visibility=View.INVISIBLE
+        view1!!.visibility=View.INVISIBLE
+        fcb!!.visibility=View.INVISIBLE
+        resendcode!!.visibility=View.VISIBLE
     }
 
+    private fun validatePhone() {
+
+        val number = phone1?.text.toString()
+        val code = code1?.text.toString()
+        validateWithPhone(number, code)
+    }
 
     private fun authenticateUserWithPhone(phone: String) {
+        apiService = PostApi.create(this)
         CompositeDisposable().add(
+
             apiService.loginWithPhone(LoginRequestWithPhone(phone))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
+//                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
 
                 }, {
 
@@ -143,38 +200,69 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
     }
 
 
-    fun loginFB (){
+    private fun validateWithPhone(phone: String, code: String) {
+        apiService = PostApi.create(this)
+        CompositeDisposable().add(
+            apiService.validatePhone(ValidatePhoneRequest(phone, code))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+//                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
 
-            callbackManager = CallbackManager.Factory.create()
-            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"))
-            LoginManager.getInstance().registerCallback(callbackManager,
-                object : FacebookCallback<LoginResult> {
-                    override fun onSuccess(loginResult: LoginResult) {
-                        Log.d("MainActivity", "Facebook token: " + loginResult.accessToken.token)
-                        authenticateWithFB(loginResult.accessToken.token)
-                    }
-                    override fun onCancel() {
-                        Log.d("MainActivity", "Facebook onCancel.")
-                    }
+                }, {
 
-                    override fun onError(error: FacebookException) {
-                        Log.d("MainActivity", "Facebook onError.")
-                    }
+
+                    Log.d("pane", "error")
                 })
-        }
-
-
-    private fun authenticateWithFB(access_token : String){
-        CompositeDisposable().add(apiService.loginFB(FbLoginRequest(access_token))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-            }, {
-                Log.d("pane", "error")
-            })
         )
     }
 
+
+    fun loginFB() {
+
+        callbackManager = CallbackManager.Factory.create()
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"))
+        LoginManager.getInstance().registerCallback(callbackManager,
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) {
+                    Log.d("MainActivity", "Facebook token: " + loginResult.accessToken.token)
+                    authenticateWithFB(loginResult.accessToken.token)
+                    logintext1!!.visibility = View.INVISIBLE
+                    validatetext1!!.visibility = View.VISIBLE
+                    validatebtn!!.visibility = View.VISIBLE
+                    loginbtn!!.visibility = View.INVISIBLE
+                    passstext!!.visibility = View.INVISIBLE
+                    smstext!!.visibility = View.VISIBLE
+                    or!!.visibility=View.INVISIBLE
+                    view2!!.visibility=View.INVISIBLE
+                    view1!!.visibility=View.INVISIBLE
+                    fcb!!.visibility=View.INVISIBLE
+                    resendcode!!.visibility=View.VISIBLE
+                }
+
+                override fun onCancel() {
+                    Log.d("MainActivity", "Facebook onCancel.")
+                }
+
+                override fun onError(error: FacebookException) {
+                    Log.d("MainActivity", "Facebook onError.")
+                }
+            })
+    }
+
+
+    private fun authenticateWithFB(access_token: String) {
+        apiService = PostApi.create(this)
+        CompositeDisposable().add(
+            apiService.loginFB(FbLoginRequest(access_token))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                }, {
+                    Log.d("pane", "error")
+                })
+        )
+    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -8,6 +8,7 @@ import android.os.Handler
 import android.util.Base64
 import android.util.Log
 import com.bumptech.glide.Glide
+import com.trackster.tracksterapp.Pane.LoginPane
 import com.trackster.tracksterapp.ui.login.LoginActivity
 import com.trackster.tracksterapp.ui.login.trailer.TrailerActivity
 import com.trackster.tracksterapp.utils.PreferenceUtils
@@ -54,12 +55,12 @@ class SplashScreenActivity : AppCompatActivity() {
     }
     private fun checkIfUserIsLogged(){
         val userId = PreferenceUtils.getUserId(this)
-        if(userId!=null && userId.isNotEmpty()){
-            startActivity(Intent(this@SplashScreenActivity, TrailerActivity::class.java))
-
-        } else{
-            startActivity(Intent(this@SplashScreenActivity, LoginActivity::class.java))
-        }
+//        if(userId!=null && userId.isNotEmpty()){
+//            startActivity(Intent(this@SplashScreenActivity, TrailerActivity::class.java))
+//
+//        } else{
+            startActivity(Intent(this@SplashScreenActivity, LoginPane::class.java))
+//        }
     }
 
    private fun getHash(){
