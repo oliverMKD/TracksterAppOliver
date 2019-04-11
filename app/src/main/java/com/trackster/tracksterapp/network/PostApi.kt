@@ -5,6 +5,8 @@ import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.network.connectivity.ConnectivityInterceptor
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
 import com.trackster.tracksterapp.network.requests.LoginRequest
+import com.trackster.tracksterapp.network.requests.LoginRequestWithPhone
+import com.trackster.tracksterapp.network.requests.ValidatePhoneRequest
 import com.trackster.tracksterapp.network.responce.InitialAccessToken
 import io.reactivex.Observable
 import okhttp3.OkHttpClient
@@ -34,6 +36,13 @@ interface PostApi {
     @POST("auth/facebook/")
     fun loginFB(@Body fbLoginRequest: FbLoginRequest): Observable<Response<User>>
 
+    @Headers("Content-Type: application/json")
+    @POST("/auth/phone/")
+    fun loginWithPhone(@Body loginRequestWithPhone: LoginRequestWithPhone): Observable<Response<User>>
+
+    @Headers("Content-Type: application/json")
+    @POST("/auth/phone/")
+    fun validatePhone(@Body validatePhoneRequest: ValidatePhoneRequest ): Observable<Response<User>>
 
     companion object Factory {
         fun create(context: Context): PostApi {
@@ -69,4 +78,6 @@ interface PostApi {
             return retrofit.create(PostApi::class.java)
         }
     }
+
+
 }
