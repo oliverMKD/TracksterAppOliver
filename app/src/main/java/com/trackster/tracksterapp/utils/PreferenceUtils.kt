@@ -60,6 +60,8 @@ object PreferenceUtils {
     fun saveAuthorizationToken(context: Context, token: String) {
         getPreferences(context)[KEY_AUTH_TOKEN] = token
     }
+
+    fun getAuthorizationToken(context: Context): String = getPreferences(context).getString(KEY_AUTH_TOKEN, "") as String
     fun saveUserId(context: Context, id: String) {
         getPreferences(context)[KEY_USER_ID] = id
     }

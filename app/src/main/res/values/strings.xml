@@ -22,6 +22,7 @@
     <string name="no_items_home_feed">No Items</string>
     <string name="title_activity_login_pane">Map</string>
     <string name="title_activity_validate__pane">Validate_Pane</string>
+    <string name="title_activity_select_trailer">Map</string>
 
 
 </resources>
