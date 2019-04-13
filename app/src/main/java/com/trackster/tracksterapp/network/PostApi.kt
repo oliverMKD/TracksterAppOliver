@@ -1,6 +1,7 @@
 package com.trackster.tracksterapp.network
 
 import android.content.Context
+import com.trackster.tracksterapp.model.Trailers
 import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.network.connectivity.ConnectivityInterceptor
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
@@ -14,13 +15,11 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.Headers
-import retrofit2.http.POST
 import com.trackster.tracksterapp.utils.BASE_URL
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Response
+import retrofit2.http.*
 import java.lang.reflect.Type
 
 
@@ -43,6 +42,12 @@ interface PostApi {
     @Headers("Content-Type: application/json")
     @POST("/auth/phone/")
     fun validatePhone(@Body validatePhoneRequest: ValidatePhoneRequest ): Observable<Response<User>>
+
+    @GET("/admin/trailers/default")
+    fun getDefaultTrailers(@Header("x-auth-token") authorization : String): Observable<ArrayList<Trailers>>
+
+    @GET("/admin/trailers/others")
+    fun getOtherTrailers(@Header("x-auth-token") authorization : String): Observable<ArrayList<Trailers>>
 
     companion object Factory {
         fun create(context: Context): PostApi {
