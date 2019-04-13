@@ -1,8 +1,10 @@
 package com.trackster.tracksterapp.selectTrailer
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -17,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.trackster.tracksterapp.Pane.LoginPane
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.OtherTrailersRecyclerAdapter
 import com.trackster.tracksterapp.adapters.TrailersRecyclerAdapter
@@ -40,6 +43,16 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback,View.OnCli
     private lateinit var adapterOthers : OtherTrailersRecyclerAdapter
     lateinit var apiService: PostApi
     private lateinit var mOthers : TextView
+    private val SPLASH_DELAY: Long = 1500 //1.5 seconds
+    private var mDelayHandler: Handler? = null
+    internal val mRunnable: Runnable = Runnable {
+        if (!isFinishing) {
+
+            goToNextActivity()
+        }
+    }
+
+
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -56,6 +69,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback,View.OnCli
         mOthers.setOnClickListener(this)
         getTrailers()
         getOtherTrailers()
+
 // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -148,5 +162,9 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback,View.OnCli
     }
     fun getToastMessage(id : String) {
         Toast.makeText(this@SelectTrailerActivity,"You selected : "+id + " trailer",Toast.LENGTH_LONG).show()
+        mDelayHandler = Handler()
+        mDelayHandler!!.postDelayed(mRunnable, SPLASH_DELAY)
     }
+    private fun goToNextActivity() {
+        startActivity(Intent(this@SelectTrailerActivity, LoginPane::class.java))    }
 }
