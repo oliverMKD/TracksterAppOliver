@@ -166,5 +166,6 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback,View.OnCli
         mDelayHandler!!.postDelayed(mRunnable, SPLASH_DELAY)
     }
     private fun goToNextActivity() {
+        //just test
         startActivity(Intent(this@SelectTrailerActivity, LoginPane::class.java))    }
 }
