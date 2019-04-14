@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
 import com.trackster.tracksterapp.mainScreen.fragments.LoadDetails
 import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
@@ -20,6 +21,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
     private val loadDetails : LoadDetails = LoadDetails.newInstance()
+    private val currentLoad : Current_Load= Current_Load.newInstance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +57,23 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
 
         fragmentTransaction.commit()
+    }
+
+    private fun openCurrentLoadFragment (){
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        if( currentLoad.isAdded  ){
+            fragmentTransaction.replace(R.id.fragment_container, currentLoad)
+
+        }
+        else{
+            fragmentTransaction.add(R.id.fragment_container, currentLoad)
+            fragmentTransaction.addToBackStack("currentLoad")
+
+        }
+
     }
 
     override fun onBackPressed() {
