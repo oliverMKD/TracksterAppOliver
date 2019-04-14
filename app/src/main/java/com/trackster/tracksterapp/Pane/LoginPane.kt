@@ -32,6 +32,7 @@ import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
 import com.trackster.tracksterapp.network.requests.LoginRequestWithPhone
 import com.trackster.tracksterapp.network.requests.ValidatePhoneRequest
+import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
 import com.trackster.tracksterapp.ui.login.trailer.TrailerActivity
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -178,7 +179,8 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
         val number = phone1?.text.toString()
         val code = code1?.text.toString()
-        validateWithPhone(number, code)
+        startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
+//        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS
     }
 
     private fun authenticateUserWithPhone(phone: String) {

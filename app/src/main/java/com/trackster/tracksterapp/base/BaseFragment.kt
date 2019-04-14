@@ -16,18 +16,6 @@ abstract class BaseFragment : Fragment() {
         return inflater.inflate(getLayoutId(), container, false)
     }
 
-//    override fun showError() {
-//        DialogUtils.showGeneralErrorMessage(activity)
-//    }
-//
-//    override fun showError(message: String) {
-//        DialogUtils.showErrorMessage(activity, message)
-//    }
-//
-//    override fun showSuccessMessage(message: String) {
-//        DialogUtils.showSuccessMessage(activity, message)
-//    }
-
     fun EditText.loadFuturaMediumFont(){
         this.typeface = Typeface.createFromAsset(context?.assets,"fonts/futura_bt_medium.ttf")
     }
@@ -42,18 +30,10 @@ abstract class BaseFragment : Fragment() {
 
     abstract fun getProgressBar(): ProgressBar?
 
-//    override fun setLoadingIndicator(active: Boolean) {
-//        if (active) {
-//            getProgressBar()?.visibility = View.VISIBLE
-//        } else {
-//            getProgressBar()?.visibility = View.GONE
-//        }
-//    }
-
     fun EditText.isNotNullEmptyOrWhitespace(): Boolean {
         return !this.text.isNullOrEmpty() && this.text.isNotBlank()
     }
 
-
+    abstract fun onBackStackChanged()
 }
 
