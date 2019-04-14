@@ -154,4 +154,5 @@
     <color name="transparent_gray">#9F202020</color>
     <color name="transparent">#00000000</color>
 
+    <color name="trans">#00000000</color>
 </resources>
