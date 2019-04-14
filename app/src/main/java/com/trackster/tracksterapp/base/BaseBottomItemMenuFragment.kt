@@ -5,6 +5,10 @@ import com.trackster.tracksterapp.main.MainActivity
 import com.trackster.tracksterapp.model.Shipment
 
 open class BaseBottomItemMenuFragment : BaseMainViewFragment() {
+    override fun onBackStackChanged() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun setLoadingIndicator(active: Boolean) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
