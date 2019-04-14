@@ -23,6 +23,8 @@ import com.trackster.tracksterapp.Pane.LoginPane
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.OtherTrailersRecyclerAdapter
 import com.trackster.tracksterapp.adapters.TrailersRecyclerAdapter
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
+import com.trackster.tracksterapp.model.Shipment
 import com.trackster.tracksterapp.model.Trailers
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.utils.PreferenceUtils
@@ -30,19 +32,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback,View.OnClickListener {
-
-
+class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
     private lateinit var lastLocation: Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    lateinit var listView: RecyclerView
-    lateinit var recyclerViewOthers : RecyclerView
-    private lateinit var adapter: TrailersRecyclerAdapter
-    private lateinit var adapterOthers : OtherTrailersRecyclerAdapter
-    lateinit var apiService: PostApi
-    private lateinit var mOthers : TextView
     private val SPLASH_DELAY: Long = 1500 //1.5 seconds
     private var mDelayHandler: Handler? = null
     internal val mRunnable: Runnable = Runnable {
@@ -53,76 +47,20 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback,View.OnCli
     }
 
 
-
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_trailer)
-        listView = findViewById(R.id.recyclerViewTrailer)
-        recyclerViewOthers = findViewById(R.id.recyclerViewTrailerOthers)
-        adapter = TrailersRecyclerAdapter(this@SelectTrailerActivity)
-        adapterOthers = OtherTrailersRecyclerAdapter(this@SelectTrailerActivity)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        mOthers = findViewById(R.id.text_other)
-        mOthers.setOnClickListener(this)
-        getTrailers()
-        getOtherTrailers()
+
 
 // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-    }
-    override fun onClick(p0: View?) {
-        when (p0?.id) {
-            R.id.text_other-> recyclerViewOthers.visibility = View.VISIBLE
-        }
-    }
-    private fun initRecyclerView(list : ArrayList<Trailers>) {
-        listView.setHasFixedSize(true)
-        listView.layoutManager = LinearLayoutManager(this)
-        listView.adapter = adapter
-        adapter.setData(list)
-    }
-    private fun initRecyclerViewOthers(list : ArrayList<Trailers>) {
-        recyclerViewOthers.setHasFixedSize(true)
-        recyclerViewOthers.layoutManager = LinearLayoutManager(this)
-        recyclerViewOthers.adapter = adapterOthers
-        adapterOthers.setData(list)
-    }
-
-    private fun getTrailers(){
-        apiService = PostApi.create(this@SelectTrailerActivity)
-        CompositeDisposable().add(apiService.getDefaultTrailers(
-            PreferenceUtils.getAuthorizationToken(this))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                initRecyclerView(it)
-// Log.d("station", " "+ it[0].location)
-            }, {
-                // showProgress(false)
-//                Utils.handleApiError(it)
-            })
-        )
-    }
-    private fun getOtherTrailers(){
-        apiService = PostApi.create(this@SelectTrailerActivity)
-        CompositeDisposable().add(apiService.getOtherTrailers(
-            PreferenceUtils.getAuthorizationToken(this))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                recyclerViewOthers.visibility = View.VISIBLE
-                initRecyclerViewOthers(it)
-// Log.d("station", " "+ it[0].location)
-            }, {
-                // showProgress(false)
-//                Utils.handleApiError(it)
-            })
-        )
     }
 
 
@@ -141,11 +79,17 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback,View.OnCli
         map.uiSettings.isZoomControlsEnabled = true
         setUpMap()
     }
-    private fun setUpMap(){
-        if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+
+    private fun setUpMap() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE
+            )
             return
         }
         map.isMyLocationEnabled = true
@@ -160,12 +104,15 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback,View.OnCli
 
         }
     }
-    fun getToastMessage(id : String) {
-        Toast.makeText(this@SelectTrailerActivity,"You selected : "+id + " trailer",Toast.LENGTH_LONG).show()
+
+    fun getToastMessage(id: String) {
+        Toast.makeText(this@SelectTrailerActivity, "You selected : " + id + " trailer", Toast.LENGTH_LONG).show()
         mDelayHandler = Handler()
         mDelayHandler!!.postDelayed(mRunnable, SPLASH_DELAY)
     }
+
     private fun goToNextActivity() {
         //just test
-        startActivity(Intent(this@SelectTrailerActivity, LoginPane::class.java))    }
+        startActivity(Intent(this@SelectTrailerActivity, MainScreenActivity::class.java))
+    }
 }

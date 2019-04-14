@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+    >
+
+        <RelativeLayout android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+
+            <android.support.v7.widget.RecyclerView
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:id="@+id/recyclerViewTrailer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+            </android.support.v7.widget.RecyclerView>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:id="@+id/linearLayoutTrailers"
+                          android:layout_below="@+id/recyclerViewTrailer"
+                          android:orientation="horizontal">
+
+                <ImageView android:layout_width="50dp"
+                           android:layout_height="50dp"
+                           android:src="@drawable/facebook_logo"
+                           android:layout_marginStart="20dp"
+
+                />
+                <TextView android:layout_width="100dp"
+                          android:layout_height="50dp"
+                          android:id="@+id/text_other"
+                          android:text="OTHER"
+                          android:textSize="20sp"
+                          android:textColor="@color/black"
+                          android:clickable="true"
+                          android:focusable="true"
+                          android:layout_marginStart="20dp"
+                />
+                <ImageView android:layout_width="50dp"
+                           android:layout_height="50dp"
+                />
+
+            </LinearLayout>
+
+
+            <android.support.v7.widget.RecyclerView
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:id="@+id/recyclerViewTrailerOthers"
+                    android:layout_below="@+id/linearLayoutTrailers"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+        </RelativeLayout>
+    </ScrollView>
+
+
+</android.support.constraint.ConstraintLayout>
