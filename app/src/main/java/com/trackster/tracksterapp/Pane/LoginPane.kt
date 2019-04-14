@@ -180,6 +180,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         val number = phone1?.text.toString()
         val code = code1?.text.toString()
         val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNmM3NmViMTdkNDQyMTc3MGFlMTg4ZCIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6IkJyb2tlciIsImxhc3ROYW1lIjoiQnJva2VyIiwidXNlclR5cGUiOjMsImlhdCI6MTU1NTI0OTU1NywiZXhwIjoxNTU1ODU0MzU3fQ.6lXud5YsSHAjpJanLP2nYFoUEC5TaKIfQXWrMaUNb4M"
+
        PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
         startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
 //        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS
