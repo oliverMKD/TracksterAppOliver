@@ -10,6 +10,10 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
 
 class LoadDetails : BaseFragment() {
+    override fun onBackStackChanged() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun getProgressBar(): ProgressBar? = null
 
     override fun getLayoutId(): Int = R.layout.activity_login_pane

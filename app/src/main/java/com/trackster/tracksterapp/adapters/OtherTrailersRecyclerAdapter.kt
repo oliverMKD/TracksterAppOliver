@@ -19,7 +19,7 @@ class OtherTrailersRecyclerAdapter(private val activity: Activity) : RecyclerVie
     private val list: MutableList<Trailers?> = arrayListOf()
 
     inner class LoadsRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val description = view.text_description!!
+        val description = view.image_select_trailer!!
         val price = view.text_price!!
 //        val text_plannedDestinationTime = view.text_plannedDestinationTime!!
 //        val text_plannedPickupTime = view.text_plannedPickupTime!!
@@ -71,7 +71,7 @@ class OtherTrailersRecyclerAdapter(private val activity: Activity) : RecyclerVie
 //
         holder.itemView.setOnClickListener {
             if (load != null) {
-                (activity as SelectTrailerActivity).getToastMessage(load.name)
+                (activity as SelectTrailerActivity).getSelectedTrailer(load.name)
             }
         }
     }

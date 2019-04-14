@@ -24,6 +24,10 @@ import com.trackster.tracksterapp.utils.USER_ID_KEY
 import kotlinx.android.synthetic.main.fragment_loads.*
 
 class LoadsFragment : BaseFragment(), MainContract.View, MainContract.Presenter {
+    override fun onBackStackChanged() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun updateLoads(loadsList: ArrayList<Shipment>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

@@ -14,6 +14,10 @@ import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
 open class BaseMainViewFragment : BaseFragment(), MainContract.View {
+    override fun onBackStackChanged() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun setLoadingIndicator(active: Boolean) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
