@@ -13,6 +13,10 @@
             tools:context=".oli.SelectTrailerActivity"
             android:name="com.google.android.gms.maps.SupportMapFragment"/>
 
+    <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
     <FrameLayout
             android:id="@+id/fragment_container_select_trailer"
             android:layout_width="0dp"
@@ -33,5 +37,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:targetApi="LOLLIPOP"/>
-
+</android.support.constraint.ConstraintLayout>
 </RelativeLayout>

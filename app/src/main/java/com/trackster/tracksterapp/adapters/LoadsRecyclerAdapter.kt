@@ -20,7 +20,7 @@ class LoadsRecyclerAdapter(private val activity: Activity) : RecyclerView.Adapte
     private val list: MutableList<Shipment?> = arrayListOf()
 
     inner class LoadsRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val description = view.text_description!!
+        val description = view.image_select_trailer!!
         val price = view.text_price
     }
 
@@ -56,7 +56,7 @@ class LoadsRecyclerAdapter(private val activity: Activity) : RecyclerView.Adapte
         val loadPrice = load!!.price
         val loadDescription = load.description
 
-        holder.description.text = loadPrice.toString()
+//        holder.description.text = loadPrice.toString()
         holder.price.text = loadDescription
 
         holder.itemView.setOnClickListener {
