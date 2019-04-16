@@ -2,6 +2,7 @@ package com.trackster.tracksterapp.network
 
 import android.content.Context
 import com.trackster.tracksterapp.model.Trailers
+import com.trackster.tracksterapp.model.Trucks
 import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.network.connectivity.ConnectivityInterceptor
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
@@ -48,6 +49,10 @@ interface PostApi {
 
     @GET("/admin/trailers/others")
     fun getOtherTrailers(@Header("x-auth-token") authorization : String): Observable<ArrayList<Trailers>>
+
+    @GET("/admin/truck-models")
+    fun getTrucks(@Header("x-auth-token") authorization : String): Observable<ArrayList<Trucks>>
+
 
     companion object Factory {
         fun create(context: Context): PostApi {

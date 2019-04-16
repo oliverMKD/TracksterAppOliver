@@ -73,7 +73,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             fragmentTransaction.addToBackStack("currentLoadFragment")
 
         }
-
+        fragmentTransaction.commit()
     }
 
     override fun onBackPressed() {

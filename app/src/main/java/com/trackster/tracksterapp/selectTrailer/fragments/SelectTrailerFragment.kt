@@ -29,6 +29,7 @@ class SelectTrailerFragment : BaseFragment(), View.OnClickListener {
     lateinit var apiService: PostApi
     private var messagesList: MutableList<Trailers> = mutableListOf()
     var fragmentPosition: Int = 0
+    var compositeDisposableContainer = CompositeDisposable()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,7 +78,7 @@ class SelectTrailerFragment : BaseFragment(), View.OnClickListener {
 
     private fun getTrailers() {
         apiService = PostApi.create(context!!)
-        CompositeDisposable().add(
+        compositeDisposableContainer.add(
             apiService.getDefaultTrailers(
                 PreferenceUtils.getAuthorizationToken(context!!)
             )
@@ -95,7 +96,7 @@ class SelectTrailerFragment : BaseFragment(), View.OnClickListener {
 
     private fun getOtherTrailers() {
         apiService = PostApi.create(context!!)
-        CompositeDisposable().add(
+        compositeDisposableContainer.add(
             apiService.getOtherTrailers(
                 PreferenceUtils.getAuthorizationToken(context!!)
             )
@@ -115,6 +116,8 @@ class SelectTrailerFragment : BaseFragment(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        compositeDisposableContainer
+
     }
 
     override fun getLayoutId(): Int = R.layout.fragment_select_trailer
