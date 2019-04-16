@@ -19,6 +19,11 @@
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true">
         <activity
+                android:name=".currentLoad.CurrentLoadActivity"
+                android:label="@string/title_activity_current_load"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
                 android:name=".mainScreen.MainScreenActivity"
                 android:label="@string/title_activity_main_screen"
                 android:theme="@style/AppTheme.NoActionBar">
