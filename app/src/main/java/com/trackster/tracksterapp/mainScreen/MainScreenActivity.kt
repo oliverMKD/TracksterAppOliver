@@ -70,7 +70,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
         else{
             fragmentTransaction.add(R.id.fragment_container, currentLoad)
-            fragmentTransaction.addToBackStack("currentLoad")
+            fragmentTransaction.addToBackStack("currentLoadFragment")
 
         }
 
@@ -111,7 +111,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
             }
             R.id.nav_slideshow -> {
-
+                openCurrentLoadFragment()
             }
             R.id.nav_manage -> {
 

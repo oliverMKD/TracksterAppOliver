@@ -12,7 +12,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:contentInsetStart="0dp"
-android:background="@color/black"
+            android:background="@color/black"
             tools:targetApi="LOLLIPOP">
 
         <LinearLayout
@@ -29,24 +29,15 @@ android:background="@color/black"
                        android:layout_marginStart="11dp"          />
 
             <TextView android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:text="Select Trailer"
+                      android:layout_height="wrap_content"
+                      android:text="Select Color"
                       android:textSize="25sp"
                       android:textColor="@color/White"
-                       android:id="@+id/imageView3"
-                       android:layout_marginTop="3dp"
-                       android:layout_marginStart="20dp"          />
+                      android:id="@+id/imageView3"
+                      android:layout_marginTop="3dp"
+                      android:layout_marginStart="20dp"          />
 
-            <!--<TextView-->
 
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:textSize="25sp"-->
-                    <!--android:textStyle="normal"-->
-                    <!--android:textColor="@color/Blue"-->
-                    <!--tools:text="Select Trailer"-->
-                    <!--android:layout_marginStart="23dp"-->
-            <!--/>-->
         </LinearLayout>
 
 

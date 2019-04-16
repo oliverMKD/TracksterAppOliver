@@ -1,64 +1,70 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/transparent_gray"
+              android:orientation="vertical">
 
     <include
             android:id="@+id/toolbarSelect"
             layout="@layout/toolbar_select_trailer_view"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
+
     />
-    <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbarSelect">
 
-    <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    >
-        <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                >
+        <RelativeLayout android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
 
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/recyclerViewTrailer"
                     android:layout_width="match_parent"
-                    android:layout_marginStart="20dp"
+
                     android:layout_height="wrap_content">
             </android.support.v7.widget.RecyclerView>
 
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:id="@+id/linearLayoutTrailers"
-                          android:layout_marginTop="20dp"
                           android:layout_below="@+id/recyclerViewTrailer"
-                          android:orientation="horizontal">
+                          android:orientation="horizontal"
+android:layout_marginTop="10dp"
+            >
 
-                <ImageView android:layout_width="50dp"
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="50dp"
                            android:layout_height="50dp"
+
                            android:src="@drawable/other_trailer"
                            android:nestedScrollingEnabled="true"
                            android:layout_marginStart="20dp"
+
 
                 />
                 <TextView android:layout_width="100dp"
                           android:layout_height="50dp"
                           android:id="@+id/text_other"
                           android:text="OTHER"
+                          android:gravity="center_vertical"
                           android:textSize="20sp"
-                          android:textColor="@color/black"
+                          android:textColor="@color/White"
+                          android:textStyle="bold"
                           android:clickable="true"
                           android:focusable="true"
-                          android:layout_marginStart="20dp"
+                          android:layout_marginStart="18dp"
                 />
-                <ImageView android:layout_width="50dp"
-                           android:layout_height="50dp"
+                <ImageView android:layout_width="30dp"
+                           android:layout_height="30dp"
+                           android:layout_marginLeft="100dp"
+                           android:background="@mipmap/forward_arrow_white"
+                           android:layout_gravity="center"
+
                 />
 
             </LinearLayout>
@@ -69,11 +75,13 @@
                     android:id="@+id/recyclerViewTrailerOthers"
                     android:layout_below="@+id/linearLayoutTrailers"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+            >
 
             </android.support.v7.widget.RecyclerView>
-        </RelativeLayout>
-    </ScrollView>
-</android.support.constraint.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+        </RelativeLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -22,6 +22,10 @@ class Current_Load : BaseFragment() {
         fun newInstance() = Current_Load()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
