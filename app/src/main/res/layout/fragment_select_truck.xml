@@ -1,8 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/transparent">
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@color/transparent_gray">
 
-</android.support.constraint.ConstraintLayout>
+
+    <include layout="@layout/toolbar_select_manufactor"
+             android:id="@+id/include"/>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+        <android.support.v7.widget.RecyclerView
+android:id="@+id/recycler_manufactor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+    <Button android:layout_width="280dp" android:layout_height="45dp"
+            android:id="@+id/select_manufactor"
+            android:background="@drawable/login_btn_style"
+            android:text="OTHERS"
+            android:textSize="12sp"
+            android:textAllCaps="true"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="48.7dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginStart="55dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginEnd="55dp"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+</LinearLayout>

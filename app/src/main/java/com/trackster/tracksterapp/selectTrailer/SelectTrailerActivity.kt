@@ -64,9 +64,11 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (selectTracksFragment.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container_select_trailer, selectTracksFragment)
+            fragmentTransaction.remove(selectTrailerFragment)
         } else {
             fragmentTransaction.add(R.id.fragment_container_select_trailer, selectTracksFragment)
             fragmentTransaction.addToBackStack("selectTrucksFragment")
+            fragmentTransaction.remove(selectTrailerFragment)
         }
 
         fragmentTransaction.commit()
@@ -77,9 +79,11 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (selectColorFragment.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container_select_trailer, selectColorFragment)
+            fragmentTransaction.remove(selectTracksFragment)
         } else {
             fragmentTransaction.add(R.id.fragment_container_select_trailer, selectColorFragment)
             fragmentTransaction.addToBackStack("selectColorFragment")
+            fragmentTransaction.remove(selectTracksFragment)
         }
 
         fragmentTransaction.commit()
@@ -149,8 +153,8 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
         Toast.makeText(this@SelectTrailerActivity, "You selected : " + id + " truck", Toast.LENGTH_LONG).show()
         openSelectColorFragment()
     }
-    fun getSelectedColor(id: String) {
-        Toast.makeText(this@SelectTrailerActivity, "You selected : " + id + " color", Toast.LENGTH_LONG).show()
+    fun getSelectedColor() {
+        Toast.makeText(this@SelectTrailerActivity, "You selected :  color", Toast.LENGTH_LONG).show()
         startActivity(Intent(this@SelectTrailerActivity, MainScreenActivity::class.java))
     }
 
