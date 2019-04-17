@@ -27,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.iid.FirebaseInstanceId
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
@@ -44,7 +45,6 @@ import java.util.*
 class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
 
     private var logintext1: TextView? = null
-    private var passstext: TextView? = null
     private var smstext: TextView? = null
     private var or: TextView? = null
     private var view1: View? = null
@@ -74,13 +74,14 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        var refreshedToken = FirebaseInstanceId.getInstance().getToken()
+        Log.d("tokenFCM", "FCM token: " + refreshedToken)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         logintext1 = findViewById<TextView>(R.id.logintext)
         validatetext1 = findViewById<TextView>(R.id.validate_phone)
         resendcode = findViewById<TextView>(R.id.resendCode)
 
-        passstext = findViewById<TextView>(R.id.passtext)
         smstext = findViewById<TextView>(R.id.smstext)
         fcb = findViewById<ImageView>(R.id.fbtn)
         or = findViewById<TextView>(R.id.or)
@@ -166,7 +167,6 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         validatetext1!!.visibility = View.VISIBLE
         validatebtn!!.visibility = View.VISIBLE
         loginbtn!!.visibility = View.INVISIBLE
-        passstext!!.visibility = View.INVISIBLE
         smstext!!.visibility = View.VISIBLE
         or!!.visibility=View.INVISIBLE
         view2!!.visibility=View.INVISIBLE
@@ -236,7 +236,6 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                     validatetext1!!.visibility = View.VISIBLE
                     validatebtn!!.visibility = View.VISIBLE
                     loginbtn!!.visibility = View.INVISIBLE
-                    passstext!!.visibility = View.INVISIBLE
                     smstext!!.visibility = View.VISIBLE
                     or!!.visibility=View.INVISIBLE
                     view2!!.visibility=View.INVISIBLE

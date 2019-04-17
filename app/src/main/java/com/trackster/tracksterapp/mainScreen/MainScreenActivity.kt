@@ -361,8 +361,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
     private fun getRoute(url: String) {
-
-
         val path: MutableList<List<LatLng>> = ArrayList()
         val directionsRequest = object : StringRequest(
             Request.Method.GET, url, Response.Listener<String> { response ->
