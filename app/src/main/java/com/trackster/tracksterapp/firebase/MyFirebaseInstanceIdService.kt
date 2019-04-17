@@ -18,4 +18,17 @@ class MyFirebaseInstanceIdService : FirebaseInstanceIdService() {
         // simpan token ke server di sini.
     }
 
+    fun onNewToken(token: String) {
+        Log.d(TAG, "Refreshed token: $token")
+
+        // If you want to send messages to this application instance or
+        // manage this apps subscriptions on the server side, send the
+        // Instance ID token to your app server.
+        sendRegistrationToServer(token)
+    }
+
+    fun sendRegistrationToServer(token: String) {
+        Log.v("FirebaseService", "Token $token")
+    }
+
 }

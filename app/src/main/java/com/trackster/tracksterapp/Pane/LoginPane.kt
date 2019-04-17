@@ -27,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.iid.FirebaseInstanceId
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
@@ -73,6 +74,8 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        var refreshedToken = FirebaseInstanceId.getInstance().getToken()
+        Log.d("tokenFCM", "FCM token: " + refreshedToken)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         logintext1 = findViewById<TextView>(R.id.logintext)
