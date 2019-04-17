@@ -30,27 +30,27 @@
 
     </RelativeLayout>
 
-    <ImageView android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
+    <ImageView android:layout_width="240dp"
+               android:layout_height="37.7dp"
                android:background="@drawable/trucklogo"
-               android:layout_marginTop="76dp"
+               android:layout_marginTop="38dp"
                app:layout_constraintStart_toStartOf="parent"
                app:layout_constraintTop_toTopOf="parent"
                app:layout_constraintEnd_toEndOf="parent"
-               android:layout_marginEnd="8dp"
-               android:layout_marginStart="8dp"
+               android:layout_marginEnd="22dp"
+               android:layout_marginStart="21.3dp"
                android:id="@+id/imageView"
-               app:layout_constraintHorizontal_bias="0.485"/>
+    />
 
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
               android:text="VALIDATE"
               android:textColor="@color/White"
               android:textStyle="bold"
-              android:textSize="28sp"
+              android:textSize="16.7sp"
               android:id="@+id/validate_phone"
               android:visibility="gone"
               app:layout_constraintTop_toBottomOf="@+id/imageView"
-              android:layout_marginTop="35dp"
+              android:layout_marginTop="26dp"
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintEnd_toEndOf="parent"
               app:layout_constraintHorizontal_bias="0.498"/>
@@ -60,180 +60,189 @@
               android:text="LOGIN"
               android:textColor="@color/White"
               android:textStyle="bold"
-              android:textSize="28sp"
+              android:textSize="16.7sp"
               android:id="@+id/logintext"
               app:layout_constraintTop_toBottomOf="@+id/imageView"
-              android:layout_marginTop="35dp"
+              android:layout_marginTop="26dp"
+              android:layout_marginStart="119dp"
+              android:layout_marginEnd="119dp"
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintHorizontal_bias="0.498"/>
+    />
+    <LinearLayout
 
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:text="INPUT PHONE NUMBER "
-              android:textColor="@color/White"
-              android:textStyle="bold"
-
-              android:textAllCaps="true"
-              android:textSize="12dp"
-              android:layout_marginStart="56dp"
-              app:layout_constraintStart_toStartOf="parent"
-
-              app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintHorizontal_bias="0.0"
-              android:layout_marginBottom="8dp"
-              app:layout_constraintBottom_toTopOf="@+id/phonenumber"/>
-
-
-    <EditText
-            android:id="@+id/phonenumber"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-
-            android:background="@drawable/forma1"
+            android:layout_width="208.7dp"
+            android:layout_height="208.7dp"
+            android:orientation="vertical"
+            android:layout_marginTop="11.3dp"
             app:layout_constraintTop_toBottomOf="@+id/logintext"
-            android:layout_marginTop="60dp"
-            app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintStart_toStartOf="parent"
-    />
-
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:text="INPUT PASSWORD "
-              android:textAllCaps="true"
-              android:textColor="@color/White"
-              android:textStyle="bold"
-              android:textSize="12dp"
-              android:id="@+id/passtext"
-              app:layout_constraintStart_toStartOf="parent"
-              android:layout_marginBottom="8dp"
-              app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintHorizontal_bias="0.185"
-              app:layout_constraintBottom_toTopOf="@+id/inputpassword"/>
-
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:text="RECEIVED SMS CODE "
-              android:id="@+id/smstext"
-              android:visibility="gone"
-              android:textAllCaps="true"
-              android:textColor="@color/White"
-              android:textStyle="bold"
-              android:textSize="12dp"
-
-              app:layout_constraintStart_toStartOf="parent"
-              android:layout_marginBottom="8dp"
-              app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintHorizontal_bias="0.185"
-              app:layout_constraintBottom_toTopOf="@+id/inputpassword"/>
-
-    <EditText
-            android:id="@+id/inputpassword"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:background="@drawable/forma1"
-            android:layout_below="@id/phonenumber"
-            android:layout_marginTop="45dp"
-            app:layout_constraintTop_toBottomOf="@+id/phonenumber"
 
             app:layout_constraintEnd_toEndOf="parent"
 
+            android:id="@+id/linearLayout">
+
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="INPUT PHONE NUMBER "
+                  android:textColor="@color/White"
+                  android:textStyle="bold"
+                  android:textAllCaps="true"
+                  android:textSize="8.3sp"
+                  android:layout_marginBottom="8dp"
+
+        />
+
+
+        <EditText
+                android:id="@+id/phonenumber"
+                android:layout_width="209.3dp"
+                android:layout_height="33.3dp"
+                android:background="@drawable/forma1"
+                app:layout_constraintTop_toBottomOf="@+id/logintext"
+        />
+
+        <!--<TextView android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="INPUT PASSWORD "-->
+        <!--android:textAllCaps="true"-->
+        <!--android:textColor="@color/White"-->
+        <!--android:textStyle="bold"-->
+        <!--android:textSize="8.3sp"-->
+        <!--android:id="@+id/passtext"-->
+        <!--android:layout_marginTop="13.7dp"-->
+        <!--/>-->
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="RECEIVED SMS CODE "
+                  android:id="@+id/smstext"
+                  android:visibility="visible"
+                  android:layout_marginTop="13.7dp"
+                  android:textAllCaps="true"
+                  android:textColor="@color/White"
+                  android:textStyle="bold"
+                  android:textSize="8.3dp"
+        />
+
+        <EditText
+                android:id="@+id/inputpassword"
+                android:layout_width="209.3dp"
+                android:layout_height="33.3dp"
+                android:background="@drawable/forma1"
+                android:layout_below="@id/smstext"
+                android:layout_marginTop="6.3dp"
+        />
+
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Resend Code?"
+                  android:textSize="6.7sp"
+                  android:textColor="@color/White"
+                  android:visibility="gone"
+                  android:id="@+id/resendCode"
+                  android:layout_marginTop="4dp"
+                  android:layout_gravity="end"
+        />
+
+
+        <Button
+                android:id="@+id/loginBtn"
+                android:layout_width="209.3dp"
+                android:layout_height="33.3dp"
+                android:text="Login"
+                android:textStyle="bold"
+
+                android:textColor="@color/DarkSlateGray"
+                android:background="@drawable/login_btn_style"
+                android:layout_marginTop="39.3dp"
+        />
+
+        <Button
+                android:id="@+id/validatebtn"
+                android:layout_width="209.3dp"
+                android:layout_height="33.3dp"
+                android:text="VALIDATE MY ACCOUNT"
+                android:visibility="gone"
+                android:textStyle="bold"
+                android:textColor="@color/DarkSlateGray"
+                android:background="@drawable/login_btn_style"
+                android:layout_marginTop="39.3dp"
+        />
+
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="208.7dp"
+            android:layout_height="8dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="30.7dp"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.505"/>
-
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-              android:text="Resend Code?"
-              android:textSize="15sp"
-              android:textColor="@color/White"
-              android:visibility="gone"
-              android:id="@+id/resendCode"
-              app:layout_constraintEnd_toEndOf="@+id/relativeLayout"
-              app:layout_constraintStart_toStartOf="@+id/relativeLayout" android:layout_marginStart="8dp"
-              app:layout_constraintHorizontal_bias="0.818" app:layout_constraintTop_toBottomOf="@+id/inputpassword"/>
-
-
-    <Button
-            android:id="@+id/loginBtn"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:text="Login"
-            android:textStyle="bold"
-            android:textColor="@color/DarkSlateGray"
-            android:background="@drawable/login_btn_style"
-            android:layout_marginTop="64dp"
-            app:layout_constraintTop_toBottomOf="@+id/inputpassword"
-
             app:layout_constraintEnd_toEndOf="parent"
-
-            app:layout_constraintStart_toStartOf="parent"/>
-
-    <Button
-            android:id="@+id/validatebtn"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:text="VALIDATE MY ACCOUNT"
-            android:visibility="gone"
-            android:textStyle="bold"
-            android:textColor="@color/DarkSlateGray"
-            android:background="@drawable/login_btn_style"
-            android:layout_marginTop="64dp"
-            app:layout_constraintTop_toBottomOf="@+id/inputpassword"
-
-            app:layout_constraintEnd_toEndOf="parent"
-
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:id="@+id/linearLayout2">
 
 
-    <View
-            android:layout_width="120dp"
-            android:layout_height="2dp"
-            android:background="@color/White"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
+        <View
+                android:layout_width="89dp"
+                android:layout_height="0.7dp"
+                android:background="@color/White"
+                android:id="@+id/view2"
+                android:layout_gravity="center"
+        />
 
+        <TextView android:layout_width="10dp"
+                  android:layout_height="8dp"
+                  android:text="OR"
+                  android:textAllCaps="true"
+                  android:textColor="@color/White"
+                  android:textSize="6sp"
+                  android:textStyle="bold"
+                  android:id="@+id/or"
+                  android:layout_marginRight="10dp"
+                  android:layout_marginLeft="10dp"
+        />
+
+        <View
+                android:layout_width="89dp"
+                android:layout_height="0.7dp"
+                android:background="@color/White"
+                android:layout_gravity="center"
+                android:id="@+id/view"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="208.7dp"
+            android:layout_height="30dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.174"
-            app:layout_constraintTop_toBottomOf="@+id/loginBtn"
-            android:layout_marginTop="44dp"
-            android:id="@+id/view2"/>
-
-
-    <View
-            android:layout_width="120dp"
-            android:layout_height="2dp"
-            android:background="@color/White"
-            android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.829"
-            app:layout_constraintTop_toBottomOf="@+id/loginBtn"
-            android:layout_marginTop="44dp"
-            android:id="@+id/view"/>
-
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:text="OR"
-              android:textAllCaps="true"
-              android:textColor="@color/White"
-              android:textSize="15sp"
-              android:textStyle="bold"
-              android:layout_marginTop="36dp"
-              app:layout_constraintTop_toBottomOf="@+id/loginBtn"
-              android:id="@+id/or"
-              app:layout_constraintEnd_toStartOf="@+id/view"
-              app:layout_constraintStart_toEndOf="@+id/view2"
-    />
+            android:orientation="horizontal"
+        android:gravity="center_vertical"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+            android:layout_marginTop="20.7dp">
 
 
-    <ImageView android:layout_width="50dp"
-               android:layout_height="50dp"
-               android:background="@drawable/fcbtn"
-               android:id="@+id/fbtn"
-               android:layout_marginTop="68dp"
-               app:layout_constraintTop_toBottomOf="@+id/loginBtn"
-               app:layout_constraintStart_toStartOf="parent"
-               android:layout_marginStart="96dp"/>
+        <ImageView android:layout_width="30dp"
+                   android:layout_height="30dp"
+                   android:background="@mipmap/fcbtn"
+                   android:id="@+id/fbtn"
+                   android:gravity="center|center_horizontal"
+                   android:layout_gravity="center|center_horizontal"
+                   android:layout_marginRight="27dp"
+                   android:layout_marginLeft="32dp"
+                   android:nextFocusRight="@id/gogbtn"
+        />
+
+        <ImageView android:layout_width="30dp"
+                   android:layout_height="30dp"
+                   android:background="@mipmap/gogle_logo_image"
+                   android:id="@+id/gogbtn"
+                   android:gravity="center|center_horizontal"
+                   android:layout_gravity="center|center_horizontal"
+        />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
 
