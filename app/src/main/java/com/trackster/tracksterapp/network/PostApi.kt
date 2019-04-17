@@ -7,10 +7,7 @@ import com.trackster.tracksterapp.model.Trucks
 import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.model.WeighStation
 import com.trackster.tracksterapp.network.connectivity.ConnectivityInterceptor
-import com.trackster.tracksterapp.network.requests.FbLoginRequest
-import com.trackster.tracksterapp.network.requests.LoginRequest
-import com.trackster.tracksterapp.network.requests.LoginRequestWithPhone
-import com.trackster.tracksterapp.network.requests.ValidatePhoneRequest
+import com.trackster.tracksterapp.network.requests.*
 import com.trackster.tracksterapp.network.responce.ChatResponse
 import com.trackster.tracksterapp.network.responce.InitialAccessToken
 import io.reactivex.Observable
@@ -65,6 +62,13 @@ interface PostApi {
 
     @GET("/chats/{chatId}")
     fun getChatById(@Header("x-auth-token") authorization : String, @Path("chatId") chatId : String): Observable<ChatResponse>
+
+    @GET("/users/me")
+    fun getInfoUser(@Header("x-auth-token") authorization : String): Observable<Response<User>>
+
+    @Headers("Content-Type: application/json")
+    @POST("/users")
+    fun updateUser(@Header("x-auth-token") authorization : String,@Body fbLoginRequest: UserRequest  ): Observable<Response<User>>
 
 
     companion object Factory {
