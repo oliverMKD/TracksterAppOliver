@@ -38,6 +38,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
+import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
 import com.trackster.tracksterapp.mainScreen.fragments.LoadDetails
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
@@ -93,12 +94,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
-
-
-
-    private val loadDetails : LoadDetails = LoadDetails.newInstance()
-    private val currentLoad : Current_Load= Current_Load.newInstance()
-
+    private val loadDetails: LoadDetails = LoadDetails.newInstance()
+    private val currentLoad: Current_Load = Current_Load.newInstance()
+    private val historyList: HistoryList = HistoryList.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,6 +133,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //
         createLocationRequest()
     }
+
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
         googleMap!!.uiSettings.isZoomControlsEnabled = true
@@ -144,6 +143,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, 5000)
     }
+
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -173,6 +173,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
+
     private fun getWeightStations(latLng: LatLng) {
 
         apiService = PostApi.create(this)
@@ -191,20 +192,23 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 })
         )
     }
-    private fun getChats(){
-        apiService = PostApi.create(this@MainScreenActivity)
-        CompositeDisposable().add(apiService.getChats(
-            PreferenceUtils.getAuthorizationToken(this))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                mapsId = it[0].id
 
-                //                Log.d("station", " "+ it[0].location)
-            }, {
-                //                showProgress(false)
-                handleApiError(it)
-            })
+    private fun getChats() {
+        apiService = PostApi.create(this@MainScreenActivity)
+        CompositeDisposable().add(
+            apiService.getChats(
+                PreferenceUtils.getAuthorizationToken(this)
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    mapsId = it[0].id
+
+                    //                Log.d("station", " "+ it[0].location)
+                }, {
+                    //                showProgress(false)
+                    handleApiError(it)
+                })
         )
     }
 
@@ -232,6 +236,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 })
         )
     }
+
     private fun placeMarkerOnMap(location: LatLng) {
         // 1
         val markerOptions = MarkerOptions().position(location)
@@ -268,6 +273,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         return addressText
     }
+
     private fun createLocationRequest() {
         // 1
         locationRequest = LocationRequest()
@@ -317,6 +323,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
+
     private fun startLocationUpdates() {
         //1
         if (ActivityCompat.checkSelfPermission(
@@ -334,6 +341,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //2
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null /* Looper */)
     }
+
     private fun getUrl(origin: LatLng, dest: LatLng): String {
 
         // Origin of route
@@ -414,6 +422,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
+
     private fun openLoadDetailsFragment() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -428,22 +437,38 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         fragmentTransaction.commit()
     }
 
-    private fun openCurrentLoadFragment (){
+    private fun openCurrentLoadFragment() {
 
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
-        if( currentLoad.isAdded  ){
+        if (currentLoad.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, currentLoad)
 
-        }
-        else{
+        } else {
             fragmentTransaction.add(R.id.fragment_container, currentLoad)
             fragmentTransaction.addToBackStack("currentLoadFragment")
 
         }
         fragmentTransaction.commit()
     }
+
+    private fun openHistoryList() {
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        if (historyList.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, historyList)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, historyList)
+            fragmentTransaction.addToBackStack("historyListFragment")
+
+        }
+        fragmentTransaction.commit()
+    }
+
 
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
@@ -483,7 +508,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 openCurrentLoadFragment()
             }
             R.id.nav_manage -> {
-
+                openHistoryList()
             }
             R.id.nav_share -> {
 
