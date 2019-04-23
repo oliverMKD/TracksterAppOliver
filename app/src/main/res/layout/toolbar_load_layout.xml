@@ -20,8 +20,6 @@
             android:id="@+id/currentload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-
             android:text="Current Load"
             android:textColor="@color/White"
             android:textSize="32sp"

@@ -45,11 +45,17 @@ import java.util.*
 class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
 
     private var logintext1: TextView? = null
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Pane/ProfileXML
     private var smstext: TextView? = null
     private var or: TextView? = null
     private var view1: View? = null
     private var view2: View? = null
     private var fcb: ImageView? = null
+    private var gogbtn: ImageView? = null
+
     private var resendcode: TextView? = null
     private var validatetext1: TextView? = null
     private var loginbtn: Button? = null
@@ -82,8 +88,13 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         validatetext1 = findViewById<TextView>(R.id.validate_phone)
         resendcode = findViewById<TextView>(R.id.resendCode)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Pane/ProfileXML
         smstext = findViewById<TextView>(R.id.smstext)
         fcb = findViewById<ImageView>(R.id.fbtn)
+        gogbtn = findViewById<ImageView>(R.id.gogbtn)
         or = findViewById<TextView>(R.id.or)
 
         view1 = findViewById<View>(R.id.view2)
@@ -167,11 +178,16 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         validatetext1!!.visibility = View.VISIBLE
         validatebtn!!.visibility = View.VISIBLE
         loginbtn!!.visibility = View.INVISIBLE
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Pane/ProfileXML
         smstext!!.visibility = View.VISIBLE
         or!!.visibility=View.INVISIBLE
         view2!!.visibility=View.INVISIBLE
         view1!!.visibility=View.INVISIBLE
         fcb!!.visibility=View.INVISIBLE
+        gogbtn!!.visibility=View.INVISIBLE
         resendcode!!.visibility=View.VISIBLE
     }
 
@@ -236,11 +252,16 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                     validatetext1!!.visibility = View.VISIBLE
                     validatebtn!!.visibility = View.VISIBLE
                     loginbtn!!.visibility = View.INVISIBLE
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Pane/ProfileXML
                     smstext!!.visibility = View.VISIBLE
                     or!!.visibility=View.INVISIBLE
                     view2!!.visibility=View.INVISIBLE
                     view1!!.visibility=View.INVISIBLE
                     fcb!!.visibility=View.INVISIBLE
+                    gogbtn!!.visibility=View.INVISIBLE
                     resendcode!!.visibility=View.VISIBLE
                 }
 

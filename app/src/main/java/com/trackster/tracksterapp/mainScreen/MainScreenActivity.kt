@@ -24,6 +24,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -31,21 +32,25 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
+<<<<<<< HEAD
 import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
 import com.trackster.tracksterapp.mainScreen.fragments.LoadDetails
+=======
+import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
+import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
+import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
+>>>>>>> origin/Pane/ProfileXML
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
 import com.trackster.tracksterapp.utils.DialogUtils
 import com.trackster.tracksterapp.utils.PreferenceUtils
-import com.trackster.tracksterapp.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -77,10 +82,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     internal val mRunnable: Runnable = Runnable {
 
-
-        this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
-        this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
-        this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
+        getChatById(mapsId)
+//        this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
+//        this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
+//        this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
         setUpMap()
         val url = getUrl(LatLng(-122.5, 37.7), LatLng(-122.5, 37.7))
         getRoute(url)
@@ -94,9 +99,16 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
+<<<<<<< HEAD
     private val loadDetails: LoadDetails = LoadDetails.newInstance()
     private val currentLoad: Current_Load = Current_Load.newInstance()
     private val historyList: HistoryList = HistoryList.newInstance()
+=======
+    private val currentLoad: Current_Load = Current_Load.newInstance()
+    private val profileSettings: ProfileSettings = ProfileSettings.newInstance()
+    private val historyList: HistoryList = HistoryList.newInstance()
+    private val detailsList: DetailsLoad = DetailsLoad.newInstance()
+>>>>>>> origin/Pane/ProfileXML
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,7 +149,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
         googleMap!!.uiSettings.isZoomControlsEnabled = true
-        getChatById(mapsId)
+
 
         mDelayHandler = Handler()
         //Navigate with delay
@@ -423,22 +435,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
+<<<<<<< HEAD
     private fun openLoadDetailsFragment() {
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-
-        if (loadDetails.isAdded) {
-            fragmentTransaction.replace(R.id.fragment_container, loadDetails)
-        } else {
-            fragmentTransaction.add(R.id.fragment_container, loadDetails)
-            fragmentTransaction.addToBackStack("loadDetailsFragment")
-        }
-
-        fragmentTransaction.commit()
-    }
+=======
 
     private fun openCurrentLoadFragment() {
 
+>>>>>>> origin/Pane/ProfileXML
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
@@ -448,6 +451,34 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         } else {
             fragmentTransaction.add(R.id.fragment_container, currentLoad)
             fragmentTransaction.addToBackStack("currentLoadFragment")
+
+        }
+        fragmentTransaction.commit()
+    }
+
+<<<<<<< HEAD
+    private fun openCurrentLoadFragment() {
+=======
+    private fun openProfileSettingsFragment() {
+>>>>>>> origin/Pane/ProfileXML
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+<<<<<<< HEAD
+        if (currentLoad.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, currentLoad)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, currentLoad)
+            fragmentTransaction.addToBackStack("currentLoadFragment")
+=======
+        if (profileSettings.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, profileSettings)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, profileSettings)
+            fragmentTransaction.addToBackStack("profileSettingsFragment")
 
         }
         fragmentTransaction.commit()
@@ -464,12 +495,45 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         } else {
             fragmentTransaction.add(R.id.fragment_container, historyList)
             fragmentTransaction.addToBackStack("historyListFragment")
+>>>>>>> origin/Pane/ProfileXML
 
         }
         fragmentTransaction.commit()
     }
 
+<<<<<<< HEAD
+    private fun openHistoryList() {
+=======
+    private fun opendetailsList() {
+>>>>>>> origin/Pane/ProfileXML
 
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+<<<<<<< HEAD
+        if (historyList.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, historyList)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, historyList)
+            fragmentTransaction.addToBackStack("historyListFragment")
+=======
+        if (detailsList.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, detailsList)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, detailsList)
+            fragmentTransaction.addToBackStack("detailsListFragment")
+>>>>>>> origin/Pane/ProfileXML
+
+        }
+        fragmentTransaction.commit()
+    }
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> origin/Pane/ProfileXML
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
@@ -501,19 +565,23 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 // Handle the camera action
             }
             R.id.nav_gallery -> {
-                openLoadDetailsFragment()
 
             }
             R.id.nav_slideshow -> {
                 openCurrentLoadFragment()
             }
             R.id.nav_manage -> {
+<<<<<<< HEAD
                 openHistoryList()
+=======
+                openProfileSettingsFragment()
+>>>>>>> origin/Pane/ProfileXML
             }
             R.id.nav_share -> {
-
+                openHistoryList()
             }
             R.id.nav_send -> {
+                opendetailsList()
 
             }
         }

@@ -146,30 +146,34 @@
                   android:layout_gravity="end"
         />
 
+<RelativeLayout android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <Button
-                android:id="@+id/loginBtn"
-                android:layout_width="209.3dp"
-                android:layout_height="33.3dp"
-                android:text="Login"
-                android:textStyle="bold"
+    <Button
+            android:id="@+id/loginBtn"
+            android:layout_width="209.3dp"
+            android:layout_height="33.3dp"
+            android:text="Login"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="@color/DarkSlateGray"
+            android:background="@drawable/login_btn_style"
+            android:layout_marginTop="39.3dp"
+    />
 
-                android:textColor="@color/DarkSlateGray"
-                android:background="@drawable/login_btn_style"
-                android:layout_marginTop="39.3dp"
-        />
+    <Button
+            android:id="@+id/validatebtn"
+            android:layout_width="209.3dp"
+            android:layout_height="33.3dp"
+            android:text="VALIDATE MY ACCOUNT"
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:textColor="@color/DarkSlateGray"
+            android:background="@drawable/login_btn_style"
+            android:layout_marginTop="39.3dp"
+    />
 
-        <Button
-                android:id="@+id/validatebtn"
-                android:layout_width="209.3dp"
-                android:layout_height="33.3dp"
-                android:text="VALIDATE MY ACCOUNT"
-                android:visibility="gone"
-                android:textStyle="bold"
-                android:textColor="@color/DarkSlateGray"
-                android:background="@drawable/login_btn_style"
-                android:layout_marginTop="39.3dp"
-        />
+</RelativeLayout>
 
     </LinearLayout>
     <LinearLayout
