@@ -70,6 +70,11 @@ interface PostApi {
     @POST("/users")
     fun updateUser(@Header("x-auth-token") authorization : String,@Body fbLoginRequest: UserRequest  ): Observable<Response<User>>
 
+    @GET("/chats")
+    fun getDetails(@Header("x-auth-token") authorization : String): Observable<Response<com.trackster.tracksterapp.model.ChatResponse>>
+
+
+
 
     companion object Factory {
         fun create(context: Context): PostApi {

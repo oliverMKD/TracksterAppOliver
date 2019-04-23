@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+        <include
+                android:id="@+id/tolbar1"
+                layout="@layout/toolbar_details"/>
+
+        <LinearLayout
+                android:layout_below="@id/tolbar1"
+                android:layout_width="match_parent"
+                android:background="@color/transparent_gray"
+                android:orientation="vertical"
+                android:layout_height="match_parent">
+
+
+            <TextView
+                    android:text="Description"
+                    android:textAllCaps="true"
+                    android:textColor="@color/zuta"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="30dp"
+            />
+
+            <TextView
+                    android:id="@+id/desc"
+                    android:layout_width="283dp"
+                    android:layout_height="97dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Donec scelerisque augue neque,quis pellentes ue enim volutpat vel.usce eget ultrices odio. Proin efficitur tortor nunc, quis aliquet diam commodo eu."
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/White"
+            />
+
+            <TextView
+                    android:text="Price"
+                    android:textAllCaps="true"
+                    android:textColor="@color/zuta"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="16dp"
+            />
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <TextView
+                        android:layout_width="10dp"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="25dp"
+                        android:layout_marginTop="16dp"
+                        android:text="$"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/White"
+                />
+                <TextView
+                        android:id="@+id/price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="18dp"
+                        android:layout_marginTop="16dp"
+                        android:text="4,900.00"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/White"
+                />
+                <TextView
+
+                        android:layout_width="100dp"
+                        android:layout_height="18dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="5dp"
+                        android:text="USD"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/White"
+                />
+            </LinearLayout>
+
+
+            <TextView
+                    android:text="Broker"
+                    android:textAllCaps="true"
+                    android:textColor="@color/zuta"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="20dp"
+            />
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"            >
+
+                <TextView
+                        android:id="@+id/broker_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="18dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="25dp"
+                        android:text="Robert"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/White"
+                />
+
+                <TextView
+                        android:id="@+id/broker_last_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="18dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="5dp"
+                        android:text="Dawson"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/White"
+                />
+
+
+            </LinearLayout>
+
+            <TextView
+                    android:text="Origin"
+                    android:textColor="@color/zuta"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="20dp"
+            />
+
+            <TextView
+                    android:id="@+id/orignin_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="18dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="25dp"
+                    android:text="Warehouse Name A"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/White"
+            />
+
+            <TextView
+                    android:text="Delivery"
+                    android:textColor="@color/zuta"
+                    android:textAllCaps="true"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="20dp"
+            />
+
+            <TextView
+                    android:id="@+id/delivery_house"
+                    android:layout_width="wrap_content"
+                    android:layout_height="18dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="25dp"
+                    android:text="Warehouse Name B"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/White"
+            />
+
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+                <TextView
+                        android:text="PICKUP DATE"
+                        android:textColor="@color/zuta"
+                        android:textAllCaps="true"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="25dp"
+                        android:layout_marginTop="20dp"
+                />
+
+                <TextView
+                        android:text="DELIVERY DATE"
+                        android:textColor="@color/zuta"
+                        android:textAllCaps="true"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="55dp"
+                        android:layout_marginTop="20dp"
+                />
+            </LinearLayout>
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+                <TextView
+                        android:id="@+id/pickup"
+                        android:layout_width="150dp"
+                        android:layout_height="18dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="25dp"
+                        android:text="26/03/2019"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/White"
+                />
+
+
+                <TextView
+                        android:id="@+id/delivery_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="18dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="55dp"
+                        android:text="26/03/2019"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/White"
+                />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</android.support.constraint.ConstraintLayout>

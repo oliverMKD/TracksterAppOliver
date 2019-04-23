@@ -27,9 +27,7 @@
             android:text="Route Name Goes Here"
             android:textColor="@color/White"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="28dp"
-            app:layout_constraintTop_toBottomOf="@+id/data"/>
+            tools:layout_editor_absoluteY="33dp" tools:layout_editor_absoluteX="28dp"/>
 
     <TextView
             android:id="@+id/value"
@@ -55,7 +53,7 @@
         android:layout_marginStart="9dp"/>
 
     <TextView
-            android:id="@+id/miljiBroj"
+            android:id="@+id/miles"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="5,480 "
@@ -76,7 +74,7 @@
             android:textStyle="bold"
             tools:layout_editor_absoluteY="53dp"
             app:layout_constraintTop_toBottomOf="@+id/routeName"
-            app:layout_constraintStart_toEndOf="@+id/miljiBroj"
+            app:layout_constraintStart_toEndOf="@+id/miles"
             android:layout_marginStart="6dp"/>
 
 
@@ -88,6 +86,7 @@
                android:layout_marginStart="96dp"
                app:layout_constraintEnd_toEndOf="parent"
                android:layout_marginEnd="18dp"
+               android:id="@+id/hisbtn"
                app:layout_constraintHorizontal_bias="0.428"/>
 
 </android.support.constraint.ConstraintLayout>

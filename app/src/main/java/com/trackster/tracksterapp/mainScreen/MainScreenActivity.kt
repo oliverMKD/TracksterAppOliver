@@ -38,6 +38,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
+import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
+import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
 import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
@@ -94,6 +96,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     private val currentLoad: Current_Load = Current_Load.newInstance()
     private val profileSettings: ProfileSettings = ProfileSettings.newInstance()
+    private val historyList: HistoryList = HistoryList.newInstance()
+    private val detailsList: DetailsLoad = DetailsLoad.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -423,7 +427,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
-
     private fun openCurrentLoadFragment() {
 
         val fragmentManager = supportFragmentManager
@@ -456,7 +459,37 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         fragmentTransaction.commit()
     }
 
+    private fun openHistoryList() {
 
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        if (historyList.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, historyList)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, historyList)
+            fragmentTransaction.addToBackStack("historyListFragment")
+
+        }
+        fragmentTransaction.commit()
+    }
+
+    private fun opendetailsList() {
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        if (detailsList.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, detailsList)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, detailsList)
+            fragmentTransaction.addToBackStack("detailsListFragment")
+
+        }
+        fragmentTransaction.commit()
+    }
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
@@ -497,9 +530,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 openProfileSettingsFragment()
             }
             R.id.nav_share -> {
-
+                openHistoryList()
             }
             R.id.nav_send -> {
+                opendetailsList()
 
             }
         }
