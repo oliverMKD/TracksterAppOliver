@@ -74,15 +74,18 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     lateinit var apiService: PostApi
 
+    private val compositeDisposable = CompositeDisposable()
+
     internal val mRunnable: Runnable = Runnable {
 
-
-        this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
-        this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
-        this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
+//        getChatById(mapsId)
+//
         setUpMap()
+
+
         val url = getUrl(LatLng(-122.5, 37.7), LatLng(-122.5, 37.7))
         getRoute(url)
+
     }
 
 
@@ -138,7 +141,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
         googleMap!!.uiSettings.isZoomControlsEnabled = true
-        getChatById(mapsId)
+
 
         mDelayHandler = Handler()
         //Navigate with delay
@@ -173,14 +176,17 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
-    private fun getWeightStations(latLng: LatLng) {
+    private fun getWeightStations() {
 
         apiService = PostApi.create(this)
+        var map : MutableMap< String,String> =  mutableMapOf()
+        map["42.0151079"]
+        map["21.4526962"]
+        map.put("42.0151079","21.4526962")
 
-        CompositeDisposable().add(
+        compositeDisposable.add(
             apiService.getWeighStations(
-                PreferenceUtils.getAuthorizationToken(this), "application/json", latLng, 1
-            )
+                PreferenceUtils.getAuthorizationToken(this),map , 1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -193,12 +199,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
     private fun getChats(){
         apiService = PostApi.create(this@MainScreenActivity)
-        CompositeDisposable().add(apiService.getChats(
+        compositeDisposable.add(apiService.getChats(
             PreferenceUtils.getAuthorizationToken(this))
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
                 mapsId = it[0].id
+                getWeightStations()
 
                 //                Log.d("station", " "+ it[0].location)
             }, {
@@ -210,23 +217,24 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     private fun getChatById(id: String) {
         apiService = PostApi.create(this@MainScreenActivity)
-        CompositeDisposable().add(
-            apiService.getChatById(
-                PreferenceUtils.getAuthorizationToken(this), id
-            )
+        compositeDisposable.add(
+            apiService.getChatById(PreferenceUtils.getAuthorizationToken(this),id)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    Log.d("details", "" + it)
                     val a = it.pickupAddress.location.lat
                     val b = it.pickupAddress.location.long
                     val c = it.destinationAddress.location.lat
                     val d = it.destinationAddress.location.long
                     latLngOrigin = LatLng(a, b)
                     latLngDestination = LatLng(c, d)
+                    this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
+                    this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
+                    this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
 
                     //                Log.d("station", " "+ it[0].location)
                 }, {
+                    Log.d("destinacija",""+ it.localizedMessage)
                     //                showProgress(false)
 //                    Utils.handleApiError(it)
                 })
@@ -345,7 +353,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         // Api Key
         val key = R.string.google_maps_key
-        val sensor = "key=" + "AIzaSyAAiXz26AXC1vFu6e2dl1TIi9hZEEiI22Y"
+        val sensor = "key=" + "AIzaSyD2kBqzaanSMkp9iX9J2JFtm1c7LjPFNW4"
 
         // Building the parameters to the web service
         val parameters = "$str_origin&$str_dest&$sensor"
