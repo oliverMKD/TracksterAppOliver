@@ -24,6 +24,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -31,20 +32,20 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
-import com.trackster.tracksterapp.mainScreen.fragments.LoadDetails
+import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
+import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
+import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
 import com.trackster.tracksterapp.utils.DialogUtils
 import com.trackster.tracksterapp.utils.PreferenceUtils
-import com.trackster.tracksterapp.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -78,8 +79,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     internal val mRunnable: Runnable = Runnable {
 
-//        getChatById(mapsId)
-//
+
         setUpMap()
 
 
@@ -97,11 +97,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
 
 
-
-
-    private val loadDetails : LoadDetails = LoadDetails.newInstance()
-    private val currentLoad : Current_Load= Current_Load.newInstance()
-
+    private val currentLoad: Current_Load = Current_Load.newInstance()
+    private val profileSettings: ProfileSettings = ProfileSettings.newInstance()
+    private val historyList: HistoryList = HistoryList.newInstance()
+    private val detailsList: DetailsLoad = DetailsLoad.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,6 +137,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //
         createLocationRequest()
     }
+
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
         googleMap!!.uiSettings.isZoomControlsEnabled = true
@@ -147,6 +147,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, 5000)
     }
+
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -178,6 +179,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
     private fun getWeightStations() {
 
+
         apiService = PostApi.create(this)
         var map : MutableMap< String,String> =  mutableMapOf()
         map["42.0151079"]
@@ -197,7 +199,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 })
         )
     }
-    private fun getChats(){
+
+    private fun getChats() {
         apiService = PostApi.create(this@MainScreenActivity)
         compositeDisposable.add(apiService.getChats(
             PreferenceUtils.getAuthorizationToken(this))
@@ -212,6 +215,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 //                showProgress(false)
                 handleApiError(it)
             })
+
         )
     }
 
@@ -240,6 +244,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 })
         )
     }
+
     private fun placeMarkerOnMap(location: LatLng) {
         // 1
         val markerOptions = MarkerOptions().position(location)
@@ -276,6 +281,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         return addressText
     }
+
     private fun createLocationRequest() {
         // 1
         locationRequest = LocationRequest()
@@ -325,6 +331,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
+
     private fun startLocationUpdates() {
         //1
         if (ActivityCompat.checkSelfPermission(
@@ -342,6 +349,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //2
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null /* Looper */)
     }
+
     private fun getUrl(origin: LatLng, dest: LatLng): String {
 
         // Origin of route
@@ -422,30 +430,18 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
-    private fun openLoadDetailsFragment() {
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
 
-        if (loadDetails.isAdded) {
-            fragmentTransaction.replace(R.id.fragment_container, loadDetails)
-        } else {
-            fragmentTransaction.add(R.id.fragment_container, loadDetails)
-            fragmentTransaction.addToBackStack("loadDetailsFragment")
-        }
 
-        fragmentTransaction.commit()
-    }
 
-    private fun openCurrentLoadFragment (){
+    private fun openCurrentLoadFragment() {
 
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
-        if( currentLoad.isAdded  ){
+        if (currentLoad.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, currentLoad)
 
-        }
-        else{
+        } else {
             fragmentTransaction.add(R.id.fragment_container, currentLoad)
             fragmentTransaction.addToBackStack("currentLoadFragment")
 
@@ -453,6 +449,55 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         fragmentTransaction.commit()
     }
 
+    private fun openProfileSettingsFragment() {
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+
+        if (profileSettings.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, profileSettings)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, profileSettings)
+            fragmentTransaction.addToBackStack("profileSettingsFragment")
+
+        }
+        fragmentTransaction.commit()
+    }
+
+    private fun openHistoryList() {
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        if (historyList.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, historyList)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, historyList)
+            fragmentTransaction.addToBackStack("historyListFragment")
+        }
+        fragmentTransaction.commit()
+    }
+
+
+    private fun opendetailsList() {
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+
+        if (detailsList.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, detailsList)
+
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, detailsList)
+            fragmentTransaction.addToBackStack("detailsListFragment")
+
+        }
+        fragmentTransaction.commit()
+    }
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
@@ -484,7 +529,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 // Handle the camera action
             }
             R.id.nav_gallery -> {
-                openLoadDetailsFragment()
 
             }
             R.id.nav_slideshow -> {
@@ -492,11 +536,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
             R.id.nav_manage -> {
 
+                openProfileSettingsFragment()
             }
             R.id.nav_share -> {
-
+                openHistoryList()
             }
             R.id.nav_send -> {
+                opendetailsList()
 
             }
         }

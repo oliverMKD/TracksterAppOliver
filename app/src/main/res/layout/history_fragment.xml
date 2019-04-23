@@ -15,7 +15,7 @@
 
         <include
                 android:id="@+id/tolbar2"
-                layout="@layout/toolbar_load_view"/>
+                layout="@layout/toolbar_history"/>
 
         <LinearLayout
                 android:layout_below="@id/tolbar2"
