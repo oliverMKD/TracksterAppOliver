@@ -38,14 +38,9 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
-<<<<<<< HEAD
-import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
-import com.trackster.tracksterapp.mainScreen.fragments.LoadDetails
-=======
 import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
 import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
 import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
->>>>>>> origin/Pane/ProfileXML
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
@@ -80,15 +75,17 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     lateinit var apiService: PostApi
 
+    private val compositeDisposable = CompositeDisposable()
+
     internal val mRunnable: Runnable = Runnable {
 
-        getChatById(mapsId)
-//        this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
-//        this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
-//        this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
+
         setUpMap()
+
+
         val url = getUrl(LatLng(-122.5, 37.7), LatLng(-122.5, 37.7))
         getRoute(url)
+
     }
 
 
@@ -99,16 +96,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
-<<<<<<< HEAD
-    private val loadDetails: LoadDetails = LoadDetails.newInstance()
-    private val currentLoad: Current_Load = Current_Load.newInstance()
-    private val historyList: HistoryList = HistoryList.newInstance()
-=======
+
     private val currentLoad: Current_Load = Current_Load.newInstance()
     private val profileSettings: ProfileSettings = ProfileSettings.newInstance()
     private val historyList: HistoryList = HistoryList.newInstance()
     private val detailsList: DetailsLoad = DetailsLoad.newInstance()
->>>>>>> origin/Pane/ProfileXML
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,15 +177,18 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
+    private fun getWeightStations() {
 
-    private fun getWeightStations(latLng: LatLng) {
 
         apiService = PostApi.create(this)
+        var map : MutableMap< String,String> =  mutableMapOf()
+        map["42.0151079"]
+        map["21.4526962"]
+        map.put("42.0151079","21.4526962")
 
-        CompositeDisposable().add(
+        compositeDisposable.add(
             apiService.getWeighStations(
-                PreferenceUtils.getAuthorizationToken(this), "application/json", latLng, 1
-            )
+                PreferenceUtils.getAuthorizationToken(this),map , 1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -207,42 +202,43 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     private fun getChats() {
         apiService = PostApi.create(this@MainScreenActivity)
-        CompositeDisposable().add(
-            apiService.getChats(
-                PreferenceUtils.getAuthorizationToken(this)
-            )
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    mapsId = it[0].id
+        compositeDisposable.add(apiService.getChats(
+            PreferenceUtils.getAuthorizationToken(this))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                mapsId = it[0].id
+                getWeightStations()
 
-                    //                Log.d("station", " "+ it[0].location)
-                }, {
-                    //                showProgress(false)
-                    handleApiError(it)
-                })
+                //                Log.d("station", " "+ it[0].location)
+            }, {
+                //                showProgress(false)
+                handleApiError(it)
+            })
+
         )
     }
 
     private fun getChatById(id: String) {
         apiService = PostApi.create(this@MainScreenActivity)
-        CompositeDisposable().add(
-            apiService.getChatById(
-                PreferenceUtils.getAuthorizationToken(this), id
-            )
+        compositeDisposable.add(
+            apiService.getChatById(PreferenceUtils.getAuthorizationToken(this),id)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    Log.d("details", "" + it)
                     val a = it.pickupAddress.location.lat
                     val b = it.pickupAddress.location.long
                     val c = it.destinationAddress.location.lat
                     val d = it.destinationAddress.location.long
                     latLngOrigin = LatLng(a, b)
                     latLngDestination = LatLng(c, d)
+                    this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
+                    this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
+                    this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
 
                     //                Log.d("station", " "+ it[0].location)
                 }, {
+                    Log.d("destinacija",""+ it.localizedMessage)
                     //                showProgress(false)
 //                    Utils.handleApiError(it)
                 })
@@ -365,7 +361,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         // Api Key
         val key = R.string.google_maps_key
-        val sensor = "key=" + "AIzaSyAAiXz26AXC1vFu6e2dl1TIi9hZEEiI22Y"
+        val sensor = "key=" + "AIzaSyD2kBqzaanSMkp9iX9J2JFtm1c7LjPFNW4"
 
         // Building the parameters to the web service
         val parameters = "$str_origin&$str_dest&$sensor"
@@ -435,13 +431,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
-<<<<<<< HEAD
-    private fun openLoadDetailsFragment() {
-=======
+
 
     private fun openCurrentLoadFragment() {
 
->>>>>>> origin/Pane/ProfileXML
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
@@ -456,23 +449,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         fragmentTransaction.commit()
     }
 
-<<<<<<< HEAD
-    private fun openCurrentLoadFragment() {
-=======
     private fun openProfileSettingsFragment() {
->>>>>>> origin/Pane/ProfileXML
 
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
-<<<<<<< HEAD
-        if (currentLoad.isAdded) {
-            fragmentTransaction.replace(R.id.fragment_container, currentLoad)
 
-        } else {
-            fragmentTransaction.add(R.id.fragment_container, currentLoad)
-            fragmentTransaction.addToBackStack("currentLoadFragment")
-=======
         if (profileSettings.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, profileSettings)
 
@@ -495,45 +477,27 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         } else {
             fragmentTransaction.add(R.id.fragment_container, historyList)
             fragmentTransaction.addToBackStack("historyListFragment")
->>>>>>> origin/Pane/ProfileXML
-
         }
         fragmentTransaction.commit()
     }
 
-<<<<<<< HEAD
-    private fun openHistoryList() {
-=======
+
     private fun opendetailsList() {
->>>>>>> origin/Pane/ProfileXML
 
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
-<<<<<<< HEAD
-        if (historyList.isAdded) {
-            fragmentTransaction.replace(R.id.fragment_container, historyList)
 
-        } else {
-            fragmentTransaction.add(R.id.fragment_container, historyList)
-            fragmentTransaction.addToBackStack("historyListFragment")
-=======
         if (detailsList.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, detailsList)
 
         } else {
             fragmentTransaction.add(R.id.fragment_container, detailsList)
             fragmentTransaction.addToBackStack("detailsListFragment")
->>>>>>> origin/Pane/ProfileXML
 
         }
         fragmentTransaction.commit()
     }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> origin/Pane/ProfileXML
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
@@ -571,11 +535,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 openCurrentLoadFragment()
             }
             R.id.nav_manage -> {
-<<<<<<< HEAD
-                openHistoryList()
-=======
+
                 openProfileSettingsFragment()
->>>>>>> origin/Pane/ProfileXML
             }
             R.id.nav_share -> {
                 openHistoryList()
