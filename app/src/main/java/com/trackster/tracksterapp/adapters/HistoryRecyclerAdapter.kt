@@ -10,6 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.model.ChatResponse
 import com.trackster.tracksterapp.model.Trailers
+import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
 import kotlinx.android.synthetic.main.loads_item.view.*
 import kotlinx.android.synthetic.main.recycler_history.view.*
@@ -21,18 +22,18 @@ class HistoryRecyclerAdapter (private  val activity: Activity) : RecyclerView.Ad
 
 
     inner class HistoryRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val description = view.routeName!!
+        val routename = view.routeName!!
         val price = view.value!!
         val miles = view.miles!!
         val date = view.data!!
         val hisbtn = view.hisbtn!!
 
     }
-//    fun setData(list: MutableList<Trailers>) {
-//        this.list.clear()
-//        this.list.addAll(list)
-//        notifyDataSetChanged()
-//    }
+    fun setData(list: MutableList<ChatResponse>) {
+        this.list.clear()
+        this.list.addAll(list)
+        notifyDataSetChanged()
+    }
 
 //    fun addData(listUpdate: ArrayList<Trailers>) {
 //        val start = list.size
@@ -59,7 +60,10 @@ class HistoryRecyclerAdapter (private  val activity: Activity) : RecyclerView.Ad
     override fun onBindViewHolder(holder: HistoryRecyclerViewHolder, position: Int) {
 
         val load = list[position]
-
+//    holder.date.text = load!!.
+        holder.routename.text = load!!.description
+        holder.price.text = load!!.price.toString()
+        holder.miles.text = load!!.distance.toString()
 //        val description = load.routeName!!
 //        val price = load.value!!
 //        val miles = load.miles!!

@@ -36,8 +36,8 @@ class SplashScreenActivity : AppCompatActivity() {
 
         getHash()
         Glide.with(this)
-            .load(R.drawable.icon)
-            .centerCrop()
+            .load(R.drawable.trucklogo)
+            .centerInside()
             .into(splash_image)
 
 

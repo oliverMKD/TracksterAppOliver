@@ -84,7 +84,8 @@ interface PostApi {
     @GET("/chats")
     fun getDetails(@Header("x-auth-token") authorization : String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
 
-
+    @GET("/chats")
+    fun getHistory(@Header("x-auth-token") authorization: String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
 
 
     companion object Factory {

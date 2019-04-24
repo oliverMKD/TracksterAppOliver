@@ -6,6 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -13,12 +14,15 @@
                 android:id="@+id/tolbar1"
                 layout="@layout/toolbar_details"/>
 
+
+
         <LinearLayout
                 android:layout_below="@id/tolbar1"
                 android:layout_width="match_parent"
                 android:background="@color/transparent_gray"
                 android:orientation="vertical"
                 android:layout_height="match_parent">
+
 
 
             <TextView
@@ -36,7 +40,7 @@
             <TextView
                     android:id="@+id/desc"
                     android:layout_width="283dp"
-                    android:layout_height="97dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="25dp"
                     android:layout_marginTop="20dp"
                     android:text="Donec scelerisque augue neque,quis pellentes ue enim volutpat vel.usce eget ultrices odio. Proin efficitur tortor nunc, quis aliquet diam commodo eu."
@@ -240,4 +244,5 @@
 
 
     </RelativeLayout>
+
 </android.support.constraint.ConstraintLayout>
