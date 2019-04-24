@@ -7,38 +7,45 @@
         android:orientation="vertical"
         android:clickable="true"
         android:focusable="true"
-        android:background="@color/transparent_gray">
+
+        android:background="@color/transparent_gray"
+       >
 
 
     <include layout="@layout/toolbar_select_manufactor"
              android:id="@+id/include"/>
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+
+            android:layout_height="match_parent">
 
 
         <android.support.v7.widget.RecyclerView
-android:id="@+id/recycler_manufactor"
+                android:id="@+id/recycler_manufactor"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
+                android:layout_marginTop="5dp"
+                android:background="@color/transparent"
+                android:layout_height="0dp"
+                android:layout_weight="7">
 
         </android.support.v7.widget.RecyclerView>
+
+
+        <Button
+                android:layout_width="280dp"
+                android:layout_height="45dp"
+                android:id="@+id/select_manufactor"
+
+                android:background="@drawable/login_btn_style"
+                android:text="OTHERS"
+                android:textSize="12sp"
+                android:textAllCaps="true"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="48.7dp"
+                android:layout_gravity="center"
+
+        />
     </LinearLayout>
-    <Button android:layout_width="280dp" android:layout_height="45dp"
-            android:id="@+id/select_manufactor"
-            android:background="@drawable/login_btn_style"
-            android:text="OTHERS"
-            android:textSize="12sp"
-            android:textAllCaps="true"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="48.7dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            android:layout_marginStart="55dp"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginEnd="55dp"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-
 </LinearLayout>

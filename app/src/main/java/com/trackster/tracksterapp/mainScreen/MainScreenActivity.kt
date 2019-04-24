@@ -525,24 +525,22 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
+            R.id.map -> {
 
             }
-            R.id.nav_slideshow -> {
+            R.id.routes -> {
+                opendetailsList()
+            }
+            R.id.loads -> {
                 openCurrentLoadFragment()
-            }
-            R.id.nav_manage -> {
 
-                openProfileSettingsFragment()
             }
-            R.id.nav_share -> {
+            R.id.history -> {
                 openHistoryList()
             }
-            R.id.nav_send -> {
-                opendetailsList()
+            R.id.settings -> {
+                openProfileSettingsFragment()
+
 
             }
         }

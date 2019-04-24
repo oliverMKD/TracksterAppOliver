@@ -92,7 +92,7 @@ class ProfileSettings  : BaseFragment(), View.OnClickListener {
                 }, {
 
 
-                    Log.d("panePeder", "error")
+                    Log.d("pane", "error")
                 })
         )
     }
