@@ -9,10 +9,7 @@ import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.model.WeighStation
 import com.trackster.tracksterapp.network.connectivity.ConnectivityInterceptor
 import com.trackster.tracksterapp.network.connectivity.HeaderInterceptor
-import com.trackster.tracksterapp.network.requests.FbLoginRequest
-import com.trackster.tracksterapp.network.requests.LoginRequest
-import com.trackster.tracksterapp.network.requests.LoginRequestWithPhone
-import com.trackster.tracksterapp.network.requests.ValidatePhoneRequest
+import com.trackster.tracksterapp.network.requests.*
 
 import com.trackster.tracksterapp.network.responce.ChatResponse
 import com.trackster.tracksterapp.network.responce.InitialAccessToken
@@ -82,10 +79,10 @@ interface PostApi {
 
     @Headers("Content-Type: application/json")
     @POST("/users")
-    fun updateUser(@Header("x-auth-token") authorization : String,@Body fbLoginRequest: UserRequest  ): Observable<Response<User>>
+    fun updateUser(@Header("x-auth-token") authorization : String,@Body fbLoginRequest: UserRequest): Observable<Response<User>>
 
     @GET("/chats")
-    fun getDetails(@Header("x-auth-token") authorization : String): Observable<Response<com.trackster.tracksterapp.model.ChatResponse>>
+    fun getDetails(@Header("x-auth-token") authorization : String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
 
 
 

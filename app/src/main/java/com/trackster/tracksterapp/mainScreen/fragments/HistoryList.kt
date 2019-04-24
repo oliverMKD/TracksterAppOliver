@@ -28,7 +28,7 @@ class HistoryList : BaseFragment() {
 
     override fun getProgressBar(): ProgressBar? = null
 
-    override fun getLayoutId(): Int = R.layout.fragment_history
+    override fun getLayoutId(): Int = R.layout.history_fragment
 
     companion object {
         fun newInstance() = HistoryList()

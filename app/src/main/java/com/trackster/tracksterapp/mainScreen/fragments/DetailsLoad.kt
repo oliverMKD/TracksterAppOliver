@@ -26,10 +26,12 @@ class DetailsLoad :  BaseFragment() {
     private var userInfo: MutableList<ChatResponse> = mutableListOf()
     var fragmentPosition: Int = 0
     var compositeDisposableContainer = CompositeDisposable()
+    private lateinit var Id: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        getUserInfo()
 
     }
 
@@ -42,14 +44,21 @@ class DetailsLoad :  BaseFragment() {
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
                 {
 
-                    desc.setText(it.body()!!.description)
-                    price.setText(it.body()!!.price)
-                    broker_name.setText(it.body()!!.broker.firstName)
-                    broker_last_name.setText(it.body()!!.broker.lastName)
-                    orignin_name.setText(it.body()!!.pickupAddresses.street)
-                    delivery_house.setText(it.body()!!.pickupAddresses.street)
-                    pickup.setText(it.body()!!.pickupAddresses.plannedTime)
-                    delivery_date.setText(it.body()!!.pickupAddresses.plannedTime)
+                    Id = it[0].id
+
+
+
+                    desc.setText(it[0] .description)
+
+
+
+                    price.setText(it[0].price)
+                    broker_name.setText(it[0].broker.firstName)
+                    broker_last_name.setText(it[0].broker.lastName)
+                    orignin_name.setText(it[0].pickupAddresses.street)
+                    delivery_house.setText(it[0].pickupAddresses.street)
+                    pickup.setText(it[0].pickupAddresses.plannedTime)
+                    delivery_date.setText(it[0].pickupAddresses.plannedTime)
 
 
 

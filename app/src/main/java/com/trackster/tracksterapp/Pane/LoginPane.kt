@@ -45,10 +45,7 @@ import java.util.*
 class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
 
     private var logintext1: TextView? = null
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Pane/ProfileXML
     private var smstext: TextView? = null
     private var or: TextView? = null
     private var view1: View? = null
@@ -88,10 +85,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         validatetext1 = findViewById<TextView>(R.id.validate_phone)
         resendcode = findViewById<TextView>(R.id.resendCode)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Pane/ProfileXML
         smstext = findViewById<TextView>(R.id.smstext)
         fcb = findViewById<ImageView>(R.id.fbtn)
         gogbtn = findViewById<ImageView>(R.id.gogbtn)
@@ -178,10 +172,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         validatetext1!!.visibility = View.VISIBLE
         validatebtn!!.visibility = View.VISIBLE
         loginbtn!!.visibility = View.INVISIBLE
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Pane/ProfileXML
         smstext!!.visibility = View.VISIBLE
         or!!.visibility=View.INVISIBLE
         view2!!.visibility=View.INVISIBLE
@@ -252,10 +243,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                     validatetext1!!.visibility = View.VISIBLE
                     validatebtn!!.visibility = View.VISIBLE
                     loginbtn!!.visibility = View.INVISIBLE
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Pane/ProfileXML
                     smstext!!.visibility = View.VISIBLE
                     or!!.visibility=View.INVISIBLE
                     view2!!.visibility=View.INVISIBLE
