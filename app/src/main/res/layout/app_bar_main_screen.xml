@@ -8,23 +8,51 @@
         tools:context=".mainScreen.MainScreenActivity">
 
 
-
-        <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/transparent"
-                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+    <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/transparent_gray"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
 
     <include layout="@layout/content_main_screen"/>
+
+    <ImageView
+            android:id="@+id/hamburger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="30dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/hamburger_menu"/>
+
+    <ImageView
+            android:id="@+id/attach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="30dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_gravity="top|end"
+            android:src="@drawable/spajalica"/>
 
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
+            android:layout_gravity="bottom|start"
             android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@android:drawable/ic_dialog_email"/>
+            app:srcCompat="@drawable/floating_new"/>
+
+    <ImageView
+            android:id="@+id/chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/cetri"/>
 
 </android.support.design.widget.CoordinatorLayout>
