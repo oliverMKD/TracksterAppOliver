@@ -18,8 +18,11 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ImageView
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -57,7 +60,8 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,View.OnClickListener {
+
 
     private var googleMap: GoogleMap? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -107,6 +111,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setContentView(R.layout.activity_main_screen)
         setSupportActionBar(toolbar)
         getChats()
+        hamburger.setOnClickListener(this)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -137,10 +142,17 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //
         createLocationRequest()
     }
-
+    override fun onClick(p0: View?) {
+        when (p0?.id){
+            R.id.hamburger-> {
+                drawer_layout.openDrawer(Gravity.START)
+            }
+        }
+    }
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
-        googleMap!!.uiSettings.isZoomControlsEnabled = true
+        googleMap!!.uiSettings.isZoomControlsEnabled = false
+        googleMap!!.uiSettings.isMyLocationButtonEnabled = false
 
 
         mDelayHandler = Handler()
