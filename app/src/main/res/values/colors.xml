@@ -155,6 +155,8 @@
     <color name="semi_transparent">#33000000</color>
     <color name="transparent_gray">#9F202020</color>
     <color name="transparent">#00000000</color>
+    <color name="chat_color">#e8f7ff</color>
+
 
     <color name="trans">#00000000</color>
 </resources>

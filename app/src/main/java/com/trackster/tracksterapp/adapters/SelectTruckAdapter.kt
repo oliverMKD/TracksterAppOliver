@@ -31,8 +31,7 @@ class SelectTruckAdapter(private val activity: Activity) :
 
     fun isEmptyState() = list.isEmpty()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LoadsRecyclerViewHolder =
-        LoadsRecyclerViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LoadsRecyclerViewHolder =     LoadsRecyclerViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.fragment_select_manufactor,
                 parent,
