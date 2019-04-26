@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:targetApi="LOLLIPOP">
+
+    <TextView
+        android:id="@+id/date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/colorMessageDate"
+        android:textSize="12.3sp" />
+
+    <ImageView
+        android:id="@+id/avatar_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/message_relative_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/date_text_view"
+        android:layout_marginBottom="@dimen/message_relative_layout_margin"
+        android:layout_marginEnd="@dimen/message_relative_layout_margin"
+        android:layout_marginStart="@dimen/message_relative_layout_marginStartEnd"
+        android:layout_marginTop="@dimen/message_relative_layout_margin"
+        android:background="@drawable/rounded_message_background">
+
+        <ImageView
+            android:id="@+id/message_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/my_message_image_view_height"
+            android:padding="@dimen/message_image_view_padding"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/message_video_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/message_image_view"
+            android:layout_alignEnd="@id/message_image_view"
+            android:layout_alignStart="@id/message_image_view"
+            android:layout_alignTop="@id/message_image_view"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_video" />
+
+        <TextView
+            android:id="@+id/message_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/message_image_view"
+            android:letterSpacing="0.01"
+            android:minWidth="@dimen/my_message_text_view_min_width"
+            android:padding="@dimen/message_text_view_padding"
+            android:textColor="@android:color/white"
+            android:textSize="16.7sp" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/time_linear_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/message_relative_layout"
+        android:layout_marginBottom="@dimen/time_text_view_margin_right"
+        android:layout_marginEnd="@dimen/message_relative_layout_margin">
+
+        <ImageView
+            android:id="@+id/time_image_view"
+            android:layout_width="@dimen/time_image_view_width_height"
+            android:layout_height="@dimen/time_image_view_width_height"
+            android:layout_gravity="center_vertical"
+            app:srcCompat="@drawable/ic_sent" />
+
+        <TextView
+            android:id="@+id/time_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/time_text_view_margin_right"
+            android:textColor="@color/colorAvatarBackground"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/time_try_again_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/time_text_view_margin_right"
+            android:text="@string/try_again"
+            android:textColor="@color/errorMessageBackground"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</RelativeLayout>

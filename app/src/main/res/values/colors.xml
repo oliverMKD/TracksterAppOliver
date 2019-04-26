@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+
 
     <color name="registration_heading">#333642</color>
     <color name="colorGrayLight">#b0b2b4</color>
@@ -157,4 +157,9 @@
     <color name="transparent">#00000000</color>
 
     <color name="trans">#00000000</color>
+    <color name="textColorPrimary">#2e343a</color>
+    <color name="colorSendMessageEditTextStroke">#bebebe</color>
+    <color name="colorSendMessageEditTextBackground">#f6f7f8</color>
+    <color name="colorMessageDate">#5a5a5a</color>
+    <color name="errorMessageBackground">#942343</color>
 </resources>

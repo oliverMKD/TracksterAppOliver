@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.chat.ChatDetailsActivity
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
 import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
 import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
@@ -112,6 +113,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setSupportActionBar(toolbar)
         getChats()
         hamburger.setOnClickListener(this)
+        chat.setOnClickListener(this)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -147,6 +149,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             R.id.hamburger-> {
                 drawer_layout.openDrawer(Gravity.START)
             }
+            R.id.chat ->
+                startActivity(Intent(this@MainScreenActivity,ChatDetailsActivity::class.java))
         }
     }
     override fun onMapReady(googleMap: GoogleMap?) {
@@ -194,18 +198,21 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         apiService = PostApi.create(this)
         var map : MutableMap< String,String> =  mutableMapOf()
-        map["42.0151079"]
-        map["21.4526962"]
-        map.put("42.0151079","21.4526962")
+//        map["42.0151079"]
+//        map["21.4526962"]
+//        map.put("42.0151079","21.4526962")
+        val mapa = "42.0151079,21.4526962"
+        val bb = mapa.replace("\\,","%2C")
 
         compositeDisposable.add(
             apiService.getWeighStations(
-                PreferenceUtils.getAuthorizationToken(this),map , 1)
+                PreferenceUtils.getAuthorizationToken(this),bb , 1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     //                Log.d("station", " "+ it[0].location)
-                }, {
+                },
+                    {
                     //                showProgress(false)
 //                    handleApiError(it)
                 })

@@ -5,8 +5,59 @@
     <dimen name="bottom_navigation_icon_padding">12dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">176dp</dimen>
+
+    <!-- Chat details screen -->
+    <dimen name="send_messages_view_padding">10dp</dimen>
+    <dimen name="send_messages_view_padding_bottom">45dp</dimen>
+    <dimen name="rounded_button_radius">24dp</dimen>
+    <dimen name="sign_in_button_line_spacing_extra">5.9sp</dimen>
+    <dimen name="progress_bar_margin_bottom">8dp</dimen>
+    <dimen name="sign_in_button_margin_top">16dp</dimen>
+
+    <dimen name="select_image_text_view_width_height">40dp</dimen>
+    <dimen name="rounded_send_message_edit_text_radius">20dp</dimen>
+    <dimen name="send_message_elevation">10dp</dimen>
+    <dimen name="message_edit_text_padding">14dp</dimen>
+    <dimen name="message_edit_text_padding_end">40dp</dimen>
+    <dimen name="message_avatar_width_height">40dp</dimen>
+    <dimen name="message_text_view_margin_left">10dp</dimen>
+    <dimen name="my_message_text_view_min_width">100dp</dimen>
+
+    <dimen name="message_text_view_max_width">200dp</dimen>
+    <dimen name="message_text_view_padding">15dp</dimen>
+    <dimen name="message_image_view_padding">10dp</dimen>
+
+    <dimen name="send_message_image_view_padding">5dp</dimen>
+    <dimen name="time_text_view_margin_right">5dp</dimen>
+    <dimen name="message_relative_layout_margin">5dp</dimen>
+    <dimen name="message_relative_layout_marginStartEnd">50dp</dimen>
+    <dimen name="chat_details_send_message_margin">10dp</dimen>
+    <dimen name="my_message_image_view_height">200dp</dimen>
+
+    <dimen name="custom_toolbar_margin">5dp</dimen>
+    <dimen name="custom_toolbar_marginEnd">30dp</dimen>
+    <dimen name="custom_toolbar_items_margin">2dp</dimen>
+
+    <dimen name="contact_image_view_width">50dp</dimen>
+
+    <dimen name="time_image_view_width_height">20dp</dimen>
+    <dimen name="toolbar_logo_width_height">32dp</dimen>
+    <dimen name="toolbar_title_margin_start">32dp</dimen>
+
+    <dimen name="action_bar_logo_right">15dp</dimen>
+    <dimen name="action_bar_elevation">4dp</dimen>
+
+    <!-- Chat list screen -->
+    <dimen name="chat_list_item_margin">16dp</dimen>
+    <dimen name="chat_list_item_avatar_size">50dp</dimen>
+    <dimen name="chat_list_item_icon_size">21dp</dimen>
+    <dimen name="contacts_refresh_distance_to_trigger">40dp</dimen>
+
+    <dimen name="list_view_divider_height">2dp</dimen>
+    <dimen name="stroke_width">0.5dp</dimen>
+
 </resources>
