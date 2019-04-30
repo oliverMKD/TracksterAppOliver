@@ -21,8 +21,6 @@
                 android:layout_width="62dp"
                 android:layout_height="62dp"
                 android:paddingTop="@dimen/nav_header_vertical_spacing"
-                app:srcCompat="@drawable/profile2"
-
                 android:id="@+id/imageView"/>
 
         <LinearLayout
