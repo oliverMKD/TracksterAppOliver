@@ -19,14 +19,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:orientation="vertical"        >
+                android:orientation="vertical">
 
-            <ImageView android:layout_width="30dp"
-                       android:layout_height="30dp"
-                       android:src="@mipmap/back_white"
-                       android:id="@+id/imageView2"
-                       android:layout_marginTop="16dp"
-                       android:layout_marginStart="11dp"          />
 
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -35,7 +29,7 @@
                       android:textColor="@color/White"
                       android:id="@+id/imageView3"
                       android:layout_marginTop="3dp"
-                      android:layout_marginStart="20dp"          />
+                      android:layout_marginStart="20dp"/>
 
 
         </LinearLayout>
