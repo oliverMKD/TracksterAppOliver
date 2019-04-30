@@ -184,12 +184,12 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
     private fun validatePhone() {
 
-        val number = phone1?.text.toString()
-        val code = code1?.text.toString()
-        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNmM3NmViMTdkNDQyMTc3MGFlMTg4ZCIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6IkJyb2tlcjIiLCJsYXN0TmFtZSI6IkJyb2tlcjIiLCJ1c2VyVHlwZSI6MywiaWF0IjoxNTU1ODg0MjUwLCJleHAiOjE1NTY0ODkwNTB9.I9AcJ5LuUrRhqXwGcK48eHSUg__kQt0709skNtFFcss"
-
-       PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
-        startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
+//        val number = phone1?.text.toString()
+//        val code = code1?.text.toString()
+//        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNmM3NmViMTdkNDQyMTc3MGFlMTg4ZCIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6IkJyb2tlcjIiLCJsYXN0TmFtZSI6IkJyb2tlcjIiLCJ1c2VyVHlwZSI6MywiaWF0IjoxNTU1ODg0MjUwLCJleHAiOjE1NTY0ODkwNTB9.I9AcJ5LuUrRhqXwGcK48eHSUg__kQt0709skNtFFcss"
+//
+//       PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
+//        startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
 //        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS
     }
 
@@ -251,6 +251,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                     fcb!!.visibility=View.INVISIBLE
                     gogbtn!!.visibility=View.INVISIBLE
                     resendcode!!.visibility=View.VISIBLE
+                    startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
                 }
 
                 override fun onCancel() {
@@ -271,6 +272,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                    PreferenceUtils.saveAuthorizationToken(this,it.body()!!.token)
                 }, {
                     Log.d("pane", "error")
                 })
