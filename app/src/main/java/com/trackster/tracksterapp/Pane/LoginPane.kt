@@ -271,6 +271,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                    PreferenceUtils.saveAuthorizationToken(this,it.body()!!.token)
                 }, {
                     Log.d("pane", "error")
                 })

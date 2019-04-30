@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <item name="app_name" type="string" />
+
 
     <item name="config_url" type="string" />
 
@@ -20,7 +20,6 @@
     <item name="general_error_button" type="string" />
     <item name="general_error_no_internet" type="string" />
 
-    <item name="colorAccent" type="color" />
     <item name="notification_icon" type="drawable" />
 
     <item name="colorSeenMessage" type="color" />

@@ -83,17 +83,7 @@
             android:textSize="17.3sp"
             tools:targetApi="O" />
 
-        <ImageView
-            android:id="@+id/send_message_image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/img_selector_image_view"
-            android:layout_alignBottom="@id/img_selector_image_view"
-            android:layout_alignParentEnd="true"
-            android:padding="@dimen/chat_details_send_message_margin"
-            android:paddingStart="@dimen/chat_details_send_message_margin"
-            android:paddingEnd="@dimen/chat_details_send_message_margin"
-            app:srcCompat="@drawable/arrow_send" />
+
 
     </RelativeLayout>
 
