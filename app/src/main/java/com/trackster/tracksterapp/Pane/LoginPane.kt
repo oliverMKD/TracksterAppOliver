@@ -186,7 +186,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
         val number = phone1?.text.toString()
         val code = code1?.text.toString()
-        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNmM3NmViMTdkNDQyMTc3MGFlMTg4ZCIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6IlByb2JhIiwibGFzdE5hbWUiOiJCcm9rZXIyIiwidXNlclR5cGUiOjMsImlhdCI6MTU1NjYxMTE1OSwiZXhwIjoxNTU3MjE1OTU5fQ.aePgNpjq-NyycHTfcIxBC6Tv_k0-cHkXqyDTaUwVELc"
+        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImZpcnN0TmFtZSI6Ik9saXZlciIsImxhc3ROYW1lIjoiQm96aW5vdnNraSIsInVzZXJUeXBlIjo2LCJpYXQiOjE1NTY2MzE4MjksImV4cCI6MTU1NzIzNjYyOX0.0DoGviMGXMkoD-Oxq4k1_aA5ikXwiS1J2CdqvYoSF6Y"
 
        PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
         startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))

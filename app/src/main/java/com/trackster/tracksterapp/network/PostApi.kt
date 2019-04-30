@@ -59,7 +59,7 @@ interface PostApi {
     @GET("weigh-stations/circle")
     fun getWeighStations(
         @Header("x-auth-token") authorization: String,
-        @QueryMap(encoded = true) params : MutableMap<String,String> ,
+        @Query("center") center : String ,
         @Query("radius") radius: Int
     ): Single<ArrayList<WeighStation>>
 

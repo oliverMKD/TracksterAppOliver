@@ -55,12 +55,12 @@ class SplashScreenActivity : AppCompatActivity() {
         compositeDisposable.dispose()
     }
     private fun checkIfUserIsLogged(){
-        val JWTToken = PreferenceUtils.getAuthorizationToken(this)
-        if(JWTToken!=null && JWTToken.isNotEmpty()){
-            startActivity(Intent(this@SplashScreenActivity, MainScreenActivity::class.java))
-        } else{
+//        val JWTToken = PreferenceUtils.getAuthorizationToken(this)
+//        if(JWTToken!=null && JWTToken.isNotEmpty()){
+//            startActivity(Intent(this@SplashScreenActivity, MainScreenActivity::class.java))
+//        } else{
             startActivity(Intent(this@SplashScreenActivity, LoginPane::class.java))
-        }
+//        }
     }
 
    private fun getHash(){
