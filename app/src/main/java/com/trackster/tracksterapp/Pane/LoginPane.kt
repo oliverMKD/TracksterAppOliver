@@ -190,6 +190,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
        PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
         startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
+
 //        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS
     }
 
@@ -251,6 +252,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                     fcb!!.visibility=View.INVISIBLE
                     gogbtn!!.visibility=View.INVISIBLE
                     resendcode!!.visibility=View.VISIBLE
+                    startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
                 }
 
                 override fun onCancel() {
@@ -271,6 +273,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                    PreferenceUtils.saveAuthorizationToken(this,it.body()!!.token)
                 }, {
                     Log.d("pane", "error")
                 })
