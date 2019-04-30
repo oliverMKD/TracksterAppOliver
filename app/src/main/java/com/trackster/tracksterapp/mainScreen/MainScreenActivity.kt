@@ -196,11 +196,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         var map : MutableMap< String,String> =  mutableMapOf()
         map["42.0151079"]
         map["21.4526962"]
-        map.put("42.0151079","21.4526962")
+        val coordinates = "42.0151079,21.4526962"
+        val newCoordinates = coordinates.replace("\\,","%2C")
 
         compositeDisposable.add(
             apiService.getWeighStations(
-                PreferenceUtils.getAuthorizationToken(this),map , 1)
+                PreferenceUtils.getAuthorizationToken(this),newCoordinates , 1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
