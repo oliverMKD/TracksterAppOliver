@@ -12,7 +12,8 @@ data class ChatResponse(
     @SerializedName("broker") val broker: User,
     @SerializedName("Files") val files: com.trackster.tracksterapp.model.Files,
     @SerializedName("pickupAddresses") val pickupAddresses: Address,
-    @SerializedName("destinationAddresses") val destinationAddresses: Address
+    @SerializedName("destinationAddresses") val destinationAddresses: Address,
+    @SerializedName("Message") val message: Message
 
 
 )

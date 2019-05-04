@@ -3,10 +3,7 @@ package com.trackster.tracksterapp.network
 import android.content.Context
 import android.support.v4.media.AudioAttributesCompat
 import com.google.android.gms.maps.model.LatLng
-import com.trackster.tracksterapp.model.Trailers
-import com.trackster.tracksterapp.model.Trucks
-import com.trackster.tracksterapp.model.User
-import com.trackster.tracksterapp.model.WeighStation
+import com.trackster.tracksterapp.model.*
 import com.trackster.tracksterapp.network.connectivity.ConnectivityInterceptor
 import com.trackster.tracksterapp.network.connectivity.HeaderInterceptor
 import com.trackster.tracksterapp.network.requests.*
@@ -87,6 +84,9 @@ interface PostApi {
     @GET("/chats")
     fun getHistory(@Header("x-auth-token") authorization: String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
 
+    @POST("/chats/{chatId}/push/message")
+    fun postMessage(@Header("x-auth-token") authorization: String,
+                    @Path("chatId") chatId: String, @Body message: Message) : Single<Message>
 
     companion object Factory {
         fun create(context: Context): PostApi {

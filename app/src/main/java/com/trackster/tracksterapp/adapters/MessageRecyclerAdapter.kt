@@ -17,6 +17,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.utils.CONTENT_KEY
+import com.trackster.tracksterapp.utils.PreferenceUtils
 import com.trackster.tracksterapp.utils.TRY_AGAIN_BROADCAST
 import com.trackster.tracksterapp.utils.Utils
 
@@ -68,7 +69,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (list[position].isMine) {
+        if (list[position].senderId==PreferenceUtils.getUserId(context)) {
             return 1
         }
         return 0
@@ -83,7 +84,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
     }
 
     private fun setViewsLayoutParams(message: Message, holder: MessageRecyclerViewHolder) =
-            if (message.isPortrait) holder.messageImageView.layoutParams = messageParamsPortrait
+            if (message.senderId==PreferenceUtils.getUserId(context)) holder.messageImageView.layoutParams = messageParamsPortrait
             else holder.messageImageView.layoutParams = messageParamsLandscape
 
     private fun setContent(message: Message, holder: MessageRecyclerViewHolder) {
@@ -92,45 +93,46 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         holder.messageTextView.visibility = View.GONE
         holder.messageImageView.visibility = View.GONE
 
-        if (TextUtils.isEmpty(message.sendTime)) {
+        if (TextUtils.isEmpty(message.createTime)) {
             holder.dateTextView.visibility = View.GONE
         } else {
             holder.dateTextView.visibility = View.VISIBLE
-            holder.dateTextView.text = message.sendTime
+            holder.dateTextView.text = message.createTime
         }
 
         when (true) {
-            message.additionalData.isSending -> setSendingUI(holder)
-            message.additionalData.errorSending -> setErrorMessageUI(holder)
-            else -> {
+//            message.additionalData.isSending -> setSendingUI(holder)
+//            message.additionalData.errorSending -> setErrorMessageUI(holder)
+            else ->
+            {
                 holder.timeImageView.setImageResource(R.drawable.ic_sent)
 
-                if (message.isMine) holder.messageRelativeLayout.setBackgroundResource(R.drawable.rounded_message_background)
+                if (message.senderId==PreferenceUtils.getUserId(context)) holder.messageRelativeLayout.setBackgroundResource(R.drawable.rounded_message_background)
                 else holder.messageRelativeLayout.setBackgroundResource(R.drawable.rounded_friend_message_background)
 
-                if (message.read && message.isMine) {
-                    holder.timeTextView.text = context.getString(R.string.seen)
-                    holder.timeTextView.setTextColor(Utils.getColor(context, R.color.colorSeenMessage))
-                } else {
-                    holder.timeTextView.text = message.additionalData.time
-                    holder.timeTextView.setTextColor(Utils.getColor(context, R.color.colorAvatarBackground))
-                }
+//                if (message.read && message.isMine) {
+//                    holder.timeTextView.text = context.getString(R.string.seen)
+//                    holder.timeTextView.setTextColor(Utils.getColor(context, R.color.colorSeenMessage))
+//                } else {
+////                    holder.timeTextView.text = message.additionalData.time
+////                    holder.timeTextView.setTextColor(Utils.getColor(context, R.color.colorAvatarBackground))
+//                }
 
-                if (Utils.hasMessageMedia(message)) {
-                    holder.messageImageView.visibility = View.VISIBLE
-                    if (!TextUtils.isEmpty(message.imageUrl)) {
-                        Glide.with(context)
-                                .load(message.imageUrl)
-                                .into(holder.messageImageView)
-                    }
-
-                    if (!TextUtils.isEmpty(message.videoUrl)) {
-                        holder.messageVideoImageView.visibility = View.VISIBLE
-                        Glide.with(context)
-                                .load(message.videoUrl)
-                                .into(holder.messageImageView)
-                    }
-                }
+//                if (Utils.hasMessageMedia(message)) {
+//                    holder.messageImageView.visibility = View.VISIBLE
+//                    if (!TextUtils.isEmpty(message.imageUrl)) {
+//                        Glide.with(context)
+//                                .load(message.imageUrl)
+//                                .into(holder.messageImageView)
+//                    }
+//
+//                    if (!TextUtils.isEmpty(message.videoUrl)) {
+//                        holder.messageVideoImageView.visibility = View.VISIBLE
+//                        Glide.with(context)
+//                                .load(message.videoUrl)
+//                                .into(holder.messageImageView)
+//                    }
+//                }
             }
         }
 
@@ -143,10 +145,10 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
                 .apply(RequestOptions.errorOf(R.drawable.ic_placeholder))
                 .apply(RequestOptions.circleCropTransform()).into(holder.avatarImageView)
 
-        if (!TextUtils.isEmpty(message.additionalData.uri)) {
-            holder.messageImageView.visibility = View.VISIBLE
-            Glide.with(context).load(Uri.parse(message.additionalData.uri)).into(holder.messageImageView)
-        }
+//        if (!TextUtils.isEmpty(message.additionalData.uri)) {
+//            holder.messageImageView.visibility = View.VISIBLE
+//            Glide.with(context).load(Uri.parse(message.additionalData.uri)).into(holder.messageImageView)
+//        }
     }
 
     private fun setClickListener(message: Message, holder: MessageRecyclerViewHolder) {
@@ -191,12 +193,12 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         notifyDataSetChanged()
     }
 
-    fun removeMessage(key: Int?) {
-        val message = list.find { message -> message.additionalData.id == key }
-        if (message != null) {
-            list.remove(message)
-        }
-    }
+//    fun removeMessage(key: Int?) {
+////        val message = list.find { message -> message.additionalData.id == key }
+//        if (message != null) {
+//            list.remove(message)
+//        }
+//    }
 
 //    private fun openMediaDetails(message: Message) {
 //        val intent = Intent(context, MediaDetailsActivity::class.java)

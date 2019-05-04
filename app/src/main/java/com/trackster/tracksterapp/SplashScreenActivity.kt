@@ -9,6 +9,7 @@ import android.util.Base64
 import android.util.Log
 import com.bumptech.glide.Glide
 import com.trackster.tracksterapp.Pane.LoginPane
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.ui.login.LoginActivity
 import com.trackster.tracksterapp.ui.login.trailer.TrailerActivity
 import com.trackster.tracksterapp.utils.PreferenceUtils
@@ -54,13 +55,13 @@ class SplashScreenActivity : AppCompatActivity() {
         compositeDisposable.dispose()
     }
     private fun checkIfUserIsLogged(){
-        val userId = PreferenceUtils.getUserId(this)
-//        if(userId!=null && userId.isNotEmpty()){
-//            startActivity(Intent(this@SplashScreenActivity, TrailerActivity::class.java))
-//
-//        } else{
+        val userId = PreferenceUtils.getAuthorizationToken(this)
+        if(userId!=null && userId.isNotEmpty()){
+            startActivity(Intent(this@SplashScreenActivity, MainScreenActivity::class.java))
+
+        } else{
             startActivity(Intent(this@SplashScreenActivity, LoginPane::class.java))
-//        }
+        }
     }
 
    private fun getHash(){

@@ -15,7 +15,6 @@ import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.util.Log
 import com.trackster.tracksterapp.BuildConfig
-import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.model.AdditionalData
 import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.rx.RxBus
@@ -70,8 +69,8 @@ object DetailsMediaManager {
     private fun showMediaOptionsDialog(activity: Activity) {
         val dialogBuilder = AlertDialog.Builder(activity)
 
-        val pickMediaOptions = arrayOf<CharSequence>(activity.getString(R.string.make_video),
-                activity.getString(R.string.take_photo), activity.getString(R.string.upload_from_library))
+//        val pickMediaOptions = arrayOf<CharSequence>(activity.getString(R.string.make_video),
+//                activity.getString(R.string.take_photo), activity.getString(R.string.upload_from_library))
 
         val dialogListener = DialogInterface.OnClickListener { dialogInterface, which ->
             when (which) {
@@ -81,17 +80,17 @@ object DetailsMediaManager {
                 3 -> dialogInterface?.cancel()
             }
         }
+//
+//        dialogBuilder.setItems(pickMediaOptions, dialogListener)
+//
+//        val dialog = dialogBuilder.create()
+//
+//        val dialogNegativeClickListener = DialogInterface.OnClickListener { dialogInterface, _ ->
+//            dialogInterface.cancel()
+//        }
+//        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.cancel), dialogNegativeClickListener)
 
-        dialogBuilder.setItems(pickMediaOptions, dialogListener)
-
-        val dialog = dialogBuilder.create()
-
-        val dialogNegativeClickListener = DialogInterface.OnClickListener { dialogInterface, _ ->
-            dialogInterface.cancel()
-        }
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.cancel), dialogNegativeClickListener)
-
-        dialog.show()
+//        dialog.show()
     }
 
     private fun dispatchTakePictureIntent(activity: Activity) {
@@ -138,7 +137,7 @@ object DetailsMediaManager {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
-        activity.startActivityForResult(Intent.createChooser(intent, activity.getString(R.string.select_picture)), PICK_IMAGE_REQUEST)
+//        activity.startActivityForResult(Intent.createChooser(intent, activity.getString(R.string.select_picture)), PICK_IMAGE_REQUEST)
     }
 
     fun setMediaDataGallery(activity: Activity, uri: Uri) {
@@ -148,13 +147,12 @@ object DetailsMediaManager {
         tmpUri = uri
     }
 
-    fun hasMedia(message: Message) = !TextUtils.isEmpty(message.imageUrl) || !TextUtils.isEmpty(message.videoUrl)
+//    fun hasMedia(message: Message) = !TextUtils.isEmpty(message.imageUrl) || !TextUtils.isEmpty(message.videoUrl)
 
     private fun createUrl(activity: Activity): String = ConfigManager.getAWSCDNUrl(activity) + MESSAGES + File.separator + fileName
 
-    fun createMessage(activity: Activity, recipient: Int, hasMedia: Boolean, isMediaPortrait: Boolean, content: String?): Message? {
-        return Message(0, 0, recipient, "now", content!!, "", true, false,
-                getImageLink(activity, hasMedia), getVideoLink(activity, hasMedia), isMediaPortrait, createAdditionalData(hasMedia))
+    fun createMessage(activity: Activity, content: String?,id : String): Message? {
+        return Message(id, content!!,"","","")
     }
 
     private fun createAdditionalData(hasMedia: Boolean): AdditionalData {
@@ -193,28 +191,28 @@ object DetailsMediaManager {
         return ""
     }
 
-    fun getPendingMessages(key: Int?): MutableList<Message> {
-        val pendingMessages: MutableList<Message> = mutableListOf()
-        for (pendingMessage in mutableListSendingMessages) {
-            if (pendingMessage.recipient == key) {
-                pendingMessages.add(pendingMessage)
-            }
-        }
+//    fun getPendingMessages(key: Int?): MutableList<Message> {
+//        val pendingMessages: MutableList<Message> = mutableListOf()
+//        for (pendingMessage in mutableListSendingMessages) {
+//            if (pendingMessage.recipient == key) {
+//                pendingMessages.add(pendingMessage)
+//            }
+//        }
+//
+//        return pendingMessages
+//    }
 
-        return pendingMessages
-    }
-
-    fun removeMessage(key: Int?) {
-        val message = mutableListSendingMessages.find { message -> message.additionalData.observerId == key }
-        if (message != null) {
-            mutableListSendingMessages.remove(message)
-        }
-    }
-
-    fun removeMessageId(key: Int?) {
-        val message = mutableListSendingMessages.find { message -> message.additionalData.id == key }
-        if (message != null) {
-            mutableListSendingMessages.remove(message)
-        }
-    }
+//    fun removeMessage(key: Int?) {
+//        val message = mutableListSendingMessages.find { message -> message.additionalData.observerId == key }
+//        if (message != null) {
+//            mutableListSendingMessages.remove(message)
+//        }
+//    }
+//
+//    fun removeMessageId(key: Int?) {
+//        val message = mutableListSendingMessages.find { message -> message.additionalData.id == key }
+//        if (message != null) {
+//            mutableListSendingMessages.remove(message)
+//        }
+//    }
 }

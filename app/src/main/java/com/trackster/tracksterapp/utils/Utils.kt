@@ -36,8 +36,8 @@ object Utils {
         return ContextCompat.getColor(context, color)
     }
 
-    fun hasMessageMedia(message: Message) =
-        !TextUtils.isEmpty(message.imageUrl) || !TextUtils.isEmpty(message.videoUrl)
+//    fun hasMessageMedia(message: Message) =
+//        !TextUtils.isEmpty(message.imageUrl) || !TextUtils.isEmpty(message.videoUrl)
 
     fun getAWSConfigurationClient(): ClientConfiguration {
         val cc = ClientConfiguration()

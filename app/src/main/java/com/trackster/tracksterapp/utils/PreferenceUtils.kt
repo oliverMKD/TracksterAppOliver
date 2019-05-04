@@ -15,6 +15,7 @@ object PreferenceUtils {
 
     private const val KEY_AUTH_TOKEN = "auth_token"
     private const val KEY_USER_ID = "user_id"
+    private const val KEY_CHAT_ID = "chat_id"
 
     private fun getPreferences(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -66,6 +67,11 @@ object PreferenceUtils {
         getPreferences(context)[KEY_USER_ID] = id
     }
     fun getUserId(context: Context): String = getPreferences(context).getString(KEY_USER_ID, "") as String
+
+    fun saveChatId(context: Context, id: String) {
+        getPreferences(context)[KEY_CHAT_ID] = id
+    }
+    fun getChatId(context: Context): String = getPreferences(context).getString(KEY_CHAT_ID, "") as String
 
 //    fun clearAuthorizationToken(context: Context) {
 //        getPreferences(context)[KEY_AUTH_TOKEN] = ""

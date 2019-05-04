@@ -6,10 +6,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.drawable.Drawable
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
-import android.support.media.ExifInterface
 import android.support.v4.app.ActivityCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -17,6 +16,7 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
@@ -26,8 +26,6 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.transition.Transition
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.MessageRecyclerAdapter
 import com.trackster.tracksterapp.base.BaseChatActivity
@@ -38,7 +36,7 @@ import com.trackster.tracksterapp.model.AdditionalData
 import com.trackster.tracksterapp.model.Contact
 import com.trackster.tracksterapp.model.FirebaseMessage
 import com.trackster.tracksterapp.model.Message
-import com.trackster.tracksterapp.rx.RxBus
+import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.utils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -94,23 +92,25 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         initMutualViews()
 
 
-            initAWS()
+//            initAWS()
             initViews()
-            handleIntent()
+//            handleIntent()
             initMessageList()
+        getMessages()
 
-            compositeDisposable.add(RxBus.listen(ClearPendingMessageEvent::class.java).subscribe {
-                pendingMessageUploaded()
-            })
-
-
-            listenForUploadReady()
-            if (FeedMediaManager.uploadsCounter > 0 || DetailsMediaManager.uploadsCounter > 0) {
-                setPaddingSendMessageRelativeLayout(true)
-            }
+//            compositeDisposable.add(RxBus.listen(ClearPendingMessageEvent::class.java).subscribe {
+//                pendingMessageUploaded()
+//            })
+//
+//
+//            listenForUploadReady()
+//            if (FeedMediaManager.uploadsCounter > 0 || DetailsMediaManager.uploadsCounter > 0) {
+//                setPaddingSendMessageRelativeLayout(true)
+//            }
     }
 
     override fun onResume() {
@@ -159,13 +159,13 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     private fun setPaddingSendMessageRelativeLayout(isSnackbarVisible: Boolean) {
-        val sendMessageViewPadding = resources.getDimensionPixelSize(R.dimen.send_messages_view_padding)
+        val sendMessageViewPadding = resources.getDimensionPixelSize(R.dimen.design_bottom_navigation_margin)
 
         if (isSnackbarVisible) {
             sendMessageRelativeLayout?.setPadding(sendMessageViewPadding,
                 sendMessageViewPadding,
                 sendMessageViewPadding,
-                resources.getDimensionPixelSize(R.dimen.send_messages_view_padding_bottom))
+                resources.getDimensionPixelSize(R.dimen.design_bottom_navigation_margin))
         } else {
             sendMessageRelativeLayout?.setPadding(sendMessageViewPadding,
                 sendMessageViewPadding,
@@ -177,6 +177,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
         sendMessageRelativeLayout = findViewById(R.id.send_message_relative_layout)
         recyclerView = findViewById(R.id.recycler_view_details)
         val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.reverseLayout = true
         linearLayoutManager.stackFromEnd = true
         recyclerView?.layoutManager = linearLayoutManager
         progressBar = findViewById(R.id.progress_bar)
@@ -208,7 +209,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     private fun initViews() {
         imgSelectorImageView = findViewById(R.id.img_selector_image_view)
         imgSelectorImageView?.setOnClickListener(this)
-//        sendMessageImageView = findViewById(R.id.send_message_image_view)
+        sendMessageImageView = findViewById(R.id.button_send_msg)
         sendMessageImageView?.setOnClickListener(this)
 
         sendMessageEditText = findViewById(R.id.send_message_edit_text)
@@ -250,51 +251,30 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
 
 
     private fun getMessages() {
-//        if (contact != null) {
-//            progressBar?.visibility = View.VISIBLE
-//            compositeDisposable.add(apiService.getMessages(contact!!.id, PreferenceUtils.getAuthorizationToken(this@ChatDetailsActivity))
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe({ result ->
-//                    progressBar?.visibility = View.GONE
-//                    setData(result)
-//                }, { error ->
-//                    progressBar?.visibility = View.GONE
-//                    handleApiError(error)
-//                }))
-//        }
+        apiService = PostApi.create(this@ChatDetailsActivity)
+        compositeDisposable.add(
+            apiService.getChatById(PreferenceUtils.getAuthorizationToken(this@ChatDetailsActivity),
+                PreferenceUtils.getChatId(this@ChatDetailsActivity))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+//                    mutableListMessages = it.message
+                    setData(it.message)
+                    //                Log.d("station", " "+ it[0].location)
+                }, {
+                    Log.d("destinacija",""+ it.localizedMessage)
+                    //                showProgress(false)
+                })
+        )
     }
 
     private fun setData(result: MutableList<Message>) {
         result.reverse()
-        setDatesData(result)
-        val pendingMessages = DetailsMediaManager.getPendingMessages(contact?.id)
-        result.addAll(pendingMessages)
+//        setDatesData(result)
+//        val pendingMessages = DetailsMediaManager.getPendingMessages(contact?.id)
+//        result.addAll(pendingMessages)
         adapter.setData(result)
         scrollToBottom()
-    }
-
-    private fun setMotherphoneData(result: MutableList<Message>) {
-        val data = result.filter { message ->
-            message.sender == sender!!.id && message.recipient == recipient!!.id ||
-                    message.recipient == sender!!.id && message.sender == recipient!!.id
-        } as MutableList<Message>
-
-        data.reverse()
-        setDatesData(data)
-    }
-
-    private fun getAllMessages() {
-//        progressBar?.visibility = View.VISIBLE
-//        compositeDisposable.add(apiService.getAllMessages(PreferenceUtils.getAuthorizationToken(this))
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribeOn(Schedulers.io())
-//            .subscribe({ result ->
-//                progressBar?.visibility = View.GONE
-//                setMotherphoneData(result)
-//            }, { _ ->
-//                progressBar?.visibility = View.GONE
-//            }))
     }
 
     private fun setDatesData(list: MutableList<Message>) {
@@ -304,28 +284,30 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     private fun setDateForMessage(message: Message) {
-        val additionalData = AdditionalData()
-        additionalData.time = getString(R.string.sent) + " " + DateFormat.formatDate(message.sendTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
-
-        var messageDate = DateFormat.formatDate(message.sendTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-        messageDate = DateFormat.formatDateDetailsMessage(message.sendTime, messageDate)
-        if (messageDate == Day.TODAY) {
-            messageDate = getString(R.string.today)
-        } else if (messageDate == Day.YESTERDAY) {
-            messageDate = getString(R.string.yesterday)
-        }
-        if (previousDate == messageDate) {
-            message.sendTime = ""
-        } else {
-            message.sendTime = messageDate
-            previousDate = messageDate
-        }
-
-        message.additionalData = additionalData
+//        val additionalData = AdditionalData()
+//        additionalData.time = getString(R.string.validate) + " " + DateFormat.formatDate(message.sendTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
+//
+//        var messageDate = DateFormat.formatDate(message.sendTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+//        messageDate = DateFormat.formatDateDetailsMessage(message.sendTime, messageDate)
+//        if (messageDate == Day.TODAY) {
+//            messageDate = getString(R.string.Continue)
+//        } else if (messageDate == Day.YESTERDAY) {
+//            messageDate = getString(R.string.validate)
+//        }
+//        if (previousDate == messageDate) {
+//            message.sendTime = ""
+//        } else {
+//            message.sendTime = messageDate
+//            previousDate = messageDate
+//        }
+//
+//        message.additionalData = additionalData
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
+            R.id.button_send_msg -> sendMessage(DetailsMediaManager.createMessage(
+                this,sendMessageEditText?.text.toString(),"1234")!!)
 //            R.id.img_selector_image_view -> addMedia()
 //            R.id.send_message_image_view -> {
 //                if (contact != null) {
@@ -364,16 +346,16 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
         scrollToBottom()
     }
 
-    private fun messageNotSent(message: Message) {
-        adapter.removeMessage(message.additionalData.id)
-        DetailsMediaManager.removeMessage(message.additionalData.id)
-        message.additionalData.isSending = false
-        message.additionalData.errorSending = true
-        mutableListMessages.add(message)
-
-        adapter.setData(createNewData())
-        scrollToBottom()
-    }
+//    private fun messageNotSent(message: Message) {
+//        adapter.removeMessage(message.additionalData.id)
+//        DetailsMediaManager.removeMessage(message.additionalData.id)
+//        message.additionalData.isSending = false
+//        message.additionalData.errorSending = true
+//        mutableListMessages.add(message)
+//
+//        adapter.setData(createNewData())
+//        scrollToBottom()
+//    }
 
     private fun uploadMedia(message: Message) {
         val fileName = DetailsMediaManager.MESSAGES + File.separator + DetailsMediaManager.fileName
@@ -389,38 +371,21 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     private fun postMessage(message: Message) {
-//        if (contact != null) {
-//            compositeDisposable.add(apiService.sendMessage(contact!!.id, PreferenceUtils.getAuthorizationToken(this@ChatDetailsActivity),
-//                MessageRequest(message.content, message.imageUrl, message.videoUrl, message.isPortrait))
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe({ result ->
-//                    if (DetailsMediaManager.hasMedia(result)) {
-//                        result.additionalData = message.additionalData
-//                        DetailsMediaManager.removeMessage(message.additionalData.observerId)
-//                        DetailsMediaManager.mutableListSendingMessages.add(result)
-//                        DetailsMediaManager.pendingMessage = result
-//
-//                        stopProgress(null)
-//                    } else {
-//                        adapter.removeMessage(message.additionalData.id)
-//                        DetailsMediaManager.removeMessageId(message.additionalData.id)
-//                        setDateForMessage(result)
-//                        mutableListMessages.add(result)
-//
-//                        adapter.setData(createNewData())
-//                        scrollToBottom()
-//                    }
-//                }, { error ->
-//                    stopProgress(error)
-//                    handleApiError(error)
-//
-//                    if (DetailsMediaManager.tmpId != null) {
-//                        val sendingMessage = getSendingMessage(DetailsMediaManager.tmpId)!!
-//                        messageNotSent(sendingMessage)
-//                    }
-//                }))
-//        }
+
+        apiService = PostApi.create(this@ChatDetailsActivity)
+        compositeDisposable.add(
+            apiService.postMessage(PreferenceUtils.getAuthorizationToken(this@ChatDetailsActivity),
+                PreferenceUtils.getChatId(this@ChatDetailsActivity),message)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    //                    mutableListMessages = it.message
+                    //                Log.d("station", " "+ it[0].location)
+                }, {
+                    Log.d("destinacija",""+ it.localizedMessage)
+                    //                showProgress(false)
+                })
+        )
     }
 
     private fun stopProgress(error: Throwable?) {
@@ -441,8 +406,8 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     private fun createNewData(): MutableList<Message> =
         mutableListMessages.asSequence().toMutableList()
 
-    private fun getSendingMessage(messageId: Int?): Message? =
-        mutableListMessages.asSequence().find { message -> message.additionalData.observerId == messageId }
+//    private fun getSendingMessage(messageId: Int?): Message? =
+//        mutableListMessages.asSequence().find { message -> message.additionalData.observerId == messageId }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -567,18 +532,18 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     private var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            // try again clicked
-            val message = intent.getSerializableExtra(CONTENT_KEY) as Message
-            message.additionalData.errorSending = false
-            message.additionalData.isSending = true
-            DetailsMediaManager.tmpId = message.additionalData.id
-            if (DetailsMediaManager.hasMedia(message)) {
-                hasMedia = true
-                DetailsMediaManager.tmpUri = Uri.parse(message.additionalData.uri)
-                DetailsMediaManager.uploadFile = message.additionalData.uploadFile
-                DetailsMediaManager.fileName = message.additionalData.imageName
-            }
-            sendMessage(message)
+//            // try again clicked
+//            val message = intent.getSerializableExtra(CONTENT_KEY) as Message
+//            message.additionalData.errorSending = false
+//            message.additionalData.isSending = true
+//            DetailsMediaManager.tmpId = message.additionalData.id
+//            if (DetailsMediaManager.hasMedia(message)) {
+//                hasMedia = true
+//                DetailsMediaManager.tmpUri = Uri.parse(message.additionalData.uri)
+//                DetailsMediaManager.uploadFile = message.additionalData.uploadFile
+//                DetailsMediaManager.fileName = message.additionalData.imageName
+//            }
+//            sendMessage(message)
         }
     }
 

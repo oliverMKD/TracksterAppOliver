@@ -227,6 +227,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             .subscribeOn(Schedulers.io())
             .subscribe({
                 mapsId = it[0].id
+                PreferenceUtils.saveChatId(this,mapsId)
+//                getChatById(mapsId)
                 getWeightStations()
 
                 //                Log.d("station", " "+ it[0].location)
