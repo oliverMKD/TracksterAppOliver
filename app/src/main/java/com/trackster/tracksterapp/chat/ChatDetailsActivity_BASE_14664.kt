@@ -18,7 +18,10 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.bumptech.glide.Glide
@@ -49,7 +52,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     // UI components
-    private var sendMessageRelativeLayout: LinearLayout? = null
+    private var sendMessageRelativeLayout: RelativeLayout? = null
     private var imgSelectorImageView: ImageView? = null
     private var sendMessageImageView: ImageView? = null
     private var sendMessageEditText: EditText? = null
@@ -217,9 +220,11 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 val message = sendMessageEditText?.text
                 if (!TextUtils.isEmpty(message)) {
+                    sendMessageImageView?.setImageResource(R.drawable.arrow_send_blue)
                     isMessageSendable = true
                 } else {
                     if (isMessageSendable) {
+                        sendMessageImageView?.setImageResource(R.drawable.arrow_send)
                         isMessageSendable = false
                     }
                 }
@@ -245,7 +250,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
 
-    public fun getMessages() {
+    private fun getMessages() {
         apiService = PostApi.create(this@ChatDetailsActivity)
         compositeDisposable.add(
             apiService.getChatById(PreferenceUtils.getAuthorizationToken(this@ChatDetailsActivity),
@@ -253,28 +258,8 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                  var brokerName = it.broker.firstName
-                    var brokerLastName  =it.broker.lastName
-                    var brokerFullName = brokerName+" " + brokerLastName
-                    var driverName = it.driver.firstName
-                    var driverLastName =it.driver.lastName
-                    var driverFullName = driverName +" "+ driverLastName
-                    var carrierName = it.carrier.firstName
-                    var carrierLastName =it.carrier.lastName
-                    var carrierFullName = carrierName +" "+ carrierLastName
-
-                    var brokerId = it.broker.id
-                    var carrierId = it.carrier.id
-
-                    PreferenceUtils.saveBrokerName(this@ChatDetailsActivity, brokerFullName )
-                    PreferenceUtils.saveDriverName(this@ChatDetailsActivity, driverFullName )
-                    PreferenceUtils.saveCarrierName(this@ChatDetailsActivity, carrierFullName )
-                    PreferenceUtils.saveBrokerId(this@ChatDetailsActivity, brokerId )
-                    PreferenceUtils.saveCarrierId(this@ChatDetailsActivity, carrierId )
 //                    mutableListMessages = it.message
-                    mutableListMessages = it.message
-                    setData(mutableListMessages)
-                    scrollToBottom()
+                    setData(it.message)
                     //                Log.d("station", " "+ it[0].location)
                 }, {
                     Log.d("destinacija",""+ it.localizedMessage)
@@ -284,8 +269,10 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     private fun setData(result: MutableList<Message>) {
-//        result.reverse()
-        setDatesData(result)
+        result.reverse()
+//        setDatesData(result)
+//        val pendingMessages = DetailsMediaManager.getPendingMessages(contact?.id)
+//        result.addAll(pendingMessages)
         adapter.setData(result)
         scrollToBottom()
     }
@@ -297,26 +284,30 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     private fun setDateForMessage(message: Message) {
-        val additionalData = DateFormat.formatDate(message.createTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
+//        val additionalData = AdditionalData()
+//        additionalData.time = getString(R.string.validate) + " " + DateFormat.formatDate(message.sendTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
 //
-        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
-        if (previousDate == messageDate) {
-            message.createTime = ""
-        } else {
-            message.createTime = messageDate
-            previousDate = messageDate
-        }
-
-        message.createTime = messageDate
+//        var messageDate = DateFormat.formatDate(message.sendTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+//        messageDate = DateFormat.formatDateDetailsMessage(message.sendTime, messageDate)
+//        if (messageDate == Day.TODAY) {
+//            messageDate = getString(R.string.Continue)
+//        } else if (messageDate == Day.YESTERDAY) {
+//            messageDate = getString(R.string.validate)
+//        }
+//        if (previousDate == messageDate) {
+//            message.sendTime = ""
+//        } else {
+//            message.sendTime = messageDate
+//            previousDate = messageDate
+//        }
+//
+//        message.additionalData = additionalData
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.button_send_msg -> { sendMessage(DetailsMediaManager.createMessage(
+            R.id.button_send_msg -> sendMessage(DetailsMediaManager.createMessage(
                 this,sendMessageEditText?.text.toString(),"1234")!!)
-            clearMessage()
-            }
 //            R.id.img_selector_image_view -> addMedia()
 //            R.id.send_message_image_view -> {
 //                if (contact != null) {
@@ -388,11 +379,6 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    setDateForMessage(it)
-                    mutableListMessages.add(it)
-
-                    adapter.setData(createNewData())
-                    scrollToBottom()
                     //                    mutableListMessages = it.message
                     //                Log.d("station", " "+ it[0].location)
                 }, {
@@ -547,7 +533,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
 
         override fun onReceive(context: Context, intent: Intent) {
 //            // try again clicked
-            val message = intent.getSerializableExtra(CONTENT_KEY) as Message
+//            val message = intent.getSerializableExtra(CONTENT_KEY) as Message
 //            message.additionalData.errorSending = false
 //            message.additionalData.isSending = true
 //            DetailsMediaManager.tmpId = message.additionalData.id
@@ -557,7 +543,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
 //                DetailsMediaManager.uploadFile = message.additionalData.uploadFile
 //                DetailsMediaManager.fileName = message.additionalData.imageName
 //            }
-            sendMessage(message)
+//            sendMessage(message)
         }
     }
 
