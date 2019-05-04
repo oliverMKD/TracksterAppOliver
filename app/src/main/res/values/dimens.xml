@@ -15,10 +15,11 @@
     <dimen name="send_messages_view_padding_bottom">45dp</dimen>
     <dimen name="rounded_button_radius">24dp</dimen>
     <dimen name="sign_in_button_line_spacing_extra">5.9sp</dimen>
-    <dimen name="progress_bar_margin_bottom">8dp</dimen>
+    <dimen name="progress_bar_margin_bottom">5dp</dimen>
     <dimen name="sign_in_button_margin_top">16dp</dimen>
 
     <dimen name="select_image_text_view_width_height">40dp</dimen>
+
     <dimen name="rounded_send_message_edit_text_radius">20dp</dimen>
     <dimen name="send_message_elevation">10dp</dimen>
     <dimen name="message_edit_text_padding">14dp</dimen>

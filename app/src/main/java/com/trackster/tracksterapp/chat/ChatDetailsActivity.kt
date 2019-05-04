@@ -18,10 +18,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.RelativeLayout
+import android.widget.*
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.bumptech.glide.Glide
@@ -52,7 +49,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     // UI components
-    private var sendMessageRelativeLayout: RelativeLayout? = null
+    private var sendMessageRelativeLayout: LinearLayout? = null
     private var imgSelectorImageView: ImageView? = null
     private var sendMessageImageView: ImageView? = null
     private var sendMessageEditText: EditText? = null
@@ -220,11 +217,9 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 val message = sendMessageEditText?.text
                 if (!TextUtils.isEmpty(message)) {
-                    sendMessageImageView?.setImageResource(R.drawable.arrow_send_blue)
                     isMessageSendable = true
                 } else {
                     if (isMessageSendable) {
-                        sendMessageImageView?.setImageResource(R.drawable.arrow_send)
                         isMessageSendable = false
                     }
                 }
@@ -250,7 +245,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
 
-    private fun getMessages() {
+    public fun getMessages() {
         apiService = PostApi.create(this@ChatDetailsActivity)
         compositeDisposable.add(
             apiService.getChatById(PreferenceUtils.getAuthorizationToken(this@ChatDetailsActivity),
@@ -258,6 +253,24 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                  var brokerName = it.broker.firstName
+                    var brokerLastName  =it.broker.lastName
+                    var brokerFullName = brokerName+" " + brokerLastName
+                    var driverName = it.driver.firstName
+                    var driverLastName =it.driver.lastName
+                    var driverFullName = driverName +" "+ driverLastName
+                    var carrierName = it.carrier.firstName
+                    var carrierLastName =it.carrier.lastName
+                    var carrierFullName = carrierName +" "+ carrierLastName
+
+                    var brokerId = it.broker.id
+                    var carrierId = it.carrier.id
+
+                    PreferenceUtils.saveBrokerName(this@ChatDetailsActivity, brokerFullName )
+                    PreferenceUtils.saveDriverName(this@ChatDetailsActivity, driverFullName )
+                    PreferenceUtils.saveCarrierName(this@ChatDetailsActivity, carrierFullName )
+                    PreferenceUtils.saveBrokerId(this@ChatDetailsActivity, brokerId )
+                    PreferenceUtils.saveCarrierId(this@ChatDetailsActivity, carrierId )
 //                    mutableListMessages = it.message
                     setData(it.message)
                     //                Log.d("station", " "+ it[0].location)

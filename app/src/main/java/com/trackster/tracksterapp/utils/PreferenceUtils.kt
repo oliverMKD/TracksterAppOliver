@@ -16,6 +16,11 @@ object PreferenceUtils {
     private const val KEY_AUTH_TOKEN = "auth_token"
     private const val KEY_USER_ID = "user_id"
     private const val KEY_CHAT_ID = "chat_id"
+    private const val KEY_BROKER_NAME = "broker_name"
+    private const val KEY_DRIVER_NAME = "driver_name"
+    private const val BROKER_ID = "broker_id"
+    private const val CARRIER_ID = "carrier_id"
+    private const val CARRIER_NAME = "carrier_name"
 
     private fun getPreferences(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -72,6 +77,32 @@ object PreferenceUtils {
         getPreferences(context)[KEY_CHAT_ID] = id
     }
     fun getChatId(context: Context): String = getPreferences(context).getString(KEY_CHAT_ID, "") as String
+
+    fun saveDriverName(context: Context, id: String) {
+        getPreferences(context)[KEY_DRIVER_NAME] = id
+    }
+    fun getDriverName(context: Context): String = getPreferences(context).getString(KEY_DRIVER_NAME, "") as String
+
+    fun saveBrokerName(context: Context, id: String) {
+        getPreferences(context)[KEY_BROKER_NAME] = id
+    }
+    fun getBrokerName(context: Context): String = getPreferences(context).getString(KEY_BROKER_NAME, "") as String
+
+    fun saveCarrierName(context: Context, id: String) {
+        getPreferences(context)[CARRIER_NAME] = id
+    }
+    fun getCarrierName(context: Context): String = getPreferences(context).getString(CARRIER_NAME, "") as String
+
+    fun saveCarrierId(context: Context, id: String) {
+        getPreferences(context)[CARRIER_ID] = id
+    }
+    fun getCarrierId(context: Context): String = getPreferences(context).getString(CARRIER_ID, "") as String
+
+    fun saveBrokerId(context: Context, id: String) {
+        getPreferences(context)[BROKER_ID] = id
+    }
+    fun getBrokerId(context: Context): String = getPreferences(context).getString(BROKER_ID, "") as String
+
 
 //    fun clearAuthorizationToken(context: Context) {
 //        getPreferences(context)[KEY_AUTH_TOKEN] = ""

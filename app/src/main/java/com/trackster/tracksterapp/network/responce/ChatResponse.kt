@@ -15,5 +15,7 @@ data class ChatResponse(
     @SerializedName("pickupAddress") var pickupAddress: Address,
     @SerializedName("destinationAddress") var destinationAddress: Address,
     @SerializedName("broker") var broker: User,
+    @SerializedName("carrier") var carrier: User,
+    @SerializedName("driver") var driver: User,
     @SerializedName("messages") val message: ArrayList<Message>
 )

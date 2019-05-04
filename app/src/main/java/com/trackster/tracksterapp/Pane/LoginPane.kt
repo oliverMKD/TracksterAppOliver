@@ -187,8 +187,9 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
         val number = phone1?.text.toString()
         val code = code1?.text.toString()
-        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNmM3NmViMTdkNDQyMTc3MGFlMTg4ZCIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6IlByb2JhIiwibGFzdE5hbWUiOiJCcm9rZXIyIiwidXNlclR5cGUiOjMsImlhdCI6MTU1NjYxMTE1OSwiZXhwIjoxNTU3MjE1OTU5fQ.aePgNpjq-NyycHTfcIxBC6Tv_k0-cHkXqyDTaUwVELc"
-
+        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6Ik9saXZlciIsImxhc3ROYW1lIjoiQm96aW5vdnNraSIsInVzZXJUeXBlIjo2LCJpYXQiOjE1NTY5NjkzNjIsImV4cCI6MTU1NzU3NDE2Mn0.OYtvY3k8BXENNpDj8GYL6LkaG3GWoavkMEtu8PLGscg"
+val id = "5c7ac90b9ce4ba08c29a72b6"
+        PreferenceUtils.saveUserId(this@LoginPane, id)
        PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
         startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
 //        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS

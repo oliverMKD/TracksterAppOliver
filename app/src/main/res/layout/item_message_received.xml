@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout"
+        android:paddingTop="1dp">
+
+
+    <TextView
+            android:id="@+id/received_name2"
+            android:text="John Doe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="1dp"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+            android:id="@+id/received_body"
+            android:text="hi man, how are you?"
+            android:background="@drawable/rounded_rectangle_orange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="240dp"
+            android:padding="8dp"
+            android:textColor="@color/black"
+            android:layout_marginTop="3dp"
+            app:layout_constraintTop_toBottomOf="@+id/received_name"
+            android:layout_marginLeft="8dp" />
+
+    <TextView
+            android:id="@+id/text_message_time"
+            android:text="11:40"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            app:layout_constraintTop_toBottomOf="@id/received_body"
+            android:layout_marginTop="1dp"
+
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp"/>
+
+</android.support.constraint.ConstraintLayout>

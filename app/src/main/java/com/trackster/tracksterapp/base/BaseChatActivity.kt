@@ -95,10 +95,11 @@ abstract class BaseChatActivity : AppCompatActivity() {
     }
 
     fun setToolbarTitleAndLogo(toolbarTitle: String?, logoUrl: String?) {
-        title = toolbarTitle
+        title = "Chat"
 
         toolbar?.setLogo(R.drawable.ic_avatar)
         toolbar?.setTitleMargin(resources.getDimensionPixelSize(R.dimen.toolbar_title_margin_start), 0, 0, 0)
+        toolbar?.setTitleTextColor(resources.getColor(R.color.White))
 
         Glide.with(this)
                 .asDrawable()

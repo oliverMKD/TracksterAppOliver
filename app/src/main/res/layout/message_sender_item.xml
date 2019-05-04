@@ -7,7 +7,7 @@
     tools:targetApi="LOLLIPOP">
 
     <TextView
-        android:id="@+id/date_text_view"
+        android:id="@+id/date_text_view2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -16,14 +16,14 @@
         android:textSize="12.3sp" />
 
     <ImageView
-        android:id="@+id/avatar_image_view"
+        android:id="@+id/avatar_image_view2"
         android:layout_width="@dimen/message_avatar_width_height"
         android:layout_height="@dimen/message_avatar_width_height"
         android:layout_above="@+id/time_linear_layout"
         android:layout_margin="@dimen/message_relative_layout_margin" />
 
     <RelativeLayout
-        android:id="@+id/message_relative_layout"
+        android:id="@+id/message_relative_layout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/date_text_view"
@@ -38,7 +38,7 @@
             android:id="@+id/message_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/message_image_view"
+            android:layout_below="@+id/message_image_view2"
             android:layout_centerVertical="true"
             android:letterSpacing="0.01"
             android:minWidth="@dimen/my_message_text_view_min_width"
@@ -47,14 +47,14 @@
             android:textSize="16.7sp" />
 
         <ImageView
-            android:id="@+id/message_image_view"
+            android:id="@+id/message_image_view2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/message_image_view_padding"
             android:visibility="gone" />
 
         <ImageView
-            android:id="@+id/message_video_image_view"
+            android:id="@+id/message_video_image_view2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/message_image_view"
@@ -67,20 +67,20 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/time_linear_layout"
+        android:id="@+id/time_linear_layout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/message_relative_layout"
         android:layout_marginStart="@dimen/message_relative_layout_margin">
 
         <ImageView
-            android:id="@+id/time_image_view"
+            android:id="@+id/time_image_view2"
             android:layout_width="@dimen/time_image_view_width_height"
             android:layout_height="@dimen/time_image_view_width_height"
             app:srcCompat="@drawable/ic_sent" />
 
         <TextView
-            android:id="@+id/time_text_view"
+            android:id="@+id/time_text_view2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

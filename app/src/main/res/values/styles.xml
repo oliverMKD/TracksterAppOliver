@@ -49,8 +49,8 @@
 
     <!-- Toolbar themes. -->
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="android:background">@android:color/white</item>
+        <item name="android:textColorPrimary">@color/White</item>
+        <item name="android:background">@android:color/black</item>
     </style>
 
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
