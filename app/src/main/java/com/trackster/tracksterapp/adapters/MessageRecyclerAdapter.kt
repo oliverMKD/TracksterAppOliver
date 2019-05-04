@@ -15,11 +15,9 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.chat.ChatDetailsActivity
 import com.trackster.tracksterapp.model.Message
-import com.trackster.tracksterapp.utils.CONTENT_KEY
-import com.trackster.tracksterapp.utils.PreferenceUtils
-import com.trackster.tracksterapp.utils.TRY_AGAIN_BROADCAST
-import com.trackster.tracksterapp.utils.Utils
+import com.trackster.tracksterapp.utils.*
 
 class MessageRecyclerAdapter(private val context: Activity, private var list: MutableList<Message>,
                              private var avatar: String?)
@@ -93,12 +91,12 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         holder.messageTextView.visibility = View.GONE
         holder.messageImageView.visibility = View.GONE
 
-        if (TextUtils.isEmpty(message.createTime)) {
-            holder.dateTextView.visibility = View.GONE
-        } else {
+//        if (TextUtils.isEmpty(message.createTime)) {
+//            holder.dateTextView.visibility = View.GONE
+//        } else {
             holder.dateTextView.visibility = View.VISIBLE
             holder.dateTextView.text = message.createTime
-        }
+//        }
 
         when (true) {
 //            message.additionalData.isSending -> setSendingUI(holder)
@@ -202,8 +200,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
 
 //    private fun openMediaDetails(message: Message) {
 //        val intent = Intent(context, MediaDetailsActivity::class.java)
-//        intent.putExtra(Constants.MEDIA_DETAILS_IMAGE_URL_KEY, message.imageUrl)
-//        intent.putExtra(Constants.MEDIA_DETAILS_VIDEO_URL_KEY, message.videoUrl)
+//        intent.putExtra(MEDIA_DETAILS_IMAGE_URL_KEY, message.imageUrl)
 //        (context as ChatDetailsActivity).openMediaDetails(intent)
 //    }
 }

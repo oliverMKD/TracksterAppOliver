@@ -12,6 +12,7 @@ enum class DateFormat(val format: String) {
     DATE_FORMAT_MESSAGE_DETAILS("EEEE, MMMM dd"),
     TIME_FORMAT_MESSAGE_DETAILS("HH:mm");
 
+
     companion object {
         private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS Z", Locale.US)
 
