@@ -52,7 +52,7 @@ class MessageRecyclerAdapter(
 
         val messageRelativeLayout = view.findViewById(R.id.message_relative_layout) as RelativeLayout
         val messageTextView = view.findViewById(R.id.message_text_view) as TextView
-        val messageImageView = view.findViewById(R.id.message_image_view) as ImageView
+       val messageImageView = view.findViewById(R.id.message_image_view) as ImageView
         //        val messageVideoImageView = view.findViewById(R.id.message_video_image_view) as ImageView
         val received_name = view.findViewById(R.id.received_name) as TextView?
         val sent_name = view.findViewById(R.id.sent_name) as TextView?
