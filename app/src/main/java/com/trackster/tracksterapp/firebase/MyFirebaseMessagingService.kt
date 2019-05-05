@@ -13,8 +13,7 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.trackster.tracksterapp.R
-import com.trackster.tracksterapp.chat.ChatDetailsActivity
-import com.trackster.tracksterapp.mainScreen.MainScreenActivity
+import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.model.FirebaseMessage
 import com.trackster.tracksterapp.utils.*
 import java.util.*
@@ -59,13 +58,13 @@ abstract class MyFirebaseMessagingService : FirebaseMessagingService() {
             e.printStackTrace()
         }
         if (foreground) { //app in foreground
-            intent = Intent(this, ChatDetailsActivity::class.java)
+            intent = Intent(this, ChatDetails::class.java)
             intent.putExtra("intent_backchat", 1)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             pendingIntent = PendingIntent.getActivity(this, Integer.valueOf(random) /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT)
             startActivity(intent)      // to directly open activity if app is foreground
         } else { //app in background
-            intent = Intent(this, ChatDetailsActivity::class.java)
+            intent = Intent(this, ChatDetails::class.java)
             intent.putExtra("intent_backchat", 1)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
             pendingIntent = PendingIntent.getActivity(this, Integer.valueOf(random) /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT)

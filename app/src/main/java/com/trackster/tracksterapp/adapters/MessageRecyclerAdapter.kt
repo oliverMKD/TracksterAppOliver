@@ -2,8 +2,6 @@ package com.trackster.tracksterapp.adapters
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.AnimationDrawable
-import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -12,10 +10,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
-import com.trackster.tracksterapp.chat.ChatDetailsActivity
+import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.utils.*
 
@@ -191,7 +187,7 @@ class MessageRecyclerAdapter(
 
     private fun paneChat() {
 
-        (context as ChatDetailsActivity).getMessages()
+        (context as ChatDetails).getMessages()
     }
 
     override fun getItemCount(): Int = list.size
@@ -217,6 +213,6 @@ class MessageRecyclerAdapter(
 //    private fun openMediaDetails(message: Message) {
 //        val intent = Intent(context, MediaDetailsActivity::class.java)
 //        intent.putExtra(MEDIA_DETAILS_IMAGE_URL_KEY, message.imageUrl)
-//        (context as ChatDetailsActivity).openMediaDetails(intent)
+//        (context as ChatDetails).openMediaDetails(intent)
 //    }
 }

@@ -12,7 +12,6 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
@@ -41,7 +40,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
-import com.trackster.tracksterapp.chat.ChatDetailsActivity
+import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
 import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
 import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
@@ -220,7 +219,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 drawer_layout.openDrawer(Gravity.START)
             }
             R.id.chat ->
-                startActivity(Intent(this@MainScreenActivity,ChatDetailsActivity::class.java))
+                startActivity(Intent(this@MainScreenActivity,ChatDetails::class.java))
         }
     }
     override fun onMapReady(googleMap: GoogleMap?) {
