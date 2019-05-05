@@ -51,16 +51,16 @@ android:background="@drawable/rounded_rectangle_green"
                 android:layout_height="@dimen/my_message_image_view_height"
                 android:padding="@dimen/message_image_view_padding"
                 android:visibility="gone" />
-        <ImageView
-            android:id="@+id/message_video_image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/message_image_view"
-            android:layout_alignEnd="@id/message_image_view"
-            android:layout_alignStart="@id/message_image_view"
-            android:layout_alignTop="@id/message_image_view"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_video" />
+        <!--<ImageView-->
+            <!--android:id="@+id/message_video_image_view"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignBottom="@id/message_image_view"-->
+            <!--android:layout_alignEnd="@id/message_image_view"-->
+            <!--android:layout_alignStart="@id/message_image_view"-->
+            <!--android:layout_alignTop="@id/message_image_view"-->
+            <!--android:visibility="gone"-->
+            <!--app:srcCompat="@drawable/ic_video" />-->
 
 
 

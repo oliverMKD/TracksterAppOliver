@@ -55,7 +55,9 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
     // UI components
     private var sendMessageRelativeLayout: LinearLayout? = null
     private var imgSelectorImageView: ImageView? = null
-    private var sendMessageImageView: ImageView? = null
+    private var cam: ImageView? = null
+    private var sendMessageImageView: ImageView? = null  // mikrofon
+    private var sendMessageImageView2: ImageView? = null
     private var sendMessageEditText: EditText? = null
     private var recyclerView: RecyclerView? = null
     private var progressBar: ProgressBar? = null
@@ -213,12 +215,31 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
         sendMessageImageView = findViewById(R.id.button_send_msg)
         sendMessageImageView?.setOnClickListener(this)
 
+        sendMessageImageView2= findViewById(R.id.button_send_msg2)
+        sendMessageImageView2?.setOnClickListener(this)
+
         sendMessageEditText = findViewById(R.id.send_message_edit_text)
 
+        cam = findViewById(R.id.cam)
+//        sendMessageEditText?.setOnFocusChangeListener { _, hasFocus ->
+//            if (!hasFocus) {   sendMessageImageView?.setImageResource(R.drawable.spajalica)}
+//        }
+
+        sendMessageImageView2?.visibility = View.VISIBLE
+        sendMessageImageView?.visibility = View.GONE
+
+
         sendMessageEditText?.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+
+
+            }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+
+
+
+
                 val message = sendMessageEditText?.text
                 if (!TextUtils.isEmpty(message)) {
                     isMessageSendable = true
@@ -227,9 +248,28 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
                         isMessageSendable = false
                     }
                 }
+
+                if(message!!.trim().length>0) {
+                    sendMessageImageView?.visibility = View.VISIBLE
+                    sendMessageImageView2?.visibility = View.GONE
+                    imgSelectorImageView?.visibility = View.GONE
+                    cam?.visibility = View.GONE
+
+                }else{
+                    sendMessageImageView2?.visibility = View.VISIBLE
+                    sendMessageImageView?.visibility = View.GONE
+                    imgSelectorImageView?.visibility = View.VISIBLE
+                    cam?.visibility = View.VISIBLE
+                }
+
             }
 
-            override fun afterTextChanged(s: Editable) {}
+
+
+            override fun afterTextChanged(s: Editable) {
+
+
+            }
         })
     }
 
@@ -340,7 +380,7 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
         sendMessageEditText?.setText("")
         hasMedia = false
         removeMedia()
-        sendMessageImageView?.setImageResource(R.drawable.arrow_send)
+      //  sendMessageImageView?.setImageResource(R.drawable.spajalica)
     }
 
     private fun sendMessage(message: Message) {
@@ -505,7 +545,7 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 
     private fun removeMedia() {
         isMessageSendable = false
-        Glide.with(this).load(R.drawable.add_media).apply(RequestOptions.circleCropTransform()).into(imgSelectorImageView!!)
+      //  Glide.with(this).load(R.drawable.add_media).apply(RequestOptions.circleCropTransform()).into(imgSelectorImageView!!)
     }
 
 //    override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
