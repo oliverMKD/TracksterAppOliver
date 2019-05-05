@@ -190,8 +190,10 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6Ik9saXZlciIsImxhc3ROYW1lIjoiQm96aW5vdnNraSIsInVzZXJUeXBlIjo2LCJpYXQiOjE1NTY5NjkzNjIsImV4cCI6MTU1NzU3NDE2Mn0.OYtvY3k8BXENNpDj8GYL6LkaG3GWoavkMEtu8PLGscg"
 val id = "5c7ac90b9ce4ba08c29a72b6"
         PreferenceUtils.saveUserId(this@LoginPane, id)
+
        PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
         startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
+
 //        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS
     }
 
@@ -253,6 +255,7 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                     fcb!!.visibility=View.INVISIBLE
                     gogbtn!!.visibility=View.INVISIBLE
                     resendcode!!.visibility=View.VISIBLE
+                    startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
                 }
 
                 override fun onCancel() {
@@ -276,6 +279,7 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                     PreferenceUtils.saveAuthorizationToken(this,it.body()!!.token)
                     PreferenceUtils.saveUserId(this,it.body()!!.id)
                     startActivity(Intent(this@LoginPane,MainScreenActivity::class.java))
+
                 }, {
                     Log.d("pane", "error")
                 })

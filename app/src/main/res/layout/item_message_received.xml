@@ -12,6 +12,7 @@
 
     <TextView
             android:id="@+id/received_name2"
+
             android:text="John Doe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/linear_layout"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/White"
+        android:padding="20dp"
+>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"   >
+
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Points of Interest"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+        />
+
+        <Button
+                android:id="@+id/button_popup"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+               android:layout_marginLeft="30dp"
+                android:background="@drawable/com_facebook_close"
+                android:layout_gravity="center|end"
+
+        />
+
+    </LinearLayout>
+
+    <LinearLayout
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
+
+        <ImageView
+                android:id="@+id/gas_station"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:src="@drawable/gas_station"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gas Station"
+                android:textSize="20sp"
+                android:layout_marginLeft="10dp"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+        />
+
+
+    </LinearLayout>
+
+    <View
+            android:layout_width="200dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/colorDark"
+    />
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+
+    >
+        <ImageView
+                android:id="@+id/parking"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:src="@drawable/parking"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Parking"
+                android:textSize="20sp"
+                android:layout_marginLeft="10dp"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+        />
+
+    </LinearLayout>
+
+    <View
+            android:layout_width="200dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorDark"
+    />
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+
+    >
+        <ImageView
+                android:id="@+id/lunche"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:src="@drawable/lunche"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lunch"
+                android:textSize="20sp"
+                android:layout_marginLeft="10dp"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+        />
+
+    </LinearLayout>
+
+
+    <TextView
+            android:id="@+id/text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="OnKlik na text za promena na Boja"
+            android:textSize="15dp"
+            android:textColor="@color/black"
+    />
+
+</LinearLayout>

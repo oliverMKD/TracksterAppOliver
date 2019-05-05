@@ -5,6 +5,7 @@
     <!-- View background color -->
     <solid
             android:color="#c2ffc4">
+
     </solid>
 
     <!-- The radius makes the corners rounded -->
@@ -13,3 +14,4 @@
             android:topLeftRadius="@dimen/rounded_button_radius"
             android:bottomRightRadius="@dimen/rounded_button_radius"/>
 </shape>
+

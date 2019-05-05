@@ -87,6 +87,8 @@ interface PostApi {
     @POST("/chats/{chatId}/push/message")
     fun postMessage(@Header("x-auth-token") authorization: String,
                     @Path("chatId") chatId: String, @Body message: Message) : Single<Message>
+    @GET("/admin/truck-colors")
+    fun getColors(@Header("x-auth-token") authorization: String): Observable<ArrayList<Colors>>
 
     companion object Factory {
         fun create(context: Context): PostApi {

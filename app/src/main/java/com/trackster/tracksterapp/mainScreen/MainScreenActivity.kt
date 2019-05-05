@@ -1,6 +1,7 @@
 package com.trackster.tracksterapp.mainScreen
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
@@ -8,6 +9,7 @@ import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.Snackbar
@@ -17,12 +19,11 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
+import android.transition.Slide
+import android.transition.TransitionManager
 import android.util.Log
-import android.view.Gravity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.ImageView
+import android.view.*
+import android.widget.*
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -115,10 +116,79 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         hamburger.setOnClickListener(this)
         chat.setOnClickListener(this)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        floatBtn.setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show()
+
+            val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+            // Inflate a custom view using layout inflater
+            val view = inflater.inflate(R.layout.popup_window,null)
+
+            // Initialize a new instance of popup window
+            val popupWindow = PopupWindow(
+                view, // Custom view to show in popup window
+                LinearLayout.LayoutParams.WRAP_CONTENT, // Width of popup window
+                LinearLayout.LayoutParams.WRAP_CONTENT // Window height
+            )
+
+            // Set an elevation for the popup window
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                popupWindow.elevation = 10.0F
+                popupWindow.setOutsideTouchable(true);
+            }
+
+
+            // If API level 23 or higher then execute the code
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                // Create a new slide animation for popup window enter transition
+                val slideIn = Slide()
+                slideIn.slideEdge = Gravity.BOTTOM
+                popupWindow.enterTransition = slideIn
+
+                // Slide animation for popup window exit transition
+                val slideOut = Slide()
+                slideOut.slideEdge = Gravity.BOTTOM
+                popupWindow.exitTransition = slideOut
+
+            }
+
+            // Get the widgets reference from custom view
+            val tv = view.findViewById<TextView>(R.id.text_view)
+            val buttonPopup = view.findViewById<Button>(R.id.button_popup)
+
+            // Set click listener for popup window's text view
+            tv.setOnClickListener{
+                // Change the text color of popup window's text view
+                tv.setTextColor(Color.RED)
+            }
+
+            // Set a click listener for popup's button widget
+            buttonPopup.setOnClickListener{
+                // Dismiss the popup window
+                popupWindow.dismiss()
+            }
+
+            // Set a dismiss listener for popup window
+            popupWindow.setOnDismissListener {
+                Toast.makeText(applicationContext,"Popup closed",Toast.LENGTH_SHORT).show()
+            }
+
+
+            // Finally, show the popup window on app
+            TransitionManager.beginDelayedTransition(root_layout)
+            popupWindow.showAtLocation(
+                root_layout, // Location to display popup window
+                Gravity.BOTTOM , // Exact position of layout to display popup
+                -120,// X offset
+                20 // Y offset
+            )
         }
+
+
+
+
+
 
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
@@ -198,15 +268,15 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         apiService = PostApi.create(this)
         var map : MutableMap< String,String> =  mutableMapOf()
-//        map["42.0151079"]
-//        map["21.4526962"]
-//        map.put("42.0151079","21.4526962")
-        val mapa = "42.0151079,21.4526962"
-        val bb = mapa.replace("\\,","%2C")
+
+        map["42.0151079"]
+        map["21.4526962"]
+        val coordinates = "42.0151079,21.4526962"
+        val newCoordinates = coordinates.replace("\\,","%2C")
 
         compositeDisposable.add(
             apiService.getWeighStations(
-                PreferenceUtils.getAuthorizationToken(this),bb , 1)
+                PreferenceUtils.getAuthorizationToken(this),newCoordinates , 1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({

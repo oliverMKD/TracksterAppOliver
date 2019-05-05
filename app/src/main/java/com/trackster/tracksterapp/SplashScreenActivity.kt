@@ -60,6 +60,7 @@ class SplashScreenActivity : AppCompatActivity() {
             startActivity(Intent(this@SplashScreenActivity, MainScreenActivity::class.java))
 
         } else{
+
             startActivity(Intent(this@SplashScreenActivity, LoginPane::class.java))
         }
     }

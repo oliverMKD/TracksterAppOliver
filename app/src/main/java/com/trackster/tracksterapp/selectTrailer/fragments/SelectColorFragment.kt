@@ -1,26 +1,43 @@
 package com.trackster.tracksterapp.selectTrailer.fragments
 
 import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.ProgressBar
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.adapters.SelectColorAdapter
+import com.trackster.tracksterapp.adapters.SelectTruckAdapter
 import com.trackster.tracksterapp.base.BaseFragment
+import com.trackster.tracksterapp.model.Colors
+import com.trackster.tracksterapp.model.Trucks
+import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
+import com.trackster.tracksterapp.utils.PreferenceUtils
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_color.*
+import kotlinx.android.synthetic.main.fragment_select_truck.*
 
 class SelectColorFragment : BaseFragment(), View.OnClickListener {
-
     override fun onClick(p0: View?) {
-        when (p0?.id) {
-            R.id.imageView4 -> {
-                (activity as SelectTrailerActivity).getSelectedColor()
-            }
-        }
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        imageView4.setOnClickListener(this)
+    private lateinit var selectColorAdapter: SelectColorAdapter
+    lateinit var apiService: PostApi
+    private var trucksList: MutableList<Colors> = mutableListOf()
+    var fragmentPosition: Int = 0
+
+    //    private var disposable: CompositeDisposable? = null
+    var compositeDisposableContainer = CompositeDisposable()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        selectColorAdapter = SelectColorAdapter(activity!!)
+        getTrucks()
+
     }
 
     companion object {
@@ -34,4 +51,35 @@ class SelectColorFragment : BaseFragment(), View.OnClickListener {
     override fun getLayoutId(): Int = R.layout.fragment_select_color
 
     override fun getProgressBar(): ProgressBar? = null
+
+    private fun initRecyclerView(list: ArrayList<Colors>) {
+        recycler_color.setHasFixedSize(true)
+        recycler_color.layoutManager = GridLayoutManager(context, 3)
+        recycler_color.adapter = selectColorAdapter
+        selectColorAdapter.setData(list)
+    }
+
+
+    private fun getTrucks() {
+
+        apiService = PostApi.create(context!!)
+        compositeDisposableContainer.add(apiService.getColors(
+            PreferenceUtils.getAuthorizationToken(context!!)
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                initRecyclerView(it)
+// Log.d("station", " "+ it[0].location)
+            }, {
+                // showProgress(false)
+//                Utils.handleApiError(it)
+            })
+        )
+
+    }
+    override fun onDestroy() {
+        compositeDisposableContainer.clear()
+        super.onDestroy()
+    }
 }

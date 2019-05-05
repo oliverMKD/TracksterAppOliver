@@ -21,13 +21,6 @@
 
                 android:orientation="vertical"        >
 
-            <ImageView android:layout_width="30dp"
-                       android:layout_height="30dp"
-                       android:src="@mipmap/back_white"
-                       android:id="@+id/imageView2"
-                       android:layout_marginTop="16dp"
-                       android:layout_marginStart="11dp"          />
-
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="Select Color"

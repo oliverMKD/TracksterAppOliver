@@ -3,24 +3,23 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="130dp"
-android:background="@color/transparent"
+        android:background="@color/transparent"
         android:layout_height="130dp">
 
 
     <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@drawable/ellipse_1"
-            android:id="@+id/image_manufactor"
-            android:scaleType="center"
+            android:scaleType="fitCenter"
             android:nestedScrollingEnabled="true"
-            android:layout_marginStart="8dp"
+            android:id="@+id/image_color"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"
             app:layout_constraintTop_toTopOf="parent"/>
 
 
