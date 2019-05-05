@@ -37,6 +37,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
@@ -48,6 +49,7 @@ import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
+import com.trackster.tracksterapp.network.requests.DeviceRegistrationRequest
 import com.trackster.tracksterapp.utils.DialogUtils
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -111,6 +113,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_screen)
         setSupportActionBar(toolbar)
+//        var refreshedToken = FirebaseInstanceId.getInstance().getToken()
+//        Log.d("tokenFCM", "FCM token: " + refreshedToken)
+//        registerFCM(refreshedToken!!)
         getChats()
         hamburger.setOnClickListener(this)
         chat.setOnClickListener(this)
@@ -637,5 +642,23 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+    private fun registerFCM(token: String) {
+        apiService = PostApi.create(this)
+        CompositeDisposable().add(
+            apiService.registerDevice(PreferenceUtils.getAuthorizationToken(this@MainScreenActivity),
+                DeviceRegistrationRequest(token)
+            ).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    //                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
+
+                },
+                    {
+
+
+                        Log.d("pane", "error")
+                    })
+        )
     }
 }

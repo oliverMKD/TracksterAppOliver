@@ -31,6 +31,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.network.PostApi
+import com.trackster.tracksterapp.network.requests.DeviceRegistrationRequest
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
 import com.trackster.tracksterapp.network.requests.LoginRequestWithPhone
 import com.trackster.tracksterapp.network.requests.ValidatePhoneRequest
@@ -78,8 +79,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        var refreshedToken = FirebaseInstanceId.getInstance().getToken()
-        Log.d("tokenFCM", "FCM token: " + refreshedToken)
+
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         logintext1 = findViewById<TextView>(R.id.logintext)
@@ -175,26 +175,47 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         loginbtn!!.visibility = View.INVISIBLE
 
         smstext!!.visibility = View.VISIBLE
-        or!!.visibility=View.INVISIBLE
-        view2!!.visibility=View.INVISIBLE
-        view1!!.visibility=View.INVISIBLE
-        fcb!!.visibility=View.INVISIBLE
-        gogbtn!!.visibility=View.INVISIBLE
-        resendcode!!.visibility=View.VISIBLE
+        or!!.visibility = View.INVISIBLE
+        view2!!.visibility = View.INVISIBLE
+        view1!!.visibility = View.INVISIBLE
+        fcb!!.visibility = View.INVISIBLE
+        gogbtn!!.visibility = View.INVISIBLE
+        resendcode!!.visibility = View.VISIBLE
     }
 
     private fun validatePhone() {
 
         val number = phone1?.text.toString()
         val code = code1?.text.toString()
-        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6Ik9saXZlciIsImxhc3ROYW1lIjoiQm96aW5vdnNraSIsInVzZXJUeXBlIjo2LCJpYXQiOjE1NTY5NjkzNjIsImV4cCI6MTU1NzU3NDE2Mn0.OYtvY3k8BXENNpDj8GYL6LkaG3GWoavkMEtu8PLGscg"
-val id = "5c7ac90b9ce4ba08c29a72b6"
+        val token =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6Ik9saXZlciIsImxhc3ROYW1lIjoiQm96aW5vdnNraSIsInVzZXJUeXBlIjo2LCJpYXQiOjE1NTY5NjkzNjIsImV4cCI6MTU1NzU3NDE2Mn0.OYtvY3k8BXENNpDj8GYL6LkaG3GWoavkMEtu8PLGscg"
+        val id = "5c7ac90b9ce4ba08c29a72b6"
         PreferenceUtils.saveUserId(this@LoginPane, id)
 
-       PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
-        startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
+        PreferenceUtils.saveAuthorizationToken(this@LoginPane, token)
+        startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
 
 //        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS
+    }
+
+    private fun registerFCM(token: String) {
+        apiService = PostApi.create(this)
+        CompositeDisposable().add(
+            apiService.registerDevice(
+                PreferenceUtils.getAuthorizationToken(this@LoginPane),
+                DeviceRegistrationRequest(token)
+            ).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    //                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
+
+                },
+                    {
+
+
+                        Log.d("pane", "error")
+                    })
+        )
     }
 
     private fun authenticateUserWithPhone(phone: String) {
@@ -205,7 +226,7 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-//                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
+                    //                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
 
                 }, {
 
@@ -223,7 +244,7 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-//                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
+                    //                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
 
                 }, {
 
@@ -249,12 +270,12 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                     loginbtn!!.visibility = View.INVISIBLE
 
                     smstext!!.visibility = View.VISIBLE
-                    or!!.visibility=View.INVISIBLE
-                    view2!!.visibility=View.INVISIBLE
-                    view1!!.visibility=View.INVISIBLE
-                    fcb!!.visibility=View.INVISIBLE
-                    gogbtn!!.visibility=View.INVISIBLE
-                    resendcode!!.visibility=View.VISIBLE
+                    or!!.visibility = View.INVISIBLE
+                    view2!!.visibility = View.INVISIBLE
+                    view1!!.visibility = View.INVISIBLE
+                    fcb!!.visibility = View.INVISIBLE
+                    gogbtn!!.visibility = View.INVISIBLE
+                    resendcode!!.visibility = View.VISIBLE
                     startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
                 }
 
@@ -276,14 +297,21 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    PreferenceUtils.saveAuthorizationToken(this,it.body()!!.token)
-                    PreferenceUtils.saveUserId(this,it.body()!!.id)
-                    startActivity(Intent(this@LoginPane,MainScreenActivity::class.java))
+                    PreferenceUtils.saveAuthorizationToken(this, it.body()!!.token)
+                    PreferenceUtils.saveUserId(this, it.body()!!.id)
+                    getFCMToken()
+                    startActivity(Intent(this@LoginPane, MainScreenActivity::class.java))
 
                 }, {
                     Log.d("pane", "error")
                 })
         )
+    }
+
+    fun getFCMToken() {
+        var refreshedToken = FirebaseInstanceId.getInstance().getToken()
+        Log.d("tokenFCM", "FCM token: " + refreshedToken)
+        registerFCM(refreshedToken!!)
     }
 
 

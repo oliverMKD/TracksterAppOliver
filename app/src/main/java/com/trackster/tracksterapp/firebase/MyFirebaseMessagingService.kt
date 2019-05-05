@@ -19,22 +19,27 @@ import com.trackster.tracksterapp.utils.*
 import java.util.*
 import java.util.concurrent.ExecutionException
 
-abstract class MyFirebaseMessagingService : FirebaseMessagingService() {
-    val TAG = "FirebaseMessagingService"
+
+
+ class MyFirebaseMessagingService : FirebaseMessagingService() {
+    val TAG = "FirebaseMessagingSer"
     private var pendingIntent: PendingIntent? = null
 
     private lateinit var intent : Intent
-    @SuppressLint("LongLogTag", "WrongThread")
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        super.onMessageReceived(remoteMessage);
         Log.d(TAG, "Dikirim dari: ${remoteMessage.from}")
-        val message = remoteMessage?.data?.get(FIREBASE_MESSAGE_PAYLOAD_KEY)
-        val contactName = remoteMessage?.data?.get(FIREBASE_CONTACT_NAME_PAYLOAD_KEY)
-        val contactId = remoteMessage?.data?.get(FIREBASE_CONTACT_ID_PAYLOAD_KEY)
-        val pushNotificationId = remoteMessage?.data?.get(FIREBASE_PUSH_NOTIFICATION_ID_PAYLOAD_KEY)
-        sendBroadcastMessage(FirebaseMessage(message, contactName, contactId?.toInt(), pushNotificationId?.toInt()))
+        val remoteData = remoteMessage.data
+        Log.d("remoteData",""+remoteData)
+//        val message = remoteMessage?.data?.get(FIREBASE_MESSAGE_PAYLOAD_KEY)
+//        val contactName = remoteMessage?.data?.get(FIREBASE_CONTACT_NAME_PAYLOAD_KEY)
+//        val contactId = remoteMessage?.data?.get(FIREBASE_CONTACT_ID_PAYLOAD_KEY)
+//        val pushNotificationId = remoteMessage?.data?.get(FIREBASE_PUSH_NOTIFICATION_ID_PAYLOAD_KEY)
+//        sendBroadcastMessage(FirebaseMessage(message, contactName, contactId?.toInt(), pushNotificationId?.toInt()))
         if (remoteMessage.notification != null) {
             showNotification(remoteMessage.notification?.title, remoteMessage.notification?.body)
         }
+
     }
     private fun sendBroadcastMessage(firebaseMessage: FirebaseMessage) {
         val intent = Intent(FIREBASE_BROADCAST)
@@ -43,10 +48,6 @@ abstract class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun showNotification(title: String?, body: String?) {
-//        val intent = Intent(this, MainScreenActivity::class.java)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
-//            PendingIntent.FLAG_ONE_SHOT)
         var foreground = false
         val intent: Intent
         val random = Random().nextInt(1000).toString()
@@ -59,9 +60,10 @@ abstract class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
         if (foreground) { //app in foreground
             intent = Intent(this, ChatDetails::class.java)
-            intent.putExtra("intent_backchat", 1)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            intent.putExtra("intent_backchat", body)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
             pendingIntent = PendingIntent.getActivity(this, Integer.valueOf(random) /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            sendBroadcast(intent)
             startActivity(intent)      // to directly open activity if app is foreground
         } else { //app in background
             intent = Intent(this, ChatDetails::class.java)

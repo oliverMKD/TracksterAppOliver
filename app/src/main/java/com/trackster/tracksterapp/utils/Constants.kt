@@ -13,9 +13,9 @@ const val TRY_AGAIN_BROADCAST = "com.tvapps.chat.general.utils.try_again_broadca
 
 const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 2
 
-const val FIREBASE_BROADCAST = "com.tvapps.chat.general.utils.firebase_broadcast"
+const val FIREBASE_BROADCAST = "firebase_broadcast"
 const val FIREBASE_PRODUCER_BROADCAST = "com.tvapps.chat.general.utils.firebase_producer_broadcast"
-const val FIREBASE_MESSAGE_KEY = "com.tvapps.chat.general.utils.firebase_message_key"
+const val FIREBASE_MESSAGE_KEY = "firebase_message_key"
 const val FIREBASE_PRODUCER_MESSAGE_KEY = "com.tvapps.chat.general.utils.firebase_producer_message_key"
 
 const val FIREBASE_MESSAGE_PAYLOAD_KEY = "message"

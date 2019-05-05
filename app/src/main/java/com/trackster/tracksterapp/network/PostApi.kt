@@ -59,7 +59,7 @@ interface PostApi {
     @GET("weigh-stations/circle")
     fun getWeighStations(
         @Header("x-auth-token") authorization: String,
-        @Query ("center")  centar : String,
+        @Query("center") centar: String,
         @Query("radius") radius: Int
     ): Single<ArrayList<WeighStation>>
 
@@ -68,27 +68,38 @@ interface PostApi {
 
 
     @GET("/chats/{chatId}")
-    fun getChatById(@Header("x-auth-token") authorization: String,
-                    @Path("chatId") chatId: String) : Single<ChatResponse>
+    fun getChatById(
+        @Header("x-auth-token") authorization: String,
+        @Path("chatId") chatId: String
+    ): Single<ChatResponse>
 
     @GET("/users/me")
-    fun getInfoUser(@Header("x-auth-token") authorization : String): Observable<Response<User>>
+    fun getInfoUser(@Header("x-auth-token") authorization: String): Observable<Response<User>>
 
     @Headers("Content-Type: application/json")
     @POST("/users")
-    fun updateUser(@Header("x-auth-token") authorization : String,@Body fbLoginRequest: UserRequest): Observable<Response<User>>
+    fun updateUser(@Header("x-auth-token") authorization: String, @Body fbLoginRequest: UserRequest): Observable<Response<User>>
 
     @GET("/chats")
-    fun getDetails(@Header("x-auth-token") authorization : String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
+    fun getDetails(@Header("x-auth-token") authorization: String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
 
     @GET("/chats")
     fun getHistory(@Header("x-auth-token") authorization: String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
 
     @POST("/chats/{chatId}/push/message")
-    fun postMessage(@Header("x-auth-token") authorization: String,
-                    @Path("chatId") chatId: String, @Body message: Message) : Single<Message>
+    fun postMessage(
+        @Header("x-auth-token") authorization: String,
+        @Path("chatId") chatId: String, @Body message: Message
+    ): Single<Message>
+
     @GET("/admin/truck-colors")
     fun getColors(@Header("x-auth-token") authorization: String): Observable<ArrayList<Colors>>
+
+    @POST("/notifications/register-device")
+    fun registerDevice(
+        @Header("x-auth-token") authorization: String,
+        @Body message: DeviceRegistrationRequest
+    ) : Observable<BaseResponse>
 
     companion object Factory {
         fun create(context: Context): PostApi {

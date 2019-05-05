@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
           package="com.trackster.tracksterapp">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -20,9 +20,19 @@
             android:screenOrientation="portrait"
             android:supportsRtl="true"
             android:theme="@style/AppTheme.NoActionBar"
-            android:usesCleartextTraffic="true">
+            android:usesCleartextTraffic="true"
+            tools:overrideLibrary="com.google.firebase.messaging">
         <activity android:name=".chat.ChatDetails">
         </activity>
+
+        <service
+                android:name=".firebase.MyFirebaseMessagingService"
+                android:enabled="true"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <service android:name=".firebase.MyFirebaseInstanceIdService">
             <intent-filter>
@@ -53,12 +63,6 @@
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/google_maps_key"/>
-
-        <service android:name=".firebase.MyFirebaseMessagingService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
 
         <activity
                 android:name=".selectTrailer.SelectTrailerActivity"

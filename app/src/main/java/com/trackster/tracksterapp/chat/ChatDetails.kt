@@ -43,9 +43,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.io.File
+import java.io.Serializable
 
 
-class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
+class ChatDetails() :BaseChatActivity(),View.OnClickListener {
 
     object Day {
         const val TODAY = "today"
@@ -73,6 +74,7 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
     private var observerId: Int? = null
 
     private var isActivityVisible = false
+    lateinit var firebaseMessage : Serializable
 
     // aws
     private var s3Client: AmazonS3Client? = null
@@ -94,6 +96,7 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+         firebaseMessage = intent.getSerializableExtra("intent_backchat")
         initMutualViews()
 
 
@@ -538,12 +541,10 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 
     private var firebaseMessageBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val firebaseMessage = intent.getSerializableExtra(FIREBASE_MESSAGE_KEY) as FirebaseMessage?
-            if (firebaseMessage?.contactID == contact?.id) {
+//            val firebaseMessage = intent.getSerializableExtra("intent_backchat") as Message?
                 getMessages()
-            }
 
-            FirebaseUtils.putPushNotificationId(this@ChatDetails, firebaseMessage?.pushNotificationID)
+            sendMessage((firebaseMessage) as Message)
         }
     }
 
@@ -551,7 +552,7 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 
         override fun onReceive(context: Context, intent: Intent) {
 //            // try again clicked
-            val message = intent.getSerializableExtra(CONTENT_KEY) as Message
+            val message = intent.getSerializableExtra("intent_backchat") as Message
 //            message.additionalData.errorSending = false
 //            message.additionalData.isSending = true
 //            DetailsMediaManager.tmpId = message.additionalData.id
@@ -565,44 +566,11 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
         }
     }
 
-    constructor(parcel: Parcel) : this() {
-        previousDate = parcel.readString()
-        isMessageSendable = parcel.readByte() != 0.toByte()
-        hasMedia = parcel.readByte() != 0.toByte()
-        isMediaPortrait = parcel.readByte() != 0.toByte()
-        observerId = parcel.readValue(Int::class.java.classLoader) as? Int
-        isActivityVisible = parcel.readByte() != 0.toByte()
-        isMotherphone = parcel.readByte() != 0.toByte()
-    }
 
     override fun onDestroy() {
         super.onDestroy()
 
         compositeDisposable.dispose()
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(previousDate)
-        parcel.writeByte(if (isMessageSendable) 1 else 0)
-        parcel.writeByte(if (hasMedia) 1 else 0)
-        parcel.writeByte(if (isMediaPortrait) 1 else 0)
-        parcel.writeValue(observerId)
-        parcel.writeByte(if (isActivityVisible) 1 else 0)
-        parcel.writeByte(if (isMotherphone) 1 else 0)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<ChatDetails> {
-        override fun createFromParcel(parcel: Parcel): ChatDetails {
-            return ChatDetails(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ChatDetails?> {
-            return arrayOfNulls(size)
-        }
     }
 
 }

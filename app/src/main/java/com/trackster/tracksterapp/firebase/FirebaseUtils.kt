@@ -22,9 +22,6 @@ object FirebaseUtils {
         val refreshedToken = FirebaseInstanceId.getInstance().token
         Log.d(TAG, "Refreshed token: " + refreshedToken!!)
 
-//        if (PreferenceUtils.isUserLoggedIn(context))
-//            sendFirebaseTokenToServer(context, refreshedToken)
-//        else PreferenceUtils.saveFirebaseToken(context, refreshedToken)
     }
 
     /**
