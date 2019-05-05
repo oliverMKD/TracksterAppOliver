@@ -21,7 +21,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme.NoActionBar"
             android:usesCleartextTraffic="true">
-        <activity android:name=".chat.ChatDetailsActivity">
+        <activity android:name=".chat.ChatDetails">
         </activity>
 
         <service android:name=".firebase.MyFirebaseInstanceIdService">

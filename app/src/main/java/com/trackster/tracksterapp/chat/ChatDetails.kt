@@ -9,6 +9,8 @@ import android.content.IntentFilter
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.support.v4.app.ActivityCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -20,8 +22,8 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.RelativeLayout
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.bumptech.glide.Glide
@@ -32,7 +34,6 @@ import com.trackster.tracksterapp.base.BaseChatActivity
 import com.trackster.tracksterapp.base.TracksterApplication
 import com.trackster.tracksterapp.firebase.FirebaseUtils
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
-import com.trackster.tracksterapp.model.AdditionalData
 import com.trackster.tracksterapp.model.Contact
 import com.trackster.tracksterapp.model.FirebaseMessage
 import com.trackster.tracksterapp.model.Message
@@ -44,7 +45,7 @@ import io.reactivex.schedulers.Schedulers
 import java.io.File
 
 
-class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
+class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 
     object Day {
         const val TODAY = "today"
@@ -52,7 +53,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     // UI components
-    private var sendMessageRelativeLayout: RelativeLayout? = null
+    private var sendMessageRelativeLayout: LinearLayout? = null
     private var imgSelectorImageView: ImageView? = null
     private var sendMessageImageView: ImageView? = null
     private var sendMessageEditText: EditText? = null
@@ -220,11 +221,9 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 val message = sendMessageEditText?.text
                 if (!TextUtils.isEmpty(message)) {
-                    sendMessageImageView?.setImageResource(R.drawable.arrow_send_blue)
                     isMessageSendable = true
                 } else {
                     if (isMessageSendable) {
-                        sendMessageImageView?.setImageResource(R.drawable.arrow_send)
                         isMessageSendable = false
                     }
                 }
@@ -250,16 +249,36 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
 
-    private fun getMessages() {
-        apiService = PostApi.create(this@ChatDetailsActivity)
+    public fun getMessages() {
+        apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
-            apiService.getChatById(PreferenceUtils.getAuthorizationToken(this@ChatDetailsActivity),
-                PreferenceUtils.getChatId(this@ChatDetailsActivity))
+            apiService.getChatById(PreferenceUtils.getAuthorizationToken(this@ChatDetails),
+                PreferenceUtils.getChatId(this@ChatDetails))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                  var brokerName = it.broker.firstName
+                    var brokerLastName  =it.broker.lastName
+                    var brokerFullName = brokerName+" " + brokerLastName
+                    var driverName = it.driver.firstName
+                    var driverLastName =it.driver.lastName
+                    var driverFullName = driverName +" "+ driverLastName
+                    var carrierName = it.carrier.firstName
+                    var carrierLastName =it.carrier.lastName
+                    var carrierFullName = carrierName +" "+ carrierLastName
+
+                    var brokerId = it.broker.id
+                    var carrierId = it.carrier.id
+
+                    PreferenceUtils.saveBrokerName(this@ChatDetails, brokerFullName )
+                    PreferenceUtils.saveDriverName(this@ChatDetails, driverFullName )
+                    PreferenceUtils.saveCarrierName(this@ChatDetails, carrierFullName )
+                    PreferenceUtils.saveBrokerId(this@ChatDetails, brokerId )
+                    PreferenceUtils.saveCarrierId(this@ChatDetails, carrierId )
 //                    mutableListMessages = it.message
-                    setData(it.message)
+                    mutableListMessages = it.message
+                    setData(mutableListMessages)
+                    scrollToBottom()
                     //                Log.d("station", " "+ it[0].location)
                 }, {
                     Log.d("destinacija",""+ it.localizedMessage)
@@ -270,9 +289,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
 
     private fun setData(result: MutableList<Message>) {
         result.reverse()
-//        setDatesData(result)
-//        val pendingMessages = DetailsMediaManager.getPendingMessages(contact?.id)
-//        result.addAll(pendingMessages)
+        setDatesData(result)
         adapter.setData(result)
         scrollToBottom()
     }
@@ -284,30 +301,26 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     private fun setDateForMessage(message: Message) {
-//        val additionalData = AdditionalData()
-//        additionalData.time = getString(R.string.validate) + " " + DateFormat.formatDate(message.sendTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
+        val additionalData = DateFormat.formatDate(message.createTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
 //
-//        var messageDate = DateFormat.formatDate(message.sendTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-//        messageDate = DateFormat.formatDateDetailsMessage(message.sendTime, messageDate)
-//        if (messageDate == Day.TODAY) {
-//            messageDate = getString(R.string.Continue)
-//        } else if (messageDate == Day.YESTERDAY) {
-//            messageDate = getString(R.string.validate)
-//        }
-//        if (previousDate == messageDate) {
-//            message.sendTime = ""
-//        } else {
-//            message.sendTime = messageDate
-//            previousDate = messageDate
-//        }
-//
-//        message.additionalData = additionalData
+        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
+        if (previousDate == messageDate) {
+            message.createTime = ""
+        } else {
+            message.createTime = messageDate
+            previousDate = messageDate
+        }
+
+        message.createTime = messageDate
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.button_send_msg -> sendMessage(DetailsMediaManager.createMessage(
+            R.id.button_send_msg -> { sendMessage(DetailsMediaManager.createMessage(
                 this,sendMessageEditText?.text.toString(),"1234")!!)
+            clearMessage()
+            }
 //            R.id.img_selector_image_view -> addMedia()
 //            R.id.send_message_image_view -> {
 //                if (contact != null) {
@@ -360,25 +373,30 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     private fun uploadMedia(message: Message) {
         val fileName = DetailsMediaManager.MESSAGES + File.separator + DetailsMediaManager.fileName
 //        val observer = transferUtility?.upload(
-//            ConfigManager.getAWSBucketName(this@ChatDetailsActivity),     /* The bucket to upload to */
+//            ConfigManager.getAWSBucketName(this@ChatDetails),     /* The bucket to upload to */
 //            fileName,    /* The key for the uploaded object */
 //            DetailsMediaManager.uploadFile        /* The file where the data to upload exists */
 //        )
 
 //        observerId = observer?.id
 //        message.additionalData.observerId = observerId!!
-//        observer?.setTransferListener(this@ChatDetailsActivity)
+//        observer?.setTransferListener(this@ChatDetails)
     }
 
     private fun postMessage(message: Message) {
 
-        apiService = PostApi.create(this@ChatDetailsActivity)
+        apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
-            apiService.postMessage(PreferenceUtils.getAuthorizationToken(this@ChatDetailsActivity),
-                PreferenceUtils.getChatId(this@ChatDetailsActivity),message)
+            apiService.postMessage(PreferenceUtils.getAuthorizationToken(this@ChatDetails),
+                PreferenceUtils.getChatId(this@ChatDetails),message)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                    setDateForMessage(it)
+                    mutableListMessages.add(it)
+
+                    adapter.setData(createNewData())
+                    scrollToBottom()
                     //                    mutableListMessages = it.message
                     //                Log.d("station", " "+ it[0].location)
                 }, {
@@ -440,7 +458,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
     }
 
     override fun onBackPressed() {
-        startActivity(Intent(this@ChatDetailsActivity, MainScreenActivity::class.java))
+        startActivity(Intent(this@ChatDetails, MainScreenActivity::class.java))
     }
 
 
@@ -525,7 +543,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
                 getMessages()
             }
 
-            FirebaseUtils.putPushNotificationId(this@ChatDetailsActivity, firebaseMessage?.pushNotificationID)
+            FirebaseUtils.putPushNotificationId(this@ChatDetails, firebaseMessage?.pushNotificationID)
         }
     }
 
@@ -533,7 +551,7 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
 
         override fun onReceive(context: Context, intent: Intent) {
 //            // try again clicked
-//            val message = intent.getSerializableExtra(CONTENT_KEY) as Message
+            val message = intent.getSerializableExtra(CONTENT_KEY) as Message
 //            message.additionalData.errorSending = false
 //            message.additionalData.isSending = true
 //            DetailsMediaManager.tmpId = message.additionalData.id
@@ -543,8 +561,18 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
 //                DetailsMediaManager.uploadFile = message.additionalData.uploadFile
 //                DetailsMediaManager.fileName = message.additionalData.imageName
 //            }
-//            sendMessage(message)
+            sendMessage(message)
         }
+    }
+
+    constructor(parcel: Parcel) : this() {
+        previousDate = parcel.readString()
+        isMessageSendable = parcel.readByte() != 0.toByte()
+        hasMedia = parcel.readByte() != 0.toByte()
+        isMediaPortrait = parcel.readByte() != 0.toByte()
+        observerId = parcel.readValue(Int::class.java.classLoader) as? Int
+        isActivityVisible = parcel.readByte() != 0.toByte()
+        isMotherphone = parcel.readByte() != 0.toByte()
     }
 
     override fun onDestroy() {
@@ -552,4 +580,29 @@ class ChatDetailsActivity :BaseChatActivity(),View.OnClickListener {
 
         compositeDisposable.dispose()
     }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(previousDate)
+        parcel.writeByte(if (isMessageSendable) 1 else 0)
+        parcel.writeByte(if (hasMedia) 1 else 0)
+        parcel.writeByte(if (isMediaPortrait) 1 else 0)
+        parcel.writeValue(observerId)
+        parcel.writeByte(if (isActivityVisible) 1 else 0)
+        parcel.writeByte(if (isMotherphone) 1 else 0)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ChatDetails> {
+        override fun createFromParcel(parcel: Parcel): ChatDetails {
+            return ChatDetails(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ChatDetails?> {
+            return arrayOfNulls(size)
+        }
+    }
+
 }
