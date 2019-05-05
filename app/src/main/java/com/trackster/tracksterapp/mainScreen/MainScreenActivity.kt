@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.chat.ChatDetailsActivity
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
 import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
 import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
@@ -113,6 +114,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setSupportActionBar(toolbar)
         getChats()
         hamburger.setOnClickListener(this)
+        chat.setOnClickListener(this)
 
         floatBtn.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -217,6 +219,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             R.id.hamburger-> {
                 drawer_layout.openDrawer(Gravity.START)
             }
+            R.id.chat ->
+                startActivity(Intent(this@MainScreenActivity,ChatDetailsActivity::class.java))
         }
     }
     override fun onMapReady(googleMap: GoogleMap?) {
@@ -264,6 +268,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         apiService = PostApi.create(this)
         var map : MutableMap< String,String> =  mutableMapOf()
+
         map["42.0151079"]
         map["21.4526962"]
         val coordinates = "42.0151079,21.4526962"
@@ -276,7 +281,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     //                Log.d("station", " "+ it[0].location)
-                }, {
+                },
+                    {
                     //                showProgress(false)
 //                    handleApiError(it)
                 })
@@ -291,6 +297,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             .subscribeOn(Schedulers.io())
             .subscribe({
                 mapsId = it[0].id
+                PreferenceUtils.saveChatId(this,mapsId)
+//                getChatById(mapsId)
                 getWeightStations()
 
                 //                Log.d("station", " "+ it[0].location)

@@ -59,7 +59,7 @@ interface PostApi {
     @GET("weigh-stations/circle")
     fun getWeighStations(
         @Header("x-auth-token") authorization: String,
-        @Query("center") center : String ,
+        @Query ("center")  centar : String,
         @Query("radius") radius: Int
     ): Single<ArrayList<WeighStation>>
 
@@ -84,6 +84,9 @@ interface PostApi {
     @GET("/chats")
     fun getHistory(@Header("x-auth-token") authorization: String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
 
+    @POST("/chats/{chatId}/push/message")
+    fun postMessage(@Header("x-auth-token") authorization: String,
+                    @Path("chatId") chatId: String, @Body message: Message) : Single<Message>
     @GET("/admin/truck-colors")
     fun getColors(@Header("x-auth-token") authorization: String): Observable<ArrayList<Colors>>
 

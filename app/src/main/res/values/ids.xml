@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+
+    <item name="config_url" type="string" />
+
+    <item name="server_url_default" type="string" />
+
+    <item name="aws_url_default" type="string" />
+    <item name="aws_cdn_default" type="string" />
+    <item name="aws_access_key_default" type="string" />
+    <item name="aws_secret_key_default" type="string" />
+    <item name="aws_bucket_name_default" type="string" />
+    <item name="video_max_length_default" type="integer" />
+    <item name="message_max_length_default" type="integer" />
+
+    <item name="general_error_title" type="string" />
+    <item name="general_error_message" type="string" />
+    <item name="general_error_button" type="string" />
+    <item name="general_error_no_internet" type="string" />
+
+    <item name="notification_icon" type="drawable" />
+
+    <item name="colorSeenMessage" type="color" />
+    <item name="colorAvatarBackground" type="color" />
+
+</resources>

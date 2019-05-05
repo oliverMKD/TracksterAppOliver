@@ -156,7 +156,10 @@
     <color name="transparent_gray">#9F202020</color>
     <color name="transparent">#00000000</color>
     <color name="chat_color">#e8f7ff</color>
-
-
     <color name="trans">#00000000</color>
+    <color name="textColorPrimary">#2e343a</color>
+    <color name="colorSendMessageEditTextStroke">#bebebe</color>
+    <color name="colorSendMessageEditTextBackground">#f6f7f8</color>
+    <color name="colorMessageDate">#5a5a5a</color>
+    <color name="errorMessageBackground">#942343</color>
 </resources>

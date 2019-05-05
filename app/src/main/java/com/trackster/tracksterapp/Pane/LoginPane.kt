@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.iid.FirebaseInstanceId
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
 import com.trackster.tracksterapp.network.requests.LoginRequestWithPhone
@@ -186,7 +187,9 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
         val number = phone1?.text.toString()
         val code = code1?.text.toString()
-        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImZpcnN0TmFtZSI6Ik9saXZlciIsImxhc3ROYW1lIjoiQm96aW5vdnNraSIsInVzZXJUeXBlIjo2LCJpYXQiOjE1NTY2MzE4MjksImV4cCI6MTU1NzIzNjYyOX0.0DoGviMGXMkoD-Oxq4k1_aA5ikXwiS1J2CdqvYoSF6Y"
+        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6Ik9saXZlciIsImxhc3ROYW1lIjoiQm96aW5vdnNraSIsInVzZXJUeXBlIjo2LCJpYXQiOjE1NTY5NjkzNjIsImV4cCI6MTU1NzU3NDE2Mn0.OYtvY3k8BXENNpDj8GYL6LkaG3GWoavkMEtu8PLGscg"
+val id = "5c7ac90b9ce4ba08c29a72b6"
+        PreferenceUtils.saveUserId(this@LoginPane, id)
 
        PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
         startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
@@ -274,6 +277,9 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     PreferenceUtils.saveAuthorizationToken(this,it.body()!!.token)
+                    PreferenceUtils.saveUserId(this,it.body()!!.id)
+                    startActivity(Intent(this@LoginPane,MainScreenActivity::class.java))
+
                 }, {
                     Log.d("pane", "error")
                 })

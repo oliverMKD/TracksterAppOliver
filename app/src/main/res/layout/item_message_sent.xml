@@ -9,7 +9,7 @@
         android:paddingTop="8dp">
 
     <TextView
-            android:id="@+id/sent_name"
+            android:id="@+id/sent_name2"
             android:text="John Doe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,6 +44,7 @@
             android:layout_marginTop="1dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sent_body"
-            />
+    />
+
 
 </android.support.constraint.ConstraintLayout>

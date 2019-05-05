@@ -56,6 +56,7 @@ class ProfileSettings  : BaseFragment(), View.OnClickListener {
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
                 {
 
+
                     name.setText(it.body()!!.firstName)
                     email.setText(it.body()!!.email)
                     phone_number.setText(it.body()!!.phone)
@@ -83,7 +84,7 @@ class ProfileSettings  : BaseFragment(), View.OnClickListener {
         apiService = PostApi.create(context!!)
         CompositeDisposable().add(
 
-            apiService.updateUser( PreferenceUtils.getAuthorizationToken(context!!), UserRequest("Pane",3, "5c6c76eb17d4421770ae188d","broker@brokertest.com") )
+            apiService.updateUser( PreferenceUtils.getAuthorizationToken(context!!), UserRequest("Proba", "5c6c76eb17d4421770ae188d","broker@brokertest.com") )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:targetApi="LOLLIPOP">
+
+    <TextView
+        android:id="@+id/date_text_view2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:textColor="@color/colorMessageDate"
+        android:textSize="12.3sp" />
+
+    <ImageView
+        android:id="@+id/avatar_image_view2"
+        android:layout_width="@dimen/message_avatar_width_height"
+        android:layout_height="@dimen/message_avatar_width_height"
+        android:layout_above="@+id/time_linear_layout"
+        android:layout_margin="@dimen/message_relative_layout_margin" />
+
+    <RelativeLayout
+        android:id="@+id/message_relative_layout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/date_text_view"
+        android:layout_marginBottom="@dimen/message_relative_layout_margin"
+        android:layout_marginEnd="@dimen/message_relative_layout_marginStartEnd"
+        android:layout_marginStart="@dimen/message_relative_layout_margin"
+        android:layout_marginTop="@dimen/message_relative_layout_margin"
+        android:layout_toEndOf="@id/avatar_image_view"
+        android:background="@drawable/rounded_friend_message_background">
+
+        <TextView
+            android:id="@+id/message_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/message_image_view2"
+            android:layout_centerVertical="true"
+            android:letterSpacing="0.01"
+            android:minWidth="@dimen/my_message_text_view_min_width"
+            android:padding="@dimen/message_text_view_padding"
+            android:textColor="@android:color/black"
+            android:textSize="16.7sp" />
+
+        <ImageView
+            android:id="@+id/message_image_view2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/message_image_view_padding"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/message_video_image_view2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/message_image_view"
+            android:layout_alignEnd="@id/message_image_view"
+            android:layout_alignStart="@id/message_image_view"
+            android:layout_alignTop="@id/message_image_view"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_video" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/time_linear_layout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_relative_layout"
+        android:layout_marginStart="@dimen/message_relative_layout_margin">
+
+        <ImageView
+            android:id="@+id/time_image_view2"
+            android:layout_width="@dimen/time_image_view_width_height"
+            android:layout_height="@dimen/time_image_view_width_height"
+            app:srcCompat="@drawable/ic_sent" />
+
+        <TextView
+            android:id="@+id/time_text_view2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/time_text_view_margin_right"
+            android:textColor="@color/colorAvatarBackground"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+</RelativeLayout>
