@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.ChatResponse
 import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.network.PostApi
@@ -43,22 +44,15 @@ class DetailsLoad :  BaseFragment() {
                 PreferenceUtils.getAuthorizationToken(context!!)
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
                 {
-
                     Id = it[0].id
-
-
-
                     desc.setText(it[0] .description)
-
-
-
                     price.setText(it[0].price)
-                    broker_name.setText(it[0].broker.firstName)
-                    broker_last_name.setText(it[0].broker.lastName)
-                    orignin_name.setText(it[0].pickupAddresses.street)
-                    delivery_house.setText(it[0].pickupAddresses.street)
-                    pickup.setText(it[0].pickupAddresses.plannedTime)
-                    delivery_date.setText(it[0].pickupAddresses.plannedTime)
+                    broker_name.text = it[0].broker.firstName
+                    broker_last_name.text = it[0].broker.lastName
+//                    orignin_name.setText(it[0].pickupAddresses.street)
+//                    delivery_house.setText(it[0].pickupAddresses.street)
+//                    pickup.setText(it[0].pickupAddresses.plannedTime)
+//                    delivery_date.setText(it[0].pickupAddresses.plannedTime)
 
 
 
@@ -81,6 +75,7 @@ class DetailsLoad :  BaseFragment() {
     }
 
     override fun onDestroy() {
+        (activity as MainScreenActivity).show()
         super.onDestroy()
     }
 

@@ -210,9 +210,12 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
         sendMessageRelativeLayout = findViewById(R.id.send_message_relative_layout)
         recyclerView = findViewById(R.id.recycler_view_details)
         val linearLayoutManager = LinearLayoutManager(this)
-        linearLayoutManager.reverseLayout = true
-        linearLayoutManager.stackFromEnd = true
+//        linearLayoutManager.reverseLayout = true
+//        linearLayoutManager.stackFromEnd = true
         recyclerView?.layoutManager = linearLayoutManager
+        adapter = MessageRecyclerAdapter(this, mutableListMessages, contact?.avatar)
+        recyclerView?.adapter = adapter
+        recyclerView?.scrollToPosition(adapter.itemCount-1)
         progressBar = findViewById(R.id.progress_bar)
     }
 
@@ -233,9 +236,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
     }
 
     private fun initMessageList() {
-        adapter = MessageRecyclerAdapter(this, mutableListMessages, audioListMessages , contact?.avatar)
-        recyclerView?.adapter = adapter
-
         scrollToBottom()
     }
 
@@ -270,12 +270,8 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
 
         sendMessageEditText?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-
-
             }
-
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-
 
                 val message = sendMessageEditText?.text
                 if (!TextUtils.isEmpty(message)) {
@@ -298,13 +294,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
                     imgSelectorImageView?.visibility = View.VISIBLE
                     cam?.visibility = View.VISIBLE
                 }
-
             }
 
-
             override fun afterTextChanged(s: Editable) {
-
-
             }
         })
     }
@@ -366,7 +358,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
     }
 
     private fun setData(result: MutableList<Message>) {
-        result.reverse()
+//        result.reverse()
         setDatesData(result)
         adapter.setData(result)
         scrollToBottom()

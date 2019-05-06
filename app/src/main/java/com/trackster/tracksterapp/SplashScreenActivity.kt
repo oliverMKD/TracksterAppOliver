@@ -10,6 +10,7 @@ import android.util.Log
 import com.bumptech.glide.Glide
 import com.trackster.tracksterapp.Pane.LoginPane
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
+import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
 import com.trackster.tracksterapp.ui.login.LoginActivity
 import com.trackster.tracksterapp.ui.login.trailer.TrailerActivity
 import com.trackster.tracksterapp.utils.PreferenceUtils
