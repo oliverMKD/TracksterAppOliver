@@ -2,7 +2,8 @@
 <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="210dp"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="300dp"
        android:background="@color/transparent"
         android:layout_height="130dp">
 
@@ -17,11 +18,17 @@
 
     <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:id="@+id/text_price"
             android:textSize="14sp"
             android:textStyle="bold"
+            android:lines="2"
+            android:layout_weight="1"
+            android:ellipsize="none"
+            android:maxLines="100"
+            android:scrollHorizontally="false"
             android:text="Dry Van"
+            android:singleLine="false"
             android:textColor="@color/White"
             android:layout_marginStart="40dp"
             android:gravity="center_vertical"

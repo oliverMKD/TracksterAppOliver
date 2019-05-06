@@ -10,6 +10,7 @@ data class ChatResponse(
     @SerializedName("description") var description: String,
     @SerializedName("plannedPickupTime") var plannedPickupTime: String,
     @SerializedName("plannedDestinationTime") var plannedDestinationTime: String,
+    @SerializedName("distance") val distance: Int,
     @SerializedName("price") var price: Int,
     @SerializedName("status") var status: Int,
     @SerializedName("pickupAddress") var pickupAddress: Address,
