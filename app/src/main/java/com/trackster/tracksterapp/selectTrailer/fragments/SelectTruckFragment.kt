@@ -3,6 +3,7 @@ package com.trackster.tracksterapp.selectTrailer.fragments
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import android.widget.ProgressBar
@@ -12,6 +13,7 @@ import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.model.Trailers
 import com.trackster.tracksterapp.model.Trucks
 import com.trackster.tracksterapp.network.PostApi
+import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -19,22 +21,26 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_trailer.*
 import kotlinx.android.synthetic.main.fragment_select_truck.*
 
-class SelectTruckFragment : BaseFragment() {
+class SelectTruckFragment : BaseFragment(), View.OnClickListener {
+
 
     private lateinit var selectTruckAdapter: SelectTruckAdapter
     lateinit var apiService: PostApi
     private var trucksList: MutableList<Trucks> = mutableListOf()
-    var fragmentPosition: Int = 0
 
-//    private var disposable: CompositeDisposable? = null
     var compositeDisposableContainer = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         selectTruckAdapter = SelectTruckAdapter(activity!!)
-        getTrucks()
 
+        getTrucks()
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        select_manufactor.setOnClickListener(this)
     }
 
     companion object {
@@ -67,10 +73,9 @@ class SelectTruckFragment : BaseFragment() {
             .subscribeOn(Schedulers.io())
             .subscribe({
                 initRecyclerView(it)
-// Log.d("station", " "+ it[0].location)
-            }, {
-                // showProgress(false)
-//                Utils.handleApiError(it)
+            },
+                {
+           Log.d("getTrucks",""+it.localizedMessage)
             })
         )
 
@@ -78,5 +83,11 @@ class SelectTruckFragment : BaseFragment() {
     override fun onDestroy() {
         compositeDisposableContainer.clear()
         super.onDestroy()
+    }
+    override fun onClick(p0: View?) {
+        when (p0?.id) {
+            R.id.select_manufactor -> (activity as SelectTrailerActivity).openSelectColorFragment()
+        }
+
     }
 }

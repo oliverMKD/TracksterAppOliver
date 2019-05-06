@@ -21,11 +21,6 @@ class OtherTrailersRecyclerAdapter(private val activity: Activity) : RecyclerVie
     inner class LoadsRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val description = view.image_select_trailer!!
         val price = view.text_price!!
-//        val text_plannedDestinationTime = view.text_plannedDestinationTime!!
-//        val text_plannedPickupTime = view.text_plannedPickupTime!!
-//        val text_company_name = view.text_company_name!!
-//        val text_plannedPickupAddress = view.text_plannedPickupAddress!!
-//        val text_planneddestinationAddress = view.text_planneddestinationAddress!!
     }
 
     fun setData(list: MutableList<Trailers>) {
@@ -58,7 +53,7 @@ class OtherTrailersRecyclerAdapter(private val activity: Activity) : RecyclerVie
         val load = list[position]
 
 // val loadPrice = "price = " + load!!.price
-        val loadDescription = "description : " + load!!.name
+        val loadDescription = load!!.name
 
 // holder.description.text = loadPrice.toString()
         holder.price.text = loadDescription

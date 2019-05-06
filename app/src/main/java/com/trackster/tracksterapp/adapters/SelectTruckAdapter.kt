@@ -2,12 +2,14 @@ package com.trackster.tracksterapp.adapters
 
 import android.app.Activity
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.Trucks
 import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
 import kotlinx.android.synthetic.main.fragment_select_manufactor.view.*
@@ -31,7 +33,8 @@ class SelectTruckAdapter(private val activity: Activity) :
 
     fun isEmptyState() = list.isEmpty()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LoadsRecyclerViewHolder =     LoadsRecyclerViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LoadsRecyclerViewHolder =
+        LoadsRecyclerViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.fragment_select_manufactor,
                 parent,
@@ -108,7 +111,7 @@ class SelectTruckAdapter(private val activity: Activity) :
         }
         holder.itemView.setOnClickListener {
             if (truck != null) {
-                (activity as SelectTrailerActivity).getSelectedTruck(truck.id)
+                (activity as SelectTrailerActivity).getSelectedTruck(truck.name)
             }
         }
     }
