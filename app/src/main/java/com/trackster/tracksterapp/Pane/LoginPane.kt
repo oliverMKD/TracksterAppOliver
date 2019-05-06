@@ -278,7 +278,7 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                 .subscribe({
                     PreferenceUtils.saveAuthorizationToken(this,it.body()!!.token)
                     PreferenceUtils.saveUserId(this,it.body()!!.id)
-                    startActivity(Intent(this@LoginPane,MainScreenActivity::class.java))
+                    startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
 
                 }, {
                     Log.d("pane", "error")

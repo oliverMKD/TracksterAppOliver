@@ -79,10 +79,10 @@ interface PostApi {
     fun updateUser(@Header("x-auth-token") authorization : String,@Body fbLoginRequest: UserRequest): Observable<Response<User>>
 
     @GET("/chats")
-    fun getDetails(@Header("x-auth-token") authorization : String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
+    fun getDetails(@Header("x-auth-token") authorization : String): Observable<ArrayList<ChatResponse>>
 
     @GET("/chats")
-    fun getHistory(@Header("x-auth-token") authorization: String): Observable<ArrayList<com.trackster.tracksterapp.model.ChatResponse>>
+    fun getHistory(@Header("x-auth-token") authorization: String): Observable<ArrayList<ChatResponse>>
 
     @POST("/chats/{chatId}/push/message")
     fun postMessage(@Header("x-auth-token") authorization: String,

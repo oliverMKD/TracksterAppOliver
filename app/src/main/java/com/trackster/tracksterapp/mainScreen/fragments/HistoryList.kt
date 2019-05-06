@@ -3,6 +3,7 @@ package com.trackster.tracksterapp.mainScreen.fragments
 import android.os.Bundle
 
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,9 @@ import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.ChatResponse
 
+
 import com.trackster.tracksterapp.network.PostApi
+import com.trackster.tracksterapp.network.responce.ChatResponse
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -29,25 +32,15 @@ class HistoryList : BaseFragment() {
     lateinit var apiService: PostApi
     private var historyList: MutableList<ChatResponse> = mutableListOf()
     var fragmentPosition: Int = 0
-
-    //    private var disposable: CompositeDisposable? = null
     var compositeDisposableContainer = CompositeDisposable()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         historyAdapter = HistoryRecyclerAdapter(activity!!)
         getHistory()
     }
 
-
-
-
     override fun onBackStackChanged() {
-
-
-
     }
 
     override fun getProgressBar(): ProgressBar? = null
@@ -69,7 +62,6 @@ class HistoryList : BaseFragment() {
     }
 
 
-
     private fun initRecyclerView(list: ArrayList<ChatResponse>) {
         recyclerHistory.setHasFixedSize(true)
         recyclerHistory.layoutManager = LinearLayoutManager(context)
@@ -78,27 +70,20 @@ class HistoryList : BaseFragment() {
     }
 
 
-
-
     private fun getHistory() {
-
         apiService = PostApi.create(context!!)
-        compositeDisposableContainer.add(apiService.getHistory(
-            PreferenceUtils.getAuthorizationToken(context!!)
+        compositeDisposableContainer.add(
+            apiService.getHistory(
+                PreferenceUtils.getAuthorizationToken(context!!))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    initRecyclerView(it)
+                    Log.d("getHistory", "" + it.size)
+                },
+                    {
+                        Log.d("getHistory", "" + it.localizedMessage)
+                    })
         )
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                initRecyclerView(it)
-// Log.d("station", " "+ it[0].location)
-            }, {
-                // showProgress(false)
-//                Utils.handleApiError(it)
-            })
-        )
-
     }
-
-
-
 }

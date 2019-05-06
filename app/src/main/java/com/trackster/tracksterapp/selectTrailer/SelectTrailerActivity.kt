@@ -26,7 +26,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private lateinit var lastLocation: Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val SPLASH_DELAY: Long = 1500 //1.5 seconds
+    private val SPLASH_DELAY: Long = 1000 //1.5 seconds
     private var mDelayHandler: Handler? = null
     internal val mRunnable: Runnable = Runnable {
         if (!isFinishing) {
@@ -58,7 +58,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
         fragmentTransaction.commit()
     }
-    private fun openSelectTruckFragment() {
+    public fun openSelectTruckFragment() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
@@ -73,7 +73,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
         fragmentTransaction.commit()
     }
-    private fun openSelectColorFragment() {
+    public fun openSelectColorFragment() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
@@ -160,5 +160,8 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun goToSelectTruckFragment() {
         openSelectTruckFragment()
+    }
+    public fun startNewActivity(){
+        startActivity(Intent(this@SelectTrailerActivity, MainScreenActivity::class.java))
     }
 }

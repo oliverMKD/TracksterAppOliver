@@ -21,15 +21,15 @@ import kotlinx.android.synthetic.main.fragment_select_truck.*
 
 class SelectColorFragment : BaseFragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        when (p0?.id) {
+            R.id.select_manufactor_color -> (activity as SelectTrailerActivity).startNewActivity()
+        }
     }
 
     private lateinit var selectColorAdapter: SelectColorAdapter
     lateinit var apiService: PostApi
     private var trucksList: MutableList<Colors> = mutableListOf()
-    var fragmentPosition: Int = 0
 
-    //    private var disposable: CompositeDisposable? = null
     var compositeDisposableContainer = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +37,7 @@ class SelectColorFragment : BaseFragment(), View.OnClickListener {
 
         selectColorAdapter = SelectColorAdapter(activity!!)
         getTrucks()
+
 
     }
 
@@ -59,25 +60,31 @@ class SelectColorFragment : BaseFragment(), View.OnClickListener {
         selectColorAdapter.setData(list)
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        select_manufactor_color.setOnClickListener(this)
+    }
 
     private fun getTrucks() {
 
         apiService = PostApi.create(context!!)
-        compositeDisposableContainer.add(apiService.getColors(
-            PreferenceUtils.getAuthorizationToken(context!!)
-        )
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                initRecyclerView(it)
+        compositeDisposableContainer.add(
+            apiService.getColors(
+                PreferenceUtils.getAuthorizationToken(context!!)
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    initRecyclerView(it)
 // Log.d("station", " "+ it[0].location)
-            }, {
-                // showProgress(false)
+                }, {
+                    // showProgress(false)
 //                Utils.handleApiError(it)
-            })
+                })
         )
 
     }
+
     override fun onDestroy() {
         compositeDisposableContainer.clear()
         super.onDestroy()

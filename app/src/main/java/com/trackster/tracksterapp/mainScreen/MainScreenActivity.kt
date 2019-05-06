@@ -48,6 +48,8 @@ import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
+import com.trackster.tracksterapp.selectTrailer.fragments.SelectColorFragment
+import com.trackster.tracksterapp.selectTrailer.fragments.SelectTruckFragment
 import com.trackster.tracksterapp.utils.DialogUtils
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -107,6 +109,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private val profileSettings: ProfileSettings = ProfileSettings.newInstance()
     private val historyList: HistoryList = HistoryList.newInstance()
     private val detailsList: DetailsLoad = DetailsLoad.newInstance()
+    private val selectTracksFragment: SelectTruckFragment = SelectTruckFragment.newInstance()
+    private val selectColorFragment: SelectColorFragment = SelectColorFragment.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,64 +122,48 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         chat.setOnClickListener(this)
 
         floatBtn.setOnClickListener { view ->
-            //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show()
 
             val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
             // Inflate a custom view using layout inflater
             val view = inflater.inflate(R.layout.popup_window, null)
-
             // Initialize a new instance of popup window
             val popupWindow = PopupWindow(
                 view, // Custom view to show in popup window
                 LinearLayout.LayoutParams.WRAP_CONTENT, // Width of popup window
                 LinearLayout.LayoutParams.WRAP_CONTENT // Window height
             )
-
             // Set an elevation for the popup window
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 popupWindow.elevation = 10.0F
                 popupWindow.setOutsideTouchable(true);
             }
-
-
             // If API level 23 or higher then execute the code
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // Create a new slide animation for popup window enter transition
                 val slideIn = Slide()
                 slideIn.slideEdge = Gravity.BOTTOM
                 popupWindow.enterTransition = slideIn
-
                 // Slide animation for popup window exit transition
                 val slideOut = Slide()
                 slideOut.slideEdge = Gravity.BOTTOM
                 popupWindow.exitTransition = slideOut
-
             }
-
             // Get the widgets reference from custom view
             //  val tv = view.findViewById<TextView>(R.id.text_view)
             val buttonPopup = view.findViewById<Button>(R.id.button_popup)
-
             // Set click listener for popup window's text view
-//            tv.setOnClickListener{
-//                // Change the text color of popup window's text view
-//                tv.setTextColor(Color.RED)
-//            }
+
+
 
             // Set a click listener for popup's button widget
             buttonPopup.setOnClickListener {
                 // Dismiss the popup window
                 popupWindow.dismiss()
             }
-
             // Set a dismiss listener for popup window
             popupWindow.setOnDismissListener {
                 Toast.makeText(applicationContext, "Popup closed", Toast.LENGTH_SHORT).show()
             }
-
-
             // Finally, show the popup window on app
             TransitionManager.beginDelayedTransition(root_layout)
             popupWindow.showAtLocation(
@@ -186,7 +174,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             )
         }
 
-
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
             R.string.navigation_drawer_open,
@@ -194,9 +181,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
-
         nav_view.setNavigationItemSelectedListener(this)
-
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -234,13 +219,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         this.googleMap = googleMap
         googleMap!!.uiSettings.isZoomControlsEnabled = false
         googleMap!!.uiSettings.isMyLocationButtonEnabled = false
-
-
         mDelayHandler = Handler()
         //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, 5000)
     }
-
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -271,14 +253,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
+
     private fun getWeightStations() {
-
-
         apiService = PostApi.create(this)
-        var map: MutableMap<String, String> = mutableMapOf()
-
-        map["42.0151079"]
-        map["21.4526962"]
         val coordinates = "42.0151079,21.4526962"
         val newCoordinates = coordinates.replace("\\,", "%2C")
 
@@ -540,6 +517,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         floatBtn.hide()
     }
 
+
     private fun openCurrentLoadFragment() {
 
         val fragmentManager = supportFragmentManager
@@ -658,5 +636,36 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    public fun openSelectTruckFragment() {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        if (selectTracksFragment.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, selectTracksFragment)
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, selectTracksFragment)
+            fragmentTransaction.addToBackStack("selectTrucksFragment")
+        }
+
+        fragmentTransaction.commit()
+    }
+
+    public fun openSelectColorFragment() {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        if (selectColorFragment.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, selectColorFragment)
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, selectColorFragment)
+            fragmentTransaction.addToBackStack("selectColorFragment")
+        }
+
+        fragmentTransaction.commit()
+    }
+    fun getSelectedTruck(id: String) {
+        Toast.makeText(this@MainScreenActivity, "You selected : "  + " truck", Toast.LENGTH_LONG).show()
     }
 }
