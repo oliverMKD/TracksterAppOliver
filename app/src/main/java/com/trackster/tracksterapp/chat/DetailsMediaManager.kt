@@ -16,6 +16,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.trackster.tracksterapp.BuildConfig
 import com.trackster.tracksterapp.model.AdditionalData
+import com.trackster.tracksterapp.model.Files
 import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.rx.RxBus
 import com.trackster.tracksterapp.utils.ConfigManager
@@ -44,6 +45,7 @@ object DetailsMediaManager {
     var uploadsCounter = 0
 
     var mutableListSendingMessages: MutableList<Message> = mutableListOf()
+    var mutableListSendingAudio: MutableList<Files> = mutableListOf()
     var pendingMessage: Message? = null
 
     fun editUploadsCounter(increase: Boolean, error: Throwable?) {
@@ -154,7 +156,9 @@ object DetailsMediaManager {
     fun createMessage(activity: Activity, content: String?,id : String): Message? {
         return Message(id, content!!,"","","")
     }
-
+    fun createAudio(activity: Activity, content: String?,id : String): Files? {
+        return Files(id,"")
+    }
     private fun createAdditionalData(hasMedia: Boolean): AdditionalData {
         if (hasMedia) {
             return AdditionalData(tmpId!!, 0, tmpUri.toString(), fileName, uploadFile!!, "", true, false)

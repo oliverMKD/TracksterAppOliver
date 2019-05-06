@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Files (
     @SerializedName("id") val id: String,
-    @SerializedName("filename") val filename: String
+    @SerializedName("filename") var filename: String
 
 
 

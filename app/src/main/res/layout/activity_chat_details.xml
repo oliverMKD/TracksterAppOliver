@@ -95,13 +95,29 @@
                 android:layout_marginEnd="8dp"
                 android:gravity="top"
                 android:layout_gravity="center_vertical"/>
-        <ImageView
-                android:id="@+id/button_send_msg2"
-                android:background="@drawable/mic"
+        <Button
+                android:id="@+id/microfon"
+
                 android:clickable="true"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:visibility="gone"
+                android:text="@string/record"
+                android:textColor="@color/transparent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+        />
+
+        <Button
+                android:id="@+id/buttonPlayRecording"
+
+                android:clickable="true"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:visibility="gone"
+
+                android:textColor="@color/Black"
+                android:text="@string/playRecord"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="8dp"
         />
@@ -111,6 +127,7 @@
                 android:clickable="true"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="8dp"
         />

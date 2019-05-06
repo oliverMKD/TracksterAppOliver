@@ -12,11 +12,14 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.chat.ChatDetails
+import com.trackster.tracksterapp.model.Files
 import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.utils.*
 
 class MessageRecyclerAdapter(
-    private val context: Activity, private var list: MutableList<Message>,
+    private val context: Activity,
+    private var list: MutableList<Message>,
+    private var listAudio: MutableList<Files>,
     private var avatar: String?
 ) : RecyclerView.Adapter<MessageRecyclerAdapter.MessageRecyclerViewHolder>() {
 
@@ -198,8 +201,18 @@ class MessageRecyclerAdapter(
         notifyDataSetChanged()
     }
 
+    fun setAudioData(audio_files: MutableList<Files>) {
+        listAudio.clear()
+        listAudio.addAll(audio_files)
+        notifyDataSetChanged()
+    }
+
     fun addMessage(message: Message) {
         list.add(message)
+        notifyDataSetChanged()
+    }
+    fun addAudio(files: Files) {
+        listAudio.add(files)
         notifyDataSetChanged()
     }
 

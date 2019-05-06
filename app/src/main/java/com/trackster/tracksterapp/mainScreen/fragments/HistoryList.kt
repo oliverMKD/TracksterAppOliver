@@ -55,10 +55,7 @@ class HistoryList : BaseFragment() {
         fun newInstance() = HistoryList()
     }
 
-    override fun onDestroy() {
-        compositeDisposableContainer.clear()
-        super.onDestroy()
-    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -94,7 +91,10 @@ class HistoryList : BaseFragment() {
         )
 
     }
-
+    override fun onDestroy() {
+        compositeDisposableContainer.clear()
+        super.onDestroy()
+    }
 
 
 }
