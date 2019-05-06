@@ -36,7 +36,10 @@
     <string name="yesterday">yesterday</string>
 
 
-
+    <string name="record">Record</string>
+    <string name="stopRecording">Stop Recording</string>
+    <string name="playRecord">Play Record</string>
+    <string name="stopPlayingRecord">Stop Playing Record</string>
 
 
     <string name="make_video">make video</string>

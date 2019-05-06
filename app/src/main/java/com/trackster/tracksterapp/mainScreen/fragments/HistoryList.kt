@@ -51,6 +51,7 @@ class HistoryList : BaseFragment() {
         fun newInstance() = HistoryList()
     }
 
+
     override fun onDestroy() {
         compositeDisposableContainer.clear()
         (activity as MainScreenActivity).show()
@@ -86,4 +87,9 @@ class HistoryList : BaseFragment() {
                     })
         )
     }
+    override fun onDestroy() {
+        compositeDisposableContainer.clear()
+        super.onDestroy()
+    }
+
 }

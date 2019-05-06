@@ -20,6 +20,7 @@ import com.trackster.tracksterapp.utils.BASE_URL
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.Interceptor
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Response
@@ -89,6 +90,11 @@ interface PostApi {
                     @Path("chatId") chatId: String, @Body message: Message) : Single<Message>
     @GET("/admin/truck-colors")
     fun getColors(@Header("x-auth-token") authorization: String): Observable<ArrayList<Colors>>
+
+    @Multipart
+    @POST("/chats/upload/{chatId}")
+    fun postAudio(@Header("x-auth-token") authorization: String,
+                    @Path("chatId") chatId: String, @Part("file\"; filename=\"recorder.aac\" ") file: RequestBody   ) : Single<Files>
 
     companion object Factory {
         fun create(context: Context): PostApi {

@@ -6,12 +6,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.media.ExifInterface
+import android.media.MediaPlayer
+import android.media.MediaRecorder
 import android.net.Uri
-import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
+import android.os.*
 import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -20,10 +22,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.ProgressBar
+import android.widget.*
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.bumptech.glide.Glide
@@ -35,6 +34,7 @@ import com.trackster.tracksterapp.base.TracksterApplication
 import com.trackster.tracksterapp.firebase.FirebaseUtils
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.Contact
+import com.trackster.tracksterapp.model.Files
 import com.trackster.tracksterapp.model.FirebaseMessage
 import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.network.PostApi
@@ -42,10 +42,15 @@ import com.trackster.tracksterapp.utils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_chat_details.*
+import kotlinx.android.synthetic.main.activity_load_details.view.*
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import java.io.File
+import java.io.IOException
 
 
-class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
+class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
 
     object Day {
         const val TODAY = "today"
@@ -57,14 +62,16 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
     private var imgSelectorImageView: ImageView? = null
     private var cam: ImageView? = null
     private var sendMessageImageView: ImageView? = null  // mikrofon
-    private var sendMessageImageView2: ImageView? = null
+    private var microfon: Button? = null
     private var sendMessageEditText: EditText? = null
     private var recyclerView: RecyclerView? = null
     private var progressBar: ProgressBar? = null
 
     private lateinit var adapter: MessageRecyclerAdapter
     private var mutableListMessages: MutableList<Message> = mutableListOf()
+    private var audioListMessages: MutableList<Files> = mutableListOf()
 
+    private var files: Files? = null
     private var contact: Contact? = null
     private var sender: Contact? = null
     private var recipient: Contact? = null
@@ -75,6 +82,17 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
     private var observerId: Int? = null
 
     private var isActivityVisible = false
+
+    // Recording Audio
+    var mediaRecorder: MediaRecorder? = null
+    var mediaPlayer: MediaPlayer? = null
+
+    var FILE_RECORDING = ""
+
+    val PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED
+    val AUDIO_PERMISSION = Manifest.permission.RECORD_AUDIO
+    val PERMISSION_REQUEST_CODE = 100
+
 
     // aws
     private var s3Client: AmazonS3Client? = null
@@ -100,10 +118,17 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 
 
 //            initAWS()
-            initViews()
+        initViews()
 //            handleIntent()
-            initMessageList()
+        initMessageList()
         getMessages()
+
+        FILE_RECORDING = "${externalCacheDir.absolutePath}/recorder.aac"
+
+        setButtonRecordListener()
+        setButtonPlayRecordingListener()
+        enableDisableButtonPlayRecording()
+
 
 //            compositeDisposable.add(RxBus.listen(ClearPendingMessageEvent::class.java).subscribe {
 //                pendingMessageUploaded()
@@ -165,17 +190,22 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
         val sendMessageViewPadding = resources.getDimensionPixelSize(R.dimen.design_bottom_navigation_margin)
 
         if (isSnackbarVisible) {
-            sendMessageRelativeLayout?.setPadding(sendMessageViewPadding,
+            sendMessageRelativeLayout?.setPadding(
                 sendMessageViewPadding,
                 sendMessageViewPadding,
-                resources.getDimensionPixelSize(R.dimen.design_bottom_navigation_margin))
+                sendMessageViewPadding,
+                resources.getDimensionPixelSize(R.dimen.design_bottom_navigation_margin)
+            )
         } else {
-            sendMessageRelativeLayout?.setPadding(sendMessageViewPadding,
+            sendMessageRelativeLayout?.setPadding(
                 sendMessageViewPadding,
                 sendMessageViewPadding,
-                sendMessageViewPadding)
+                sendMessageViewPadding,
+                sendMessageViewPadding
+            )
         }
     }
+
     private fun initMutualViews() {
         sendMessageRelativeLayout = findViewById(R.id.send_message_relative_layout)
         recyclerView = findViewById(R.id.recycler_view_details)
@@ -190,7 +220,12 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
     }
 
     private fun initAWS() {
-        val s3Client = AmazonS3Client(BasicAWSCredentials(ConfigManager.getAWSAccessKey(this), ConfigManager.getAWSSecretKey(this)), Utils.getAWSConfigurationClient())
+        val s3Client = AmazonS3Client(
+            BasicAWSCredentials(
+                ConfigManager.getAWSAccessKey(this),
+                ConfigManager.getAWSSecretKey(this)
+            ), Utils.getAWSConfigurationClient()
+        )
         this.s3Client = s3Client
 //        transferUtility = TransferUtility(s3Client, applicationContext)
     }
@@ -199,9 +234,8 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
         contact = intent.getSerializableExtra(CONTACT_KEY) as Contact?
         setToolbarTitleAndLogo(contact?.nickname, contact?.avatar)
     }
+
     private fun initMessageList() {
-
-
         scrollToBottom()
     }
 
@@ -212,13 +246,15 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
     }
 
     private fun initViews() {
+
+
         imgSelectorImageView = findViewById(R.id.img_selector_image_view)
         imgSelectorImageView?.setOnClickListener(this)
         sendMessageImageView = findViewById(R.id.button_send_msg)
         sendMessageImageView?.setOnClickListener(this)
 
-        sendMessageImageView2= findViewById(R.id.button_send_msg2)
-        sendMessageImageView2?.setOnClickListener(this)
+        microfon = findViewById(R.id.microfon)
+        microfon?.setOnClickListener(this)
 
         sendMessageEditText = findViewById(R.id.send_message_edit_text)
 
@@ -227,7 +263,8 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 //            if (!hasFocus) {   sendMessageImageView?.setImageResource(R.drawable.spajalica)}
 //        }
 
-        sendMessageImageView2?.visibility = View.VISIBLE
+        microfon?.visibility = View.VISIBLE
+        microfon?.setBackgroundResource(R.drawable.mic)
         sendMessageImageView?.visibility = View.GONE
 
 
@@ -245,19 +282,20 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
                     }
                 }
 
-                if(message!!.trim().length>0) {
+                if (message!!.trim().length > 0) {
                     sendMessageImageView?.visibility = View.VISIBLE
-                    sendMessageImageView2?.visibility = View.GONE
+                    microfon?.visibility = View.GONE
                     imgSelectorImageView?.visibility = View.GONE
                     cam?.visibility = View.GONE
 
-                }else{
-                    sendMessageImageView2?.visibility = View.VISIBLE
+                } else {
+                    microfon?.visibility = View.VISIBLE
                     sendMessageImageView?.visibility = View.GONE
                     imgSelectorImageView?.visibility = View.VISIBLE
                     cam?.visibility = View.VISIBLE
                 }
             }
+
             override fun afterTextChanged(s: Editable) {
             }
         })
@@ -282,36 +320,38 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
     public fun getMessages() {
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
-            apiService.getChatById(PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails))
+            apiService.getChatById(
+                PreferenceUtils.getAuthorizationToken(this@ChatDetails),
+                PreferenceUtils.getChatId(this@ChatDetails)
+            )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                  var brokerName = it.broker.firstName
-                    var brokerLastName  =it.broker.lastName
-                    var brokerFullName = brokerName+" " + brokerLastName
+                    var brokerName = it.broker.firstName
+                    var brokerLastName = it.broker.lastName
+                    var brokerFullName = brokerName + " " + brokerLastName
                     var driverName = it.driver.firstName
-                    var driverLastName =it.driver.lastName
-                    var driverFullName = driverName +" "+ driverLastName
+                    var driverLastName = it.driver.lastName
+                    var driverFullName = driverName + " " + driverLastName
                     var carrierName = it.carrier.firstName
-                    var carrierLastName =it.carrier.lastName
-                    var carrierFullName = carrierName +" "+ carrierLastName
+                    var carrierLastName = it.carrier.lastName
+                    var carrierFullName = carrierName + " " + carrierLastName
 
                     var brokerId = it.broker.id
                     var carrierId = it.carrier.id
 
-                    PreferenceUtils.saveBrokerName(this@ChatDetails, brokerFullName )
-                    PreferenceUtils.saveDriverName(this@ChatDetails, driverFullName )
-                    PreferenceUtils.saveCarrierName(this@ChatDetails, carrierFullName )
-                    PreferenceUtils.saveBrokerId(this@ChatDetails, brokerId )
-                    PreferenceUtils.saveCarrierId(this@ChatDetails, carrierId )
+                    PreferenceUtils.saveBrokerName(this@ChatDetails, brokerFullName)
+                    PreferenceUtils.saveDriverName(this@ChatDetails, driverFullName)
+                    PreferenceUtils.saveCarrierName(this@ChatDetails, carrierFullName)
+                    PreferenceUtils.saveBrokerId(this@ChatDetails, brokerId)
+                    PreferenceUtils.saveCarrierId(this@ChatDetails, carrierId)
 //                    mutableListMessages = it.message
                     mutableListMessages = it.message
                     setData(mutableListMessages)
                     scrollToBottom()
                     //                Log.d("station", " "+ it[0].location)
                 }, {
-                    Log.d("destinacija",""+ it.localizedMessage)
+                    Log.d("destinacija", "" + it.localizedMessage)
                     //                showProgress(false)
                 })
         )
@@ -343,14 +383,169 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
         }
 
         message.createTime = messageDate
+
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.button_send_msg -> { sendMessage(DetailsMediaManager.createMessage(
-                this,sendMessageEditText?.text.toString(),"1234")!!)
-            clearMessage()
+            R.id.button_send_msg -> {
+                sendMessage(
+                    DetailsMediaManager.createMessage(
+                        this, sendMessageEditText?.text.toString(), "1234"
+                    )!!
+                )
+                clearMessage()
             }
+            R.id.microfon -> {
+                startRecording()
+            }
+        }
+    }
+
+    fun startRecording() {
+        fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            if (requestCode == PERMISSION_REQUEST_CODE) {
+                if (grantResults[0] == PERMISSION_GRANTED) {
+                    record()
+                }
+            }
+        }
+
+    }
+
+    private fun enableDisableButtonPlayRecording() {
+        buttonPlayRecording.isEnabled = doesFileExist()
+    }
+
+    private fun doesFileExist(): Boolean {
+        val file = File(FILE_RECORDING)
+        return file.exists()
+    }
+
+    private fun setButtonRecordListener() {
+        microfon?.setOnClickListener {
+            if (microfon?.text.toString().equals(getString(R.string.record) , true)) {
+                record()
+            } else {
+                stopRecording()
+                enableDisableButtonPlayRecording()
+                microfon?.text = getString(R.string.record)
+                microfon?.setBackgroundResource(R.drawable.mic)
+                sendAudio(
+                    DetailsMediaManager.createAudio(
+                        this, FILE_RECORDING, "1234"
+                    )!!
+                )
+
+            }
+        }
+    }
+
+    private fun setButtonPlayRecordingListener() {
+        buttonPlayRecording.setOnClickListener {
+            if (buttonPlayRecording.text.toString().equals(getString(R.string.playRecord), true)) {
+                buttonPlayRecording.text = getString(R.string.stopPlayingRecord)
+                playRecording()
+            } else {
+                buttonPlayRecording.text = getString(R.string.playRecord)
+                stopPlayingRecording()
+            }
+        }
+    }
+
+    private fun isPermissionGranted(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) checkSelfPermission(AUDIO_PERMISSION) == PERMISSION_GRANTED
+        else return true
+
+    }
+
+    private fun requestAudioPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(arrayOf(AUDIO_PERMISSION), PERMISSION_REQUEST_CODE)
+        }
+    }
+
+    private fun record() {
+        if (!isPermissionGranted()) {
+            requestAudioPermission()
+            return
+        }
+
+        microfon?.setBackgroundResource(R.drawable.stop)
+        microfon?.text = getString(R.string.stopRecording)
+        mediaRecorder = MediaRecorder()
+        mediaRecorder!!.setAudioSource(MediaRecorder.AudioSource.MIC)
+        mediaRecorder!!.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
+        mediaRecorder!!.setOutputFile(FILE_RECORDING)
+        mediaRecorder!!.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+        mediaRecorder!!.prepare()
+        mediaRecorder!!.start()
+    }
+
+    private fun stopRecording() {
+        mediaRecorder?.stop()
+        mediaRecorder?.release()
+        mediaRecorder = null
+    }
+
+    private fun playRecording() {
+        mediaPlayer = MediaPlayer()
+        mediaPlayer!!.setDataSource(FILE_RECORDING)
+        mediaPlayer!!.prepare()
+        mediaPlayer!!.start()
+        mediaPlayer!!.setOnCompletionListener {
+            buttonPlayRecording.text = getString(R.string.playRecord)
+        }
+    }
+
+    private fun stopPlayingRecording() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+
+    private fun postAudio(file: Files) {
+
+        val file = File(FILE_RECORDING)
+        val requestBody: RequestBody  = RequestBody.create(MediaType.parse("audio/*"), file)
+
+
+        apiService = PostApi.create(this@ChatDetails)
+        compositeDisposable.add(
+            apiService.postAudio(
+                PreferenceUtils.getAuthorizationToken(this@ChatDetails),
+                PreferenceUtils.getChatId(this@ChatDetails), requestBody
+
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    setAudioFile(it)
+                    audioListMessages.add(it)
+
+                    adapter.setAudioData(createAudioData())
+                    scrollToBottom()
+                    //                    mutableListMessages = it.message
+                    //                Log.d("station", " "+ it[0].location)
+                }, {
+                    Log.d("destinacija", "" + it.localizedMessage)
+                    //                showProgress(false)
+                })
+        )
+    }
+
+    private fun setAudioFile(file: Files) {
+
+       // var files = FILE_RECORDING
+        file.filename = FILE_RECORDING
+
+
+    }
+    private fun createAudioData(): MutableList<Files> =
+        audioListMessages.asSequence().toMutableList()
+
+
 //            R.id.img_selector_image_view -> addMedia()
 //            R.id.send_message_image_view -> {
 //                if (contact != null) {
@@ -363,14 +558,30 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 //                    }
 //                }
 //            }
-        }
-    }
+
 
     private fun clearMessage() {
         sendMessageEditText?.setText("")
         hasMedia = false
         removeMedia()
-      //  sendMessageImageView?.setImageResource(R.drawable.spajalica)
+        //  sendMessageImageView?.setImageResource(R.drawable.spajalica)
+    }
+
+
+    private fun sendAudio (file: Files) {
+        if (hasMedia) {
+            hasMedia = false
+
+            DetailsMediaManager.editUploadsCounter(true, null)
+           uploadAudio(file)
+
+        } else {
+            postAudio(file)
+        }
+
+        DetailsMediaManager.mutableListSendingAudio.add(file)
+        adapter.addAudio(file)
+        scrollToBottom()
     }
 
     private fun sendMessage(message: Message) {
@@ -389,6 +600,9 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
         scrollToBottom()
     }
 
+
+
+
 //    private fun messageNotSent(message: Message) {
 //        adapter.removeMessage(message.additionalData.id)
 //        DetailsMediaManager.removeMessage(message.additionalData.id)
@@ -399,6 +613,12 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 //        adapter.setData(createNewData())
 //        scrollToBottom()
 //    }
+
+    private fun uploadAudio(file: Files) {
+        val fileName = DetailsMediaManager.MESSAGES + File.separator + DetailsMediaManager.fileName
+
+    }
+
 
     private fun uploadMedia(message: Message) {
         val fileName = DetailsMediaManager.MESSAGES + File.separator + DetailsMediaManager.fileName
@@ -417,8 +637,10 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
-            apiService.postMessage(PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails),message)
+            apiService.postMessage(
+                PreferenceUtils.getAuthorizationToken(this@ChatDetails),
+                PreferenceUtils.getChatId(this@ChatDetails), message
+            )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -430,11 +652,13 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
                     //                    mutableListMessages = it.message
                     //                Log.d("station", " "+ it[0].location)
                 }, {
-                    Log.d("destinacija",""+ it.localizedMessage)
+                    Log.d("destinacija", "" + it.localizedMessage)
                     //                showProgress(false)
                 })
         )
     }
+
+
 
     private fun stopProgress(error: Throwable?) {
         DetailsMediaManager.editUploadsCounter(false, error)
@@ -470,8 +694,10 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 
     private fun addMedia() {
         if (!DetailsMediaManager.pickMedia(this))
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE
+            )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -482,7 +708,8 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
             DetailsMediaManager.setMediaDataGallery(this, data?.data!!)
             setMedia(data.data)
         } else if ((requestCode == DetailsMediaManager.REQUEST_IMAGE_CAPTURE || requestCode == DetailsMediaManager.REQUEST_VIDEO_CAPTURE)
-            && resultCode == Activity.RESULT_OK) {
+            && resultCode == Activity.RESULT_OK
+        ) {
             setMedia(DetailsMediaManager.tmpUri)
         }
     }
@@ -535,7 +762,7 @@ class ChatDetails() :BaseChatActivity(),View.OnClickListener, Parcelable {
 
     private fun removeMedia() {
         isMessageSendable = false
-      //  Glide.with(this).load(R.drawable.add_media).apply(RequestOptions.circleCropTransform()).into(imgSelectorImageView!!)
+        //  Glide.with(this).load(R.drawable.add_media).apply(RequestOptions.circleCropTransform()).into(imgSelectorImageView!!)
     }
 
 //    override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
