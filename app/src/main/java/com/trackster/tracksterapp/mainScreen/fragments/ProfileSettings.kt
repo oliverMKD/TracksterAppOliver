@@ -83,6 +83,7 @@ class ProfileSettings : BaseFragment(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        (activity as MainScreenActivity).show()
     }
 
     companion object {

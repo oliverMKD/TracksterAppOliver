@@ -55,6 +55,7 @@ import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_login_pane.*
 import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
 
@@ -116,6 +117,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setContentView(R.layout.activity_main_screen)
         setSupportActionBar(toolbar)
         getChats()
+        hamburger.visibility = View.VISIBLE
         hamburger.setOnClickListener(this)
         chat.setOnClickListener(this)
 
@@ -147,13 +149,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 popupWindow.exitTransition = slideOut
             }
             // Get the widgets reference from custom view
-            val tv = view.findViewById<TextView>(R.id.text_view)
+            //  val tv = view.findViewById<TextView>(R.id.text_view)
             val buttonPopup = view.findViewById<Button>(R.id.button_popup)
             // Set click listener for popup window's text view
-            tv.setOnClickListener {
-                // Change the text color of popup window's text view
-                tv.setTextColor(Color.RED)
-            }
+
+
+
             // Set a click listener for popup's button widget
             buttonPopup.setOnClickListener {
                 // Dismiss the popup window
@@ -172,6 +173,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 20 // Y offset
             )
         }
+
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
             R.string.navigation_drawer_open,
@@ -194,6 +196,15 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //
         createLocationRequest()
     }
+
+
+    public fun show() {
+        attach.visibility = View.VISIBLE
+        hamburger.visibility = View.VISIBLE
+        floatBtn.show()
+        chat.visibility = View.VISIBLE
+    }
+
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.hamburger -> {
@@ -203,6 +214,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 startActivity(Intent(this@MainScreenActivity, ChatDetails::class.java))
         }
     }
+
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
         googleMap!!.uiSettings.isZoomControlsEnabled = false
@@ -240,6 +252,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
+
 
     private fun getWeightStations() {
         apiService = PostApi.create(this)
@@ -497,6 +510,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
+    fun hide() {
+        attach?.visibility = View.INVISIBLE
+        hamburger?.visibility = View.INVISIBLE
+        chat?.visibility = View.INVISIBLE
+        floatBtn.hide()
+    }
+
 
     private fun openCurrentLoadFragment() {
 
@@ -596,17 +616,20 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
             R.id.routes -> {
                 opendetailsList()
+                hide()
+
             }
             R.id.loads -> {
                 openCurrentLoadFragment()
-
+                hide()
             }
             R.id.history -> {
                 openHistoryList()
+                hide()
             }
             R.id.settings -> {
                 openProfileSettingsFragment()
-
+                hide()
 
             }
         }

@@ -10,6 +10,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
+import com.trackster.tracksterapp.model.ChatResponse
+
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -48,6 +51,7 @@ class Current_Load : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposableContainer.clear()
+        (activity as MainScreenActivity).show()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
