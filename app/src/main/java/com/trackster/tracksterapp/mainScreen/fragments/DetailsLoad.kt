@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.ChatResponse
 import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.network.PostApi
@@ -81,6 +82,7 @@ class DetailsLoad :  BaseFragment() {
     }
 
     override fun onDestroy() {
+        (activity as MainScreenActivity).show()
         super.onDestroy()
     }
 

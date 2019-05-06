@@ -12,6 +12,7 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.HistoryRecyclerAdapter
 
 import com.trackster.tracksterapp.base.BaseFragment
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.ChatResponse
 
 import com.trackster.tracksterapp.network.PostApi
@@ -45,6 +46,8 @@ class HistoryList : BaseFragment() {
 
     override fun onBackStackChanged() {
 
+
+
     }
 
     override fun getProgressBar(): ProgressBar? = null
@@ -57,6 +60,7 @@ class HistoryList : BaseFragment() {
 
     override fun onDestroy() {
         compositeDisposableContainer.clear()
+        (activity as MainScreenActivity).show()
         super.onDestroy()
     }
 

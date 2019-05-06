@@ -53,6 +53,7 @@ import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_login_pane.*
 import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
 
@@ -61,7 +62,8 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,View.OnClickListener {
+class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
+    View.OnClickListener {
 
 
     private var googleMap: GoogleMap? = null
@@ -101,7 +103,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
-
     private val currentLoad: Current_Load = Current_Load.newInstance()
     private val profileSettings: ProfileSettings = ProfileSettings.newInstance()
     private val historyList: HistoryList = HistoryList.newInstance()
@@ -112,17 +113,18 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setContentView(R.layout.activity_main_screen)
         setSupportActionBar(toolbar)
         getChats()
+        hamburger.visibility = View.VISIBLE
         hamburger.setOnClickListener(this)
         chat.setOnClickListener(this)
 
         floatBtn.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                .setAction("Action", null).show()
 
             val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
             // Inflate a custom view using layout inflater
-            val view = inflater.inflate(R.layout.popup_window,null)
+            val view = inflater.inflate(R.layout.popup_window, null)
 
             // Initialize a new instance of popup window
             val popupWindow = PopupWindow(
@@ -139,7 +141,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
 
             // If API level 23 or higher then execute the code
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // Create a new slide animation for popup window enter transition
                 val slideIn = Slide()
                 slideIn.slideEdge = Gravity.BOTTOM
@@ -153,24 +155,24 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
 
             // Get the widgets reference from custom view
-            val tv = view.findViewById<TextView>(R.id.text_view)
+            //  val tv = view.findViewById<TextView>(R.id.text_view)
             val buttonPopup = view.findViewById<Button>(R.id.button_popup)
 
             // Set click listener for popup window's text view
-            tv.setOnClickListener{
-                // Change the text color of popup window's text view
-                tv.setTextColor(Color.RED)
-            }
+//            tv.setOnClickListener{
+//                // Change the text color of popup window's text view
+//                tv.setTextColor(Color.RED)
+//            }
 
             // Set a click listener for popup's button widget
-            buttonPopup.setOnClickListener{
+            buttonPopup.setOnClickListener {
                 // Dismiss the popup window
                 popupWindow.dismiss()
             }
 
             // Set a dismiss listener for popup window
             popupWindow.setOnDismissListener {
-                Toast.makeText(applicationContext,"Popup closed",Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Popup closed", Toast.LENGTH_SHORT).show()
             }
 
 
@@ -178,15 +180,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             TransitionManager.beginDelayedTransition(root_layout)
             popupWindow.showAtLocation(
                 root_layout, // Location to display popup window
-                Gravity.BOTTOM , // Exact position of layout to display popup
+                Gravity.BOTTOM, // Exact position of layout to display popup
                 -120,// X offset
                 20 // Y offset
             )
         }
-
-
-
-
 
 
         val toggle = ActionBarDrawerToggle(
@@ -213,15 +211,25 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //
         createLocationRequest()
     }
+
+
+    public fun show() {
+        attach.visibility = View.VISIBLE
+        hamburger.visibility = View.VISIBLE
+        floatBtn.show()
+        chat.visibility = View.VISIBLE
+    }
+
     override fun onClick(p0: View?) {
-        when (p0?.id){
-            R.id.hamburger-> {
+        when (p0?.id) {
+            R.id.hamburger -> {
                 drawer_layout.openDrawer(Gravity.START)
             }
             R.id.chat ->
-                startActivity(Intent(this@MainScreenActivity,ChatDetails::class.java))
+                startActivity(Intent(this@MainScreenActivity, ChatDetails::class.java))
         }
     }
+
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
         googleMap!!.uiSettings.isZoomControlsEnabled = false
@@ -262,49 +270,53 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
+
     private fun getWeightStations() {
 
 
         apiService = PostApi.create(this)
-        var map : MutableMap< String,String> =  mutableMapOf()
+        var map: MutableMap<String, String> = mutableMapOf()
 
         map["42.0151079"]
         map["21.4526962"]
         val coordinates = "42.0151079,21.4526962"
-        val newCoordinates = coordinates.replace("\\,","%2C")
+        val newCoordinates = coordinates.replace("\\,", "%2C")
 
         compositeDisposable.add(
             apiService.getWeighStations(
-                PreferenceUtils.getAuthorizationToken(this),newCoordinates , 1)
+                PreferenceUtils.getAuthorizationToken(this), newCoordinates, 1
+            )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     //                Log.d("station", " "+ it[0].location)
                 },
                     {
-                    //                showProgress(false)
+                        //                showProgress(false)
 //                    handleApiError(it)
-                })
+                    })
         )
     }
 
     private fun getChats() {
         apiService = PostApi.create(this@MainScreenActivity)
-        compositeDisposable.add(apiService.getChats(
-            PreferenceUtils.getAuthorizationToken(this))
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                mapsId = it[0].id
-                PreferenceUtils.saveChatId(this,mapsId)
+        compositeDisposable.add(
+            apiService.getChats(
+                PreferenceUtils.getAuthorizationToken(this)
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    mapsId = it[0].id
+                    PreferenceUtils.saveChatId(this, mapsId)
 //                getChatById(mapsId)
-                getWeightStations()
+                    getWeightStations()
 
-                //                Log.d("station", " "+ it[0].location)
-            }, {
-                //                showProgress(false)
-                handleApiError(it)
-            })
+                    //                Log.d("station", " "+ it[0].location)
+                }, {
+                    //                showProgress(false)
+                    handleApiError(it)
+                })
 
         )
     }
@@ -312,7 +324,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private fun getChatById(id: String) {
         apiService = PostApi.create(this@MainScreenActivity)
         compositeDisposable.add(
-            apiService.getChatById(PreferenceUtils.getAuthorizationToken(this),id)
+            apiService.getChatById(PreferenceUtils.getAuthorizationToken(this), id)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -328,7 +340,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
                     //                Log.d("station", " "+ it[0].location)
                 }, {
-                    Log.d("destinacija",""+ it.localizedMessage)
+                    Log.d("destinacija", "" + it.localizedMessage)
                     //                showProgress(false)
 //                    Utils.handleApiError(it)
                 })
@@ -521,7 +533,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
-
+    fun hide() {
+        attach?.visibility = View.INVISIBLE
+        hamburger?.visibility = View.INVISIBLE
+        chat?.visibility = View.INVISIBLE
+        floatBtn.hide()
+    }
 
     private fun openCurrentLoadFragment() {
 
@@ -588,6 +605,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
         fragmentTransaction.commit()
     }
+
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
@@ -620,17 +638,20 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
             R.id.routes -> {
                 opendetailsList()
+                hide()
+
             }
             R.id.loads -> {
                 openCurrentLoadFragment()
-
+                hide()
             }
             R.id.history -> {
                 openHistoryList()
+                hide()
             }
             R.id.settings -> {
                 openProfileSettingsFragment()
-
+                hide()
 
             }
         }
