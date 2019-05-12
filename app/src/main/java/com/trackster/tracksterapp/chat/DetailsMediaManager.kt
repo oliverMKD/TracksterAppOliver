@@ -32,6 +32,7 @@ object DetailsMediaManager {
     private const val JPG_EXT = ".jpg"
     private const val MP4_EXT = ".mp4"
     private const val PROVIDER_EXT = ".provider"
+    private const val PDF_EXT = ".pdf"
     const val MESSAGES = "media/messages"
 
     lateinit var tmpUri: Uri
@@ -71,28 +72,28 @@ object DetailsMediaManager {
     private fun showMediaOptionsDialog(activity: Activity) {
         val dialogBuilder = AlertDialog.Builder(activity)
 
-//        val pickMediaOptions = arrayOf<CharSequence>(activity.getString(R.string.make_video),
-//                activity.getString(R.string.take_photo), activity.getString(R.string.upload_from_library))
+        val pickMediaOptions = arrayOf<CharSequence>(
+                "take photo")
 
         val dialogListener = DialogInterface.OnClickListener { dialogInterface, which ->
             when (which) {
-                0 -> dispatchTakeVideoIntent(activity)
-                1 -> dispatchTakePictureIntent(activity)
-                2 -> openImagePicker(activity)
-                3 -> dialogInterface?.cancel()
+                0 -> dispatchTakePictureIntent(activity)
+                1 -> dialogInterface?.cancel()
+//                2 -> openImagePicker(activity)
+//                3 -> dialogInterface?.cancel()
             }
         }
 //
-//        dialogBuilder.setItems(pickMediaOptions, dialogListener)
-//
-//        val dialog = dialogBuilder.create()
-//
-//        val dialogNegativeClickListener = DialogInterface.OnClickListener { dialogInterface, _ ->
-//            dialogInterface.cancel()
-//        }
-//        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.cancel), dialogNegativeClickListener)
+        dialogBuilder.setItems(pickMediaOptions, dialogListener)
 
-//        dialog.show()
+        val dialog = dialogBuilder.create()
+
+        val dialogNegativeClickListener = DialogInterface.OnClickListener { dialogInterface, _ ->
+            dialogInterface.cancel()
+        }
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "cancel", dialogNegativeClickListener)
+
+        dialog.show()
     }
 
     private fun dispatchTakePictureIntent(activity: Activity) {
@@ -125,8 +126,26 @@ object DetailsMediaManager {
 
         uploadFile = File(mediaStorageDir.path + File.separator + fileName)
 
+
         tmpUri = getUri(activity)
         return tmpUri
+    }
+    private fun getMediaFile(extension: String, activity: Activity): File {
+        tmpId = System.currentTimeMillis().toInt()
+        fileName = System.currentTimeMillis().toString() + extension
+        uploadFile = File(Environment.getExternalStorageDirectory(), fileName)
+
+        // Create the storage directory if it does not exist
+        val mediaStorageDir = uploadFile
+        if (!mediaStorageDir!!.exists() && !mediaStorageDir.mkdirs()) {
+            Log.d("DetailsMediaManager", "failed to create directory")
+        }
+
+        uploadFile = File(mediaStorageDir.path + File.separator + fileName)
+
+
+        tmpUri = getUri(activity)
+        return uploadFile!!
     }
 
     private fun getUri(activity: Activity): Uri {
@@ -156,8 +175,8 @@ object DetailsMediaManager {
     fun createMessage(activity: Activity, content: String?,id : String): Message? {
         return Message(id, content!!,"","","")
     }
-    fun createAudio(activity: Activity, content: String?,id : String): Files? {
-        return Files(id,"")
+    fun createAudio(activity: Activity, document: String): File? {
+        return File(document)
     }
     private fun createAdditionalData(hasMedia: Boolean): AdditionalData {
         if (hasMedia) {

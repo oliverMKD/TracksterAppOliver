@@ -87,6 +87,8 @@ dependencies {
 
     compile 'com.amazonaws:aws-java-sdk:+'
 
+    implementation 'com.itextpdf:itextg:5.5.10'
+
     apply plugin: 'com.google.gms.google-services'
     com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
 }

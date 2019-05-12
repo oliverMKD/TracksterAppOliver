@@ -2,16 +2,16 @@ package com.trackster.tracksterapp.chat
 
 import android.Manifest
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.media.ExifInterface
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.*
+import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -27,6 +27,9 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.itextpdf.text.Document
+import com.itextpdf.text.Image
+import com.itextpdf.text.pdf.PdfWriter
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.MessageRecyclerAdapter
 import com.trackster.tracksterapp.base.BaseChatActivity
@@ -45,12 +48,14 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_chat_details.*
 import kotlinx.android.synthetic.main.activity_load_details.view.*
 import okhttp3.MediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 
 
-class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
+class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     object Day {
         const val TODAY = "today"
@@ -213,9 +218,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
 //        linearLayoutManager.reverseLayout = true
 //        linearLayoutManager.stackFromEnd = true
         recyclerView?.layoutManager = linearLayoutManager
-        adapter = MessageRecyclerAdapter(this, mutableListMessages, contact?.avatar)
+        adapter = MessageRecyclerAdapter(this, mutableListMessages)
         recyclerView?.adapter = adapter
-        recyclerView?.scrollToPosition(adapter.itemCount-1)
+        recyclerView?.scrollToPosition(adapter.itemCount - 1)
         progressBar = findViewById(R.id.progress_bar)
     }
 
@@ -271,6 +276,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
         sendMessageEditText?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
             }
+
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
                 val message = sendMessageEditText?.text
@@ -399,6 +405,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
             R.id.microfon -> {
                 startRecording()
             }
+            R.id.img_selector_image_view -> addMedia()
         }
     }
 
@@ -425,19 +432,14 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
 
     private fun setButtonRecordListener() {
         microfon?.setOnClickListener {
-            if (microfon?.text.toString().equals(getString(R.string.record) , true)) {
+            if (microfon?.text.toString().equals(getString(R.string.record), true)) {
                 record()
             } else {
                 stopRecording()
                 enableDisableButtonPlayRecording()
                 microfon?.text = getString(R.string.record)
                 microfon?.setBackgroundResource(R.drawable.mic)
-                sendAudio(
-                    DetailsMediaManager.createAudio(
-                        this, FILE_RECORDING, "1234"
-                    )!!
-                )
-
+                sendAudio()
             }
         }
     }
@@ -505,17 +507,22 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
         mediaPlayer = null
     }
 
-    private fun postAudio(file: Files) {
+    private fun postAudio() {
 
         val file = File(FILE_RECORDING)
-        val requestBody: RequestBody  = RequestBody.create(MediaType.parse("audio/*"), file)
+        val requestBody: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+
+// MultipartBody.Part is used to send also the actual file name
+        val body =
+            MultipartBody.Part.createFormData("document", file.name, requestBody)
+
 
 
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
             apiService.postAudio(
                 PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails), requestBody
+                PreferenceUtils.getChatId(this@ChatDetails), body
 
             )
                 .observeOn(AndroidSchedulers.mainThread())
@@ -524,7 +531,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
                     setAudioFile(it)
                     audioListMessages.add(it)
 
-                    adapter.setAudioData(createAudioData())
+//                    adapter.setAudioData(createAudioData())
                     scrollToBottom()
                     //                    mutableListMessages = it.message
                     //                Log.d("station", " "+ it[0].location)
@@ -537,11 +544,12 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
 
     private fun setAudioFile(file: Files) {
 
-       // var files = FILE_RECORDING
+        // var files = FILE_RECORDING
         file.filename = FILE_RECORDING
 
 
     }
+
     private fun createAudioData(): MutableList<Files> =
         audioListMessages.asSequence().toMutableList()
 
@@ -568,19 +576,19 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
     }
 
 
-    private fun sendAudio (file: Files) {
+    private fun sendAudio() {
         if (hasMedia) {
             hasMedia = false
 
             DetailsMediaManager.editUploadsCounter(true, null)
-           uploadAudio(file)
+//           uploadAudio(file)
 
         } else {
-            postAudio(file)
+            postAudio()
         }
 
-        DetailsMediaManager.mutableListSendingAudio.add(file)
-        adapter.addAudio(file)
+//        DetailsMediaManager.mutableListSendingAudio.add(file)
+//        adapter.addAudio(file)
         scrollToBottom()
     }
 
@@ -595,12 +603,10 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
             postMessage(message)
         }
 
-        DetailsMediaManager.mutableListSendingMessages.add(message)
+//        DetailsMediaManager.mutableListSendingMessages.add(message)
         adapter.addMessage(message)
         scrollToBottom()
     }
-
-
 
 
 //    private fun messageNotSent(message: Message) {
@@ -659,7 +665,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
     }
 
 
-
     private fun stopProgress(error: Throwable?) {
         DetailsMediaManager.editUploadsCounter(false, error)
         setupUploadFinished()
@@ -710,7 +715,8 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
         } else if ((requestCode == DetailsMediaManager.REQUEST_IMAGE_CAPTURE || requestCode == DetailsMediaManager.REQUEST_VIDEO_CAPTURE)
             && resultCode == Activity.RESULT_OK
         ) {
-            setMedia(DetailsMediaManager.tmpUri)
+//            setMedia(DetailsMediaManager.tmpUri)
+            probaPdf(DetailsMediaManager.tmpUri)
         }
     }
 
@@ -730,6 +736,20 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
 //                    }
 //                }
 //            })
+    }
+
+    private fun probaPdf(uri: Uri) {
+        val document = Document()
+        val directoryPath = android.os.Environment.getExternalStorageDirectory().toString()
+        PdfWriter.getInstance(document, FileOutputStream(directoryPath + "/example.pdf")) // Change pdf's name.
+        document.open()
+        val image = Image.getInstance(uri.path!! + ".jpg") // Change image's name and extension.
+        val scaler = (((((document.getPageSize().getWidth() - document.leftMargin()
+                - document.rightMargin() - 0)) / image.getWidth())) * 100) // 0 means you have no indentation. If you have any, change it.
+        image.scalePercent(scaler)
+        image.setAlignment(Image.ALIGN_CENTER or Image.ALIGN_TOP)
+        document.add(image)
+        document.close()
     }
 
     private fun setMedia(uri: Uri?) {
@@ -765,33 +785,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
         //  Glide.with(this).load(R.drawable.add_media).apply(RequestOptions.circleCropTransform()).into(imgSelectorImageView!!)
     }
 
-//    override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
-//    }
-
-//    override fun onStateChanged(id: Int, state: TransferState?) {
-//        if (state == TransferState.WAITING_FOR_NETWORK) {
-//            messageNotSent(getSendingMessage(id)!!)
-//            transferUtility?.cancel(id)
-//            AnswersAnalyticsHandler.logError("S3_Error", "Waiting for network", this)
-//            stopProgress(NoConnectivityException(getString(R.string.general_error_no_internet)))
-//        } else if (state == TransferState.COMPLETED) {
-//            val fileName = DetailsMediaManager.MESSAGES + File.separator + DetailsMediaManager.fileName
-//            Log.d("Image_link", ConfigManager.getAWSUrl(this) + fileName)
-//            val message = getSendingMessage(id)
-//            if (message != null) {
-//                postMessage(message)
-//            } else {
-//                stopProgress(null)
-//            }
-//
-//        }
-//    }
-//
-//    override fun onError(id: Int, ex: Exception?) {
-//        AnswersAnalyticsHandler.logError("S3_Error", ex?.message, this)
-//        stopProgress(ex)
-//        messageNotSent(getSendingMessage(observerId)!!)
-//    }
 
     private var firebaseMessageBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -822,44 +815,117 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener, Parcelable {
         }
     }
 
-    constructor(parcel: Parcel) : this() {
-        previousDate = parcel.readString()
-        isMessageSendable = parcel.readByte() != 0.toByte()
-        hasMedia = parcel.readByte() != 0.toByte()
-        isMediaPortrait = parcel.readByte() != 0.toByte()
-        observerId = parcel.readValue(Int::class.java.classLoader) as? Int
-        isActivityVisible = parcel.readByte() != 0.toByte()
-        isMotherphone = parcel.readByte() != 0.toByte()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
 
         compositeDisposable.dispose()
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(previousDate)
-        parcel.writeByte(if (isMessageSendable) 1 else 0)
-        parcel.writeByte(if (hasMedia) 1 else 0)
-        parcel.writeByte(if (isMediaPortrait) 1 else 0)
-        parcel.writeValue(observerId)
-        parcel.writeByte(if (isActivityVisible) 1 else 0)
-        parcel.writeByte(if (isMotherphone) 1 else 0)
+
+    fun getPathFromURI(context: Context, uri: Uri): String? {
+        // DocumentProvider
+        if (DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                val docId = DocumentsContract.getDocumentId(uri)
+                val split = docId.split((":").toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                val type = split[0]
+                if ("primary".equals(type, ignoreCase = true)) {
+                    return Environment.getExternalStorageDirectory().path + "/" + split[1]
+                } else {
+                    val splitIndex = docId.indexOf(':', 1)
+                    val tag = docId.substring(0, splitIndex)
+                    val path = docId.substring(splitIndex + 1)
+                    val nonPrimaryVolume = getPathToNonPrimaryVolume(context, tag)
+                    if (nonPrimaryVolume != null) {
+                        val result = nonPrimaryVolume + "/" + path
+                        val file = File(result)
+                        if (file.exists() && file.canRead()) {
+                            return result
+                        }
+                    }
+                }
+            } else if (isDownloadsDocument(uri)) {
+                val id = DocumentsContract.getDocumentId(uri)
+                val contentUri = ContentUris.withAppendedId(
+                    Uri.parse("content://downloads/public_downloads"),
+                    java.lang.Long.valueOf(id)
+                )
+                return getDataColumn(context, contentUri, null!!, null!!)
+            } else if (isMediaDocument(uri)) {
+                val docId = DocumentsContract.getDocumentId(uri)
+                val split = docId.split((":").toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                val type = split[0]
+                var contentUri: Uri? = null
+                if ("image" == type) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                } else if ("video" == type) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                } else if ("audio" == type) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                }
+                val selection = "_id=?"
+                val selectionArgs = arrayOf<String>(split[1])
+                return getDataColumn(context, contentUri!!, selection, selectionArgs)
+            }// MediaProvider
+            // DownloadsProvider
+        } else if ("content".equals(uri.getScheme(), ignoreCase = true)) {
+            return getDataColumn(context, uri, null!!, null!!)
+        } else if ("file".equals(uri.getScheme(), ignoreCase = true)) {
+            return uri.getPath()
+        }// File
+        // MediaStore (and general)
+        return null
     }
 
-    override fun describeContents(): Int {
-        return 0
+    fun getPathToNonPrimaryVolume(context: Context, tag: String): String? {
+        val volumes = context.getExternalCacheDirs()
+        if (volumes != null) {
+            for (volume in volumes) {
+                if (volume != null) {
+                    val path = volume.getAbsolutePath()
+                    if (path != null) {
+                        val index = path.indexOf(tag)
+                        if (index != -1) {
+                            return path.substring(0, index) + tag
+                        }
+                    }
+                }
+            }
+        }
+        return null
     }
 
-    companion object CREATOR : Parcelable.Creator<ChatDetails> {
-        override fun createFromParcel(parcel: Parcel): ChatDetails {
-            return ChatDetails(parcel)
+    fun getDataColumn(
+        context: Context, uri: Uri, selection: String?,
+        selectionArgs: Array<String>
+    ): String? {
+        var cursor: Cursor? = null
+        val column = "_data"
+        val projection = arrayOf<String>(column)
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null)
+            if (cursor != null && cursor.moveToFirst()) {
+                val column_index = cursor.getColumnIndexOrThrow(column)
+                return cursor.getString(column_index)
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close()
         }
+        return null
+    }
 
-        override fun newArray(size: Int): Array<ChatDetails?> {
-            return arrayOfNulls(size)
-        }
+    fun isExternalStorageDocument(uri: Uri): Boolean {
+        return "com.android.externalstorage.documents" == uri.getAuthority()
+    }
+
+    fun isDownloadsDocument(uri: Uri): Boolean {
+        return "com.android.providers.downloads.documents" == uri.getAuthority()
+    }
+
+    fun isMediaDocument(uri: Uri): Boolean {
+        return "com.android.providers.media.documents" == uri.getAuthority()
     }
 
 }
