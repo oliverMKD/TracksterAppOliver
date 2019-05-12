@@ -11,7 +11,6 @@ import com.trackster.tracksterapp.network.requests.*
 import com.trackster.tracksterapp.network.responce.ChatResponse
 import com.trackster.tracksterapp.network.responce.InitialAccessToken
 import io.reactivex.Observable
-import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -19,12 +18,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.trackster.tracksterapp.utils.BASE_URL
 import io.reactivex.Completable
 import io.reactivex.Single
-import okhttp3.Interceptor
-import okhttp3.RequestBody
-import okhttp3.ResponseBody
+import okhttp3.*
 import retrofit2.Converter
 import retrofit2.Response
 import retrofit2.http.*
+import retrofit2.http.Headers
 import java.io.IOException
 import java.lang.reflect.Type
 
@@ -94,7 +92,7 @@ interface PostApi {
     @Multipart
     @POST("/chats/upload/{chatId}")
     fun postAudio(@Header("x-auth-token") authorization: String,
-                    @Path("chatId") chatId: String, @Part("file\"; filename=\"recorder.aac\" ") file: RequestBody   ) : Single<Files>
+                  @Path("chatId") chatId: String, @Part  image : MultipartBody.Part) : Single<Files>
 
     companion object Factory {
         fun create(context: Context): PostApi {
