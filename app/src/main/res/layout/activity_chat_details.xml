@@ -97,7 +97,6 @@
                 android:layout_gravity="center_vertical"/>
         <Button
                 android:id="@+id/microfon"
-
                 android:clickable="true"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -110,12 +109,10 @@
 
         <Button
                 android:id="@+id/buttonPlayRecording"
-
                 android:clickable="true"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:visibility="gone"
-
                 android:textColor="@color/Black"
                 android:text="@string/playRecord"
                 android:layout_gravity="center_vertical"
