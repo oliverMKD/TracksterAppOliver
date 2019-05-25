@@ -22,6 +22,9 @@ import com.trackster.tracksterapp.rx.RxBus
 import com.trackster.tracksterapp.utils.ConfigManager
 import com.trackster.tracksterapp.utils.RealPathUtilKotlin
 import java.io.File
+import com.trackster.tracksterapp.main.MainActivity
+
+
 
 object DetailsMediaManager {
 
@@ -100,6 +103,7 @@ object DetailsMediaManager {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(activity.packageManager) != null) {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, getMediaUri(JPG_EXT, activity))
+            takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         }
     }
@@ -150,7 +154,12 @@ object DetailsMediaManager {
 
     private fun getUri(activity: Activity): Uri {
         if (Build.VERSION.SDK_INT >= 24)
-            return FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID + PROVIDER_EXT, uploadFile!!)
+
+
+            return FileProvider.getUriForFile(
+                activity,
+                BuildConfig.APPLICATION_ID + ".provider",
+                File(Environment.getExternalStorageDirectory(), "image.jpg"))
         return Uri.fromFile(uploadFile)
     }
 
