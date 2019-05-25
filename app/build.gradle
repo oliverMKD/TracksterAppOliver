@@ -30,6 +30,7 @@ android {
             exclude 'META-INF/ASL2.0'
             exclude 'META-INF/io.netty.versions.properties'
             exclude 'META-INF/INDEX.LIST'
+            exclude 'META-INF/atomicfu.kotlin_module'
         }
     }
     buildTypes {
@@ -91,4 +92,8 @@ dependencies {
 
     apply plugin: 'com.google.gms.google-services'
     com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
+
+
+    //camera
+    implementation "com.priyankvasa.android:cameraview-ex:3.5.3-alpha"
 }

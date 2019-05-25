@@ -27,6 +27,8 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -39,6 +41,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.priyankvasa.android.cameraviewex.ErrorLevel
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
@@ -58,6 +61,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login_pane.*
 import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
+import kotlinx.android.synthetic.main.nav_header_main_screen.*
 
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -75,6 +79,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private lateinit var latLngDestination: LatLng
     private lateinit var mapsId: String
     private var mDelayHandler: Handler? = null
+    var compositeDisposableContainer = CompositeDisposable()
 
 
     private lateinit var locationCallback: LocationCallback
@@ -154,7 +159,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             // Set click listener for popup window's text view
 
 
-
             // Set a click listener for popup's button widget
             buttonPopup.setOnClickListener {
                 // Dismiss the popup window
@@ -209,11 +213,39 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         when (p0?.id) {
             R.id.hamburger -> {
                 drawer_layout.openDrawer(Gravity.START)
+                getUserInfo()
             }
-            R.id.chat ->
+            R.id.chat -> {
                 startActivity(Intent(this@MainScreenActivity, ChatDetails::class.java))
+            }
+            R.id.attach -> {
+
+            }
         }
     }
+
+
+
+    private fun getUserInfo() {
+        apiService = PostApi.create(this!!)
+        compositeDisposableContainer.add(
+            apiService.getInfoUser(
+                PreferenceUtils.getAuthorizationToken(this!!)
+            ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
+                {
+                    name_user.setText(it.body()!!.firstName+" "+it.body()!!.lastName)
+
+                    Glide.with(this!!)
+                        .load(it.body()!!.image)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(imageView_Drawer)
+                }, {
+                    Log.d("test", "error" + it.localizedMessage)
+                }
+            )
+        )
+    }
+
 
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
@@ -223,6 +255,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, 5000)
     }
+
+
+
+
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -665,7 +701,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         fragmentTransaction.commit()
     }
+
     fun getSelectedTruck(id: String) {
-        Toast.makeText(this@MainScreenActivity, "You selected : "  + " truck", Toast.LENGTH_LONG).show()
+        Toast.makeText(this@MainScreenActivity, "You selected : " + " truck", Toast.LENGTH_LONG).show()
     }
 }

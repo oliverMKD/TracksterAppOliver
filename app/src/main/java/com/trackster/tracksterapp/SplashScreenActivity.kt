@@ -46,7 +46,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
         mDelayHandler = Handler()
 
-//        checkIfUserIsLogged()
+        checkIfUserIsLogged()
         //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, SPLASH_DELAY)
     }
