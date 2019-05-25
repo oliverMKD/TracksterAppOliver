@@ -50,13 +50,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_chat_details.*
 import kotlinx.android.synthetic.main.activity_load_details.view.*
 import kotlinx.android.synthetic.main.recycler_history.*
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
+import okhttp3.*
+import retrofit2.Response
+import java.io.*
 
 
 class ChatDetails() : BaseChatActivity(), View.OnClickListener {
@@ -89,6 +85,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     private var hasMedia = false
     private var isMediaPortrait = false
     private var observerId: Int? = null
+    lateinit var apkStorage : File
 
     private var isActivityVisible = false
 
@@ -265,9 +262,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         microfon = findViewById(R.id.microfon)
         microfon?.setOnClickListener(this)
 
+
         sendMessageEditText = findViewById(R.id.send_message_edit_text)
 
         cam = findViewById(R.id.cam)
+        cam!!.setOnClickListener(this)
 //        sendMessageEditText?.setOnFocusChangeListener { _, hasFocus ->
 //            if (!hasFocus) {   sendMessageImageView?.setImageResource(R.drawable.spajalica)}
 //        }
@@ -410,7 +409,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 startRecording()
             }
             R.id.img_selector_image_view -> addMedia()
+
+           // R.id.cam ->
+               // authenticateWithFB()
         }
+
     }
 
     fun startRecording() {
@@ -545,7 +548,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 })
         )
     }
-    private fun postPDF(file :File) {
+
+
+    private fun postPDF(file: File) {
         val requestBody: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file)
 
 // MultipartBody.Part is used to send also the actual file name
@@ -577,6 +582,30 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 })
         )
     }
+
+    private fun authenticateWithFB(fileName : String) {
+        apiService = PostApi.create(this)
+        CompositeDisposable().add(
+            apiService.getFiles(
+                PreferenceUtils.getAuthorizationToken(this@ChatDetails), PreferenceUtils.getChatId(this@ChatDetails),
+                fileName
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    fileName
+                    Log.d("authenticateWithFB",""+it)
+
+                }, {
+                    Log.d("pane", "error")
+                })
+        )
+    }
+
+    private fun DownloadImage(body:ResponseBody) {
+
+    }
+
 
     private fun setAudioFile(file: Files) {
 
@@ -774,7 +803,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 //            })
     }
 
-    private fun probaPdf(uri: Uri?) : File {
+    private fun probaPdf(uri: Uri?): File {
         val selectedImageUri = uri
         val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
 //        val bmp = BitmapFactory.decodeFile(uri!!.path)
@@ -789,7 +818,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
 
         val directoryPath = android.os.Environment.getExternalStorageDirectory().toString()
-        PdfWriter.getInstance(document, FileOutputStream(f )) // Change pdf's name.
+        PdfWriter.getInstance(document, FileOutputStream(f)) // Change pdf's name.
 
 
         document.open()
