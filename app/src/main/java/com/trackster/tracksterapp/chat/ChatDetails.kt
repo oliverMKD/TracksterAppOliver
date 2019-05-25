@@ -812,7 +812,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
         val document = Document()
 
-        val f = File(Environment.getExternalStorageDirectory(), "SimpleImages.pdf")
+        val f = File(Environment.getExternalStorageDirectory(), "PDF_Images.pdf")
 
           //  PdfWriter.getInstance(document, FileOutputStream(f))
 

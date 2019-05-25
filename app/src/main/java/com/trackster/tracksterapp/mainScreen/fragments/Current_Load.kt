@@ -35,6 +35,8 @@ class Current_Load : BaseFragment() {
 
     }
 
+
+
     override fun getProgressBar(): ProgressBar? = null
 
     override fun getLayoutId(): Int = R.layout.fragment_load_screen
@@ -56,6 +58,9 @@ class Current_Load : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return super.onCreateView(inflater, container, savedInstanceState)
+
+//        imageView5.set
+
     }
 
     private fun getLoad() {
