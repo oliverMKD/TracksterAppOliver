@@ -94,6 +94,12 @@ interface PostApi {
     fun postAudio(@Header("x-auth-token") authorization: String,
                   @Path("chatId") chatId: String, @Part  image : MultipartBody.Part) : Single<Files>
 
+
+    @GET("/chats/{chatId}/files/{filename}")
+    fun getFiles(@Header("x-auth-token") authorization: String,
+                    @Path("chatId") chatId: String, @Path("filename") filename : String ) : Observable<Response<ResponseBody>>
+
+
     companion object Factory {
         fun create(context: Context): PostApi {
 
