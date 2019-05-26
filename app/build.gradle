@@ -31,6 +31,9 @@ android {
             exclude 'META-INF/io.netty.versions.properties'
             exclude 'META-INF/INDEX.LIST'
             exclude 'META-INF/atomicfu.kotlin_module'
+            exclude 'META-INF/LICENSE-notice.md'
+            exclude  'META-INF/LICENSE.md'
+            exclude 'META-INF/androidx.exifinterface_exifinterface.version'
         }
     }
     buildTypes {
@@ -86,13 +89,15 @@ dependencies {
     //Cicrcular Image
     implementation 'de.hdodenhof:circleimageview:3.0.0'
 
-    compile 'com.amazonaws:aws-java-sdk:+'
+    implementation 'com.amazonaws:aws-java-sdk:+'
 
     implementation 'com.itextpdf:itextg:5.5.10'
 
+    //Fotoapparat
+    implementation 'io.fotoapparat:fotoapparat:2.6.1'
+
     apply plugin: 'com.google.gms.google-services'
     com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
-
 
     //camera
     implementation "com.priyankvasa.android:cameraview-ex:3.5.3-alpha"
