@@ -17,6 +17,7 @@ import android.util.Log
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.pdf.PdfWriter
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import io.fotoapparat.Fotoapparat
 import io.fotoapparat.configuration.CameraConfiguration
 import io.fotoapparat.log.logcat
@@ -30,12 +31,6 @@ import io.fotoapparat.view.CameraView
 import kotlinx.android.synthetic.main.content_camera.*
 import java.io.File
 import java.io.FileOutputStream
-import com.google.gson.Gson
-import android.R.id.edit
-import android.content.Context
-import android.content.SharedPreferences
-
-
 
 
 class CameraActivity : AppCompatActivity() {
@@ -51,7 +46,7 @@ class CameraActivity : AppCompatActivity() {
     private val JPG_EXT = ".jpg"
     private val PNG_EXT = ".png"
     val REQUEST_IMAGE_CAPTURE = 3
-    var i : Int = 0
+    var i: Int = 0
 
 
     lateinit var fileName: String
@@ -82,7 +77,7 @@ class CameraActivity : AppCompatActivity() {
         }
 
         fab_switch_camera.setOnClickListener {
-//            switchCamera()
+            //            switchCamera()
             val intent = Intent(Intent.ACTION_SEND_MULTIPLE)
             val uris = ArrayList<Uri>()
             //convert from paths to Android friendly Parcelable Uri's
@@ -101,6 +96,7 @@ class CameraActivity : AppCompatActivity() {
         }
 
     }
+
     private fun createFotoapparat() {
         val cameraView = findViewById<CameraView>(com.trackster.tracksterapp.R.id.camera_view)
 
@@ -163,12 +159,13 @@ class CameraActivity : AppCompatActivity() {
             activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         }
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if ((requestCode == REQUEST_IMAGE_CAPTURE )
-            && resultCode == Activity.RESULT_OK)
-        {
+        if ((requestCode == REQUEST_IMAGE_CAPTURE)
+            && resultCode == Activity.RESULT_OK
+        ) {
             probaPdf(tmpUri)
         }
     }
@@ -190,7 +187,7 @@ class CameraActivity : AppCompatActivity() {
         document.add(image)
         document.close()
         modelPDF.add(document)
-       modelString.add(directoryPath)
+        modelString.add(directoryPath)
         return f
     }
 
@@ -267,6 +264,9 @@ class CameraActivity : AppCompatActivity() {
         return Uri.fromFile(uploadFile)
     }
 
+    override fun onBackPressed() {
+        startActivity(Intent(this@CameraActivity, MainScreenActivity::class.java))
+    }
 }
 
 enum class CameraState {

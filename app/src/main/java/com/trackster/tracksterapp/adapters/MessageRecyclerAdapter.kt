@@ -1,7 +1,9 @@
 package com.trackster.tracksterapp.adapters
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -10,11 +12,19 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.facebook.FacebookSdk.getApplicationContext
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.chat.ChatDetails
-import com.trackster.tracksterapp.model.Files
 import com.trackster.tracksterapp.model.Message
-import com.trackster.tracksterapp.utils.*
+import com.trackster.tracksterapp.utils.CONTENT_KEY
+import com.trackster.tracksterapp.utils.PreferenceUtils
+import com.trackster.tracksterapp.utils.TRY_AGAIN_BROADCAST
+import com.trackster.tracksterapp.utils.Utils
+import java.io.File
+
 
 class MessageRecyclerAdapter(
     private val context: Activity,
@@ -53,7 +63,7 @@ class MessageRecyclerAdapter(
 
         val messageRelativeLayout = view.findViewById(R.id.message_relative_layout) as RelativeLayout
         val messageTextView = view.findViewById(R.id.message_text_view) as TextView
-       val messageImageView = view.findViewById(R.id.message_image_view) as ImageView
+        val messageImageView = view.findViewById(R.id.message_image_view) as ImageView
         //        val messageVideoImageView = view.findViewById(R.id.message_video_image_view) as ImageView
         val received_name = view.findViewById(R.id.received_name) as TextView?
         val sent_name = view.findViewById(R.id.sent_name) as TextView?
@@ -110,29 +120,25 @@ class MessageRecyclerAdapter(
 //        if (TextUtils.isEmpty(message.createTime)) {
 //            holder.dateTextView.visibility = View.GONE
 //        } else {
-            holder.dateTextView.visibility = View.VISIBLE
-            holder.dateTextView.text = message.createTime
+        holder.dateTextView.visibility = View.VISIBLE
+        holder.dateTextView.text = message.createTime
 //        }
 
-        when (true) {
-//            message.additionalData.isSending -> setSendingUI(holder)
-//            message.additionalData.errorSending -> setErrorMessageUI(holder)
-            else -> {
-                //  holder.timeImageView.setImageResource(R.drawable.ic_sent)
+        //  holder.timeImageView.setImageResource(R.drawable.ic_sent)
 
-                if (message.senderId == PreferenceUtils.getUserId(context))
-                    holder.messageRelativeLayout.setBackgroundResource(R.drawable.rounded_rectangle_green)
-                else
-                    holder.messageRelativeLayout.setBackgroundResource(R.drawable.rounded_rectangle_orange)
+        if (message.senderId == PreferenceUtils.getUserId(context))
+            holder.messageRelativeLayout.setBackgroundResource(com.trackster.tracksterapp.R.drawable.rounded_rectangle_green)
+        else
+            holder.messageRelativeLayout.setBackgroundResource(com.trackster.tracksterapp.R.drawable.rounded_rectangle_orange)
 
-                if (message.senderId == PreferenceUtils.getBrokerId(context)) {
-                    holder.received_name!!.text = PreferenceUtils.getBrokerName(context)
-                } else if (message.senderId == PreferenceUtils.getCarrierId(context)) {
-                    holder.received_name!!.text = PreferenceUtils.getCarrierName(context)
-                } else if (message.senderId == PreferenceUtils.getUserId(context)){
-                    holder.sent_name!!.text = PreferenceUtils.getDriverName(context)
-                }
-                
+        if (message.senderId == PreferenceUtils.getBrokerId(context)) {
+            holder.received_name!!.text = PreferenceUtils.getBrokerName(context)
+        } else if (message.senderId == PreferenceUtils.getCarrierId(context)) {
+            holder.received_name!!.text = PreferenceUtils.getCarrierName(context)
+        } else if (message.senderId == PreferenceUtils.getUserId(context)) {
+            holder.sent_name!!.text = PreferenceUtils.getDriverName(context)
+        }
+
 //                if (message.read && message.isMine) {
 //                    holder.timeTextView.text = context.getString(R.string.seen)
 //                    holder.timeTextView.setTextColor(Utils.getColor(context, R.color.colorSeenMessage))
@@ -148,6 +154,68 @@ class MessageRecyclerAdapter(
 //                                .load(message.imageUrl)
 //                                .into(holder.messageImageView)
 //                    }
+        if (!TextUtils.isEmpty(message.file?.filename)) {
+            if (message.file?.filename!!.contains(".pdf")) {
+                val sharedPref = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)
+                var modelString: MutableList<String?> = mutableListOf()
+                val serializedObject = sharedPref.getString("sliki", null)
+                if (serializedObject != null) {
+                    val gson = Gson()
+                    val type = object : TypeToken<List<String>>() {
+                    }.type
+                    modelString = gson.fromJson(serializedObject, type)
+                }
+                val iterator = modelString.listIterator()
+                for (item in iterator) {
+                    if (item!!.contains(message.file?.filename!!)) {
+                        val fileIn = File(item)
+                        val u = Uri.fromFile(fileIn)
+                        holder.messageImageView.visibility = View.VISIBLE
+                        if (message.senderId == PreferenceUtils.getUserId(context)) {
+                            Glide.with(context)
+                                .load(u)
+                                .into(holder.messageImageView)
+                        } else {
+                            Glide.with(context)
+                                .load(u)
+                                .into(holder.messageImageView)
+                        }
+
+                    }
+                }
+
+            }
+             if (message.file?.filename!!.contains(".png")){
+                val sharedPref = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)
+                var modelString: MutableList<String?> = mutableListOf()
+                val serializedObject = sharedPref.getString("png", null)
+                if (serializedObject != null) {
+                    val gson = Gson()
+                    val type = object : TypeToken<List<String>>() {
+                    }.type
+                    modelString = gson.fromJson(serializedObject, type)
+                }
+                val iterator = modelString.listIterator()
+                for (item in iterator) {
+                    if (item!!.contains(message.file?.filename!!)) {
+                        val fileIn = File(item)
+                        val u = Uri.fromFile(fileIn)
+                        holder.messageImageView.visibility = View.VISIBLE
+                        if (message.senderId == PreferenceUtils.getUserId(context)) {
+                            Glide.with(context)
+                                .load(u)
+                                .into(holder.messageImageView)
+                        } else {
+                            Glide.with(context)
+                                .load(u)
+                                .into(holder.messageImageView)
+                        }
+
+                    }
+                }
+            }
+
+        }
 //
 //                    if (!TextUtils.isEmpty(message.videoUrl)) {
 //                        holder.messageVideoImageView.visibility = View.VISIBLE
@@ -156,8 +224,6 @@ class MessageRecyclerAdapter(
 //                                .into(holder.messageImageView)
 //                    }
 //                }
-            }
-        }
 
         if (!TextUtils.isEmpty(message.content)) {
             holder.messageTextView.visibility = View.VISIBLE
@@ -199,7 +265,7 @@ class MessageRecyclerAdapter(
         notifyDataSetChanged()
     }
 
-//    fun setAudioData(audio_files: MutableList<Files>) {
+    //    fun setAudioData(audio_files: MutableList<Files>) {
 //        listAudio.clear()
 //        listAudio.addAll(audio_files)
 //        notifyDataSetChanged()

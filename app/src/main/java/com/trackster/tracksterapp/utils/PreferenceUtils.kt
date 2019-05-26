@@ -21,6 +21,7 @@ object PreferenceUtils {
     private const val BROKER_ID = "broker_id"
     private const val CARRIER_ID = "carrier_id"
     private const val CARRIER_NAME = "carrier_name"
+    private const val PDF_NAME = "pdf_name"
 
     private fun getPreferences(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -103,6 +104,10 @@ object PreferenceUtils {
     }
     fun getBrokerId(context: Context): String = getPreferences(context).getString(BROKER_ID, "") as String
 
+    fun savePdfPath(context: Context, id: String) {
+        getPreferences(context)[PDF_NAME] = id
+    }
+    fun getPdf(context: Context): String = getPreferences(context).getString(PDF_NAME, "") as String
 
 //    fun clearAuthorizationToken(context: Context) {
 //        getPreferences(context)[KEY_AUTH_TOKEN] = ""

@@ -10,7 +10,8 @@ data class Message(
     var content: String,
     var createBy : String,
     var senderId : String,
-    var createTime : String
+    var createTime : String,
+    var file: Files?
 //var isMine : Boolean
 
 ) : Serializable
