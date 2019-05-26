@@ -23,6 +23,9 @@ import com.trackster.tracksterapp.utils.ConfigManager
 import com.trackster.tracksterapp.utils.RealPathUtilKotlin
 import java.io.File
 import com.trackster.tracksterapp.main.MainActivity
+import android.os.StrictMode
+
+
 
 
 
@@ -65,7 +68,8 @@ object DetailsMediaManager {
      * Shows a dialog that enables user to choose a media source.
      */
     fun pickMedia(activity: Activity): Boolean {
-        return if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        return if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED ) {
             showMediaOptionsDialog(activity)
             true
         } else
@@ -153,13 +157,21 @@ object DetailsMediaManager {
     }
 
     private fun getUri(activity: Activity): Uri {
-        if (Build.VERSION.SDK_INT >= 24)
 
+        if (Build.VERSION.SDK_INT >= 24) {
+            try {
+                val m = StrictMode::class.java.getMethod("disableDeathOnFileUriExposure")
+                m.invoke(null)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
 
-            return FileProvider.getUriForFile(
-                activity,
-                BuildConfig.APPLICATION_ID + ".provider",
-                File(Environment.getExternalStorageDirectory(), "image.jpg"))
+        }
+//        if (Build.VERSION.SDK_INT >= 24)
+//            return FileProvider.getUriForFile(
+//                activity,
+//                BuildConfig.APPLICATION_ID + ".provider",
+//                File(Environment.getExternalStorageDirectory(), "image.jpg"))
         return Uri.fromFile(uploadFile)
     }
 
