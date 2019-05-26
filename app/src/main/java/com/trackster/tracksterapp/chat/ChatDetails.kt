@@ -765,7 +765,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     private fun addMedia() {
         if (!DetailsMediaManager.pickMedia(this))
             ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA),
                 PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE
             )
     }
