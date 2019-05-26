@@ -182,8 +182,8 @@ object DetailsMediaManager {
 
     private fun createUrl(activity: Activity): String = ConfigManager.getAWSCDNUrl(activity) + MESSAGES + File.separator + fileName
 
-    fun createMessage(activity: Activity, content: String?,id : String): Message? {
-        return Message(id, content!!,"","","")
+    fun createMessage(activity: Activity, content: String?,id : String, file : Files?): Message? {
+        return Message(id, content!!,"","","",file)
     }
     fun createAudio(activity: Activity, document: String): File? {
         return File(document)
@@ -223,29 +223,4 @@ object DetailsMediaManager {
 
         return ""
     }
-
-//    fun getPendingMessages(key: Int?): MutableList<Message> {
-//        val pendingMessages: MutableList<Message> = mutableListOf()
-//        for (pendingMessage in mutableListSendingMessages) {
-//            if (pendingMessage.recipient == key) {
-//                pendingMessages.add(pendingMessage)
-//            }
-//        }
-//
-//        return pendingMessages
-//    }
-
-//    fun removeMessage(key: Int?) {
-//        val message = mutableListSendingMessages.find { message -> message.additionalData.observerId == key }
-//        if (message != null) {
-//            mutableListSendingMessages.remove(message)
-//        }
-//    }
-//
-//    fun removeMessageId(key: Int?) {
-//        val message = mutableListSendingMessages.find { message -> message.additionalData.id == key }
-//        if (message != null) {
-//            mutableListSendingMessages.remove(message)
-//        }
-//    }
 }

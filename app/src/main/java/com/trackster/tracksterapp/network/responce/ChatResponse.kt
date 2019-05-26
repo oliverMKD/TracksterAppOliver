@@ -2,6 +2,7 @@ package com.trackster.tracksterapp.network.responce
 
 import com.google.gson.annotations.SerializedName
 import com.trackster.tracksterapp.model.Address
+import com.trackster.tracksterapp.model.Files
 import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.model.User
 
