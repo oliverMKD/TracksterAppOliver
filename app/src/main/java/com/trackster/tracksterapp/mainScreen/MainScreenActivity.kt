@@ -43,6 +43,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.priyankvasa.android.cameraviewex.ErrorLevel
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.cameraToPdf.CameraActivity
 import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
 import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
@@ -125,6 +126,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         hamburger.visibility = View.VISIBLE
         hamburger.setOnClickListener(this)
         chat.setOnClickListener(this)
+        attach.setOnClickListener(this)
 
         floatBtn.setOnClickListener { view ->
 
@@ -219,12 +221,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 startActivity(Intent(this@MainScreenActivity, ChatDetails::class.java))
             }
             R.id.attach -> {
-
+                startActivity(Intent(this@MainScreenActivity, CameraActivity::class.java))
             }
         }
     }
-
-
 
     private fun getUserInfo() {
         apiService = PostApi.create(this!!)

@@ -806,12 +806,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     private fun probaPdf(uri: Uri?): File {
         val selectedImageUri = uri
         val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-//        val bmp = BitmapFactory.decodeFile(uri!!.path)
-//        val stream = ByteArrayOutputStream()
-//        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream)
-
         val document = Document()
-
         val f = File(Environment.getExternalStorageDirectory(), "PDF_Images.pdf")
 
           //  PdfWriter.getInstance(document, FileOutputStream(f))

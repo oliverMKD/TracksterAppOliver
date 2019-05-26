@@ -150,14 +150,11 @@ object DetailsMediaManager {
         }
 
         uploadFile = File(mediaStorageDir.path + File.separator + fileName)
-
-
         tmpUri = getUri(activity)
         return uploadFile!!
     }
 
     private fun getUri(activity: Activity): Uri {
-
         if (Build.VERSION.SDK_INT >= 24) {
             try {
                 val m = StrictMode::class.java.getMethod("disableDeathOnFileUriExposure")
@@ -165,13 +162,7 @@ object DetailsMediaManager {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-
         }
-//        if (Build.VERSION.SDK_INT >= 24)
-//            return FileProvider.getUriForFile(
-//                activity,
-//                BuildConfig.APPLICATION_ID + ".provider",
-//                File(Environment.getExternalStorageDirectory(), "image.jpg"))
         return Uri.fromFile(uploadFile)
     }
 
@@ -188,8 +179,6 @@ object DetailsMediaManager {
         uploadFile = File(RealPathUtilKotlin.getRealPath(activity,uri))
         tmpUri = uri
     }
-
-//    fun hasMedia(message: Message) = !TextUtils.isEmpty(message.imageUrl) || !TextUtils.isEmpty(message.videoUrl)
 
     private fun createUrl(activity: Activity): String = ConfigManager.getAWSCDNUrl(activity) + MESSAGES + File.separator + fileName
 
