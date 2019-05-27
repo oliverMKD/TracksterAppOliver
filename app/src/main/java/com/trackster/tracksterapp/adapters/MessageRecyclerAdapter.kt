@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -165,24 +166,32 @@ class MessageRecyclerAdapter(
                     }.type
                     modelString = gson.fromJson(serializedObject, type)
                 }
-                val iterator = modelString.listIterator()
-                for (item in iterator) {
-                    if (item!!.contains(message.file?.filename!!)) {
-                        val fileIn = File(item)
-                        val u = Uri.fromFile(fileIn)
-                        holder.messageImageView.visibility = View.VISIBLE
-                        if (message.senderId == PreferenceUtils.getUserId(context)) {
-                            Glide.with(context)
-                                .load(u)
-                                .into(holder.messageImageView)
-                        } else {
-                            Glide.with(context)
-                                .load(u)
-                                .into(holder.messageImageView)
-                        }
+                if (modelString.size==PreferenceUtils.getPDFSize(context)){
+                    Log.d("getFileFromServer", "1111")
+                } else {
+                    var diff = (modelString.size-PreferenceUtils.getPDFSize(context)!!)
+                    modelString.takeLast(diff)
+                    val iterator = modelString.listIterator()
+                    PreferenceUtils.savePDFSize(context,modelString.size)
+                    for (item in iterator) {
+                        if (item!!.contains(message.file?.filename!!)) {
+                            val fileIn = File(item)
+                            val u = Uri.fromFile(fileIn)
+                            holder.messageImageView.visibility = View.VISIBLE
+                            if (message.senderId == PreferenceUtils.getUserId(context)) {
+                                Glide.with(context)
+                                    .load(u)
+                                    .into(holder.messageImageView)
+                            } else {
+                                Glide.with(context)
+                                    .load(u)
+                                    .into(holder.messageImageView)
+                            }
 
+                        }
                     }
                 }
+
 
             }
              if (message.file?.filename!!.contains(".png")){
@@ -195,24 +204,32 @@ class MessageRecyclerAdapter(
                     }.type
                     modelString = gson.fromJson(serializedObject, type)
                 }
-                val iterator = modelString.listIterator()
-                for (item in iterator) {
-                    if (item!!.contains(message.file?.filename!!)) {
-                        val fileIn = File(item)
-                        val u = Uri.fromFile(fileIn)
-                        holder.messageImageView.visibility = View.VISIBLE
-                        if (message.senderId == PreferenceUtils.getUserId(context)) {
-                            Glide.with(context)
-                                .load(u)
-                                .into(holder.messageImageView)
-                        } else {
-                            Glide.with(context)
-                                .load(u)
-                                .into(holder.messageImageView)
-                        }
+                 if (modelString.size==PreferenceUtils.getPNGSize(context)){
+                     Log.d("getFileFromServer", "1111")
+                 } else {
+                     var diff = (modelString.size-PreferenceUtils.getPNGSize(context)!!)
+                     modelString.takeLast(diff)
+                     val iterator = modelString.listIterator()
+                     PreferenceUtils.savePNGSize(context,modelString.size)
+                     for (item in iterator) {
+                         if (item!!.contains(message.file?.filename!!)) {
+                             val fileIn = File(item)
+                             val u = Uri.fromFile(fileIn)
+                             holder.messageImageView.visibility = View.VISIBLE
+                             if (message.senderId == PreferenceUtils.getUserId(context)) {
+                                 Glide.with(context)
+                                     .load(u)
+                                     .into(holder.messageImageView)
+                             } else {
+                                 Glide.with(context)
+                                     .load(u)
+                                     .into(holder.messageImageView)
+                             }
 
-                    }
-                }
+                         }
+                     }
+                 }
+
             }
 
         }

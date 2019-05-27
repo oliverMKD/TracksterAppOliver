@@ -19,5 +19,5 @@ data class ChatResponse(
     @SerializedName("broker") var broker: User,
     @SerializedName("carrier") var carrier: User,
     @SerializedName("driver") var driver: User,
-    @SerializedName("messages") val message: ArrayList<Message>
+    @SerializedName("messages") var message: ArrayList<Message>
 )

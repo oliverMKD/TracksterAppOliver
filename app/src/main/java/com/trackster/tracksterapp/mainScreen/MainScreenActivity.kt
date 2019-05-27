@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -55,6 +54,7 @@ import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
 import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
 import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
 import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
+import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
@@ -87,9 +87,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private lateinit var mapsId: String
     private var mDelayHandler: Handler? = null
     var compositeDisposableContainer = CompositeDisposable()
-    val modelStringPDF: MutableList<String?> = mutableListOf()
-    val modelStringPNG: MutableList<String?> = mutableListOf()
-
+    var modelStringPDF: MutableList<String?> = mutableListOf()
+    var modelStringPNG: MutableList<String?> = mutableListOf()
+    lateinit var modelProba: ArrayList<Message>
 
     private lateinit var locationCallback: LocationCallback
     // 2
@@ -331,10 +331,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     PreferenceUtils.saveChatId(this, mapsId)
                     getChatById(mapsId)
                     getWeightStations()
-
-                    //                Log.d("station", " "+ it[0].location)
                 }, {
-                    //                showProgress(false)
                     handleApiError(it.cause)
                 })
 
@@ -357,21 +354,33 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //                    this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
 //                    this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
 //                    this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
-                    val iterator = it.message.listIterator()
-                    for (item in iterator) {
-                        if (item.file != null) {
-                            if (item.file!!.filename != null) {
-                                getFileFromServer(item.file!!.filename!!)
+//                    var messageSize = PreferenceUtils.getSize(this@MainScreenActivity)
+                    if (PreferenceUtils.getSize(this@MainScreenActivity) == it.message.size) {
+                        Log.d("getFileFromServer", "1111")
+                    } else {
+                        val diff = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
+                        
+                        val iterator = it.message.listIterator()
+                        for (item in iterator) {
+                            if (item.file != null) {
+                                if (item.file!!.filename != null) {
+                                    getFileFromServer(item.file!!.filename!!)
+                                    var size = it.message.size
+                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+                                } else {
+                                    var size = it.message.size
+                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+                                    Log.d("getFileFromServer", "1111")
+                                }
                             } else {
-                                Log.d("getFileFromServer", "1111")
+                                var size = it.message.size
+                                PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+                                Log.d("getFileFromServer", "22222")
                             }
-                        } else {
-                            Log.d("getFileFromServer", "22222")
                         }
                     }
                 }, {
-                    handleApiError(it.cause)
-
+                    Log.d("getFileFromServer", "22222")
                 })
         )
     }
@@ -390,7 +399,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     Log.d("writtenToDisk", "" + writtenToDisk.toString())
 
                 }, {
-                    DialogUtils.showErrorMessage(this@MainScreenActivity, it.localizedMessage)
                     Log.d("destinacija", "" + it.localizedMessage)
                 })
         )
@@ -431,7 +439,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     var uri = Uri.fromFile(retrofitBetaFile)
                     generateImageFromPdf(uri)
                 }
-                 if (fileName.contains(".png")){
+                if (fileName.contains(".png")) {
                     var pngString = retrofitBetaFile.toString()
                     modelStringPNG.add(pngString)
                     var sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
