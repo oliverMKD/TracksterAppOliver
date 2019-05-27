@@ -21,7 +21,9 @@ object PreferenceUtils {
     private const val BROKER_ID = "broker_id"
     private const val CARRIER_ID = "carrier_id"
     private const val CARRIER_NAME = "carrier_name"
-    private const val PDF_NAME = "pdf_name"
+    private const val MESS_SIZE = "mess_size"
+    private const val PDF_SIZE = "pdf_size"
+    private const val PNG_SIZE = "png_size"
 
     private fun getPreferences(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -104,261 +106,18 @@ object PreferenceUtils {
     }
     fun getBrokerId(context: Context): String = getPreferences(context).getString(BROKER_ID, "") as String
 
-    fun savePdfPath(context: Context, id: String) {
-        getPreferences(context)[PDF_NAME] = id
+    fun saveMessSize(context: Context, id: Int) {
+        getPreferences(context)[MESS_SIZE] = id
     }
-    fun getPdf(context: Context): String = getPreferences(context).getString(PDF_NAME, "") as String
+    fun getSize(context: Context): Int? = getPreferences(context).getInt(MESS_SIZE, 0)
 
-//    fun clearAuthorizationToken(context: Context) {
-//        getPreferences(context)[KEY_AUTH_TOKEN] = ""
-//        getPreferences(context)[KEY_TOKEN_EXPIRE] = ""
-//    }
-//
-//    fun saveLanguage(context: Context, language: String) {
-//        getPreferences(context)[KEY_LANGUAGE] = language
-//    }
-//
-//    fun saveIsProfileComplete(context: Context, isComplete: Boolean) {
-//        getPreferences(context)[KEY_IS_PROFILE_COMPLETE] = isComplete
-//    }
-//
-//    private fun isProfileComplete(context: Context): Boolean = getPreferences(context).getBoolean(KEY_IS_PROFILE_COMPLETE, false)
-//
-//    fun getAuthorizationToken(context: Context): String = "bearer " + getPreferences(context).getString(KEY_AUTH_TOKEN, "")
-//
-//    fun getLanguage(context: Context): String = getPreferences(context).getString(KEY_LANGUAGE, Constants.DEFAULT_LANGUAGE) as String
-//
-//    fun getTokenExipreDate(context: Context): String = getPreferences(context).getString(KEY_TOKEN_EXPIRE, "") as String
-//
-//    fun isUserLoggedIn(context: Context): Boolean {
-//        val authToken = getPreferences(context).getString(KEY_AUTH_TOKEN, "") as String
-//
-//        val expiryDate = getTokenExipreDate(context)
-//
-//        if (expiryDate.isBlank()) {
-//            return false
-//        }
-//
-//        return authToken.isNotEmpty() && DateFormat.tokenNotExpired(expiryDate) && isProfileComplete(context)
-//    }
-//
-//    fun logoutUser(context: Context) {
-//        clearAuthorizationToken(context)
-//        clearProfile(context)
-//        saveIsProfileComplete(context, false)
-//        if (InitialAccessToken.getCurrentAccessToken() != null) {
-//            LoginManager.getInstance().logOut();
-//        }
-//    }
-//
-//    private fun clearProfile(context: Context) {
-//        //profile
-//        getPreferences(context)[KEY_USER_PROFILE_PICTURE_STRING] = ""
-//        getPreferences(context)[KEY_PROFILE_USERNAME] = ""
-//        getPreferences(context)[KEY_USER_NICKNAME] = ""
-//        getPreferences(context)[KEY_USER_CITY_ID] = ""
-//        getPreferences(context)[KEY_USER_ID] = ""
-//        getPreferences(context)[KEY_PROFILE_NAME] = ""
-//        getPreferences(context)[KEY_PROFILE_LASTNAME] = ""
-//        getPreferences(context)[KEY_PROFILE_BIRTHDAY] = ""
-//        getPreferences(context)[KEY_PROFILE_PHONE] = ""
-//        getPreferences(context)[KEY_PROFILE_EMAIL] = ""
-//        getPreferences(context)[KEY_PROFILE_GENDER] = ""
-//        getPreferences(context)[KEY_PROFILE_HIDE_USERNAME] = ""
-//
-//        //Vip Membership
-//        getPreferences(context)[KEY_IS_USER_VIP_MEMBER] = false
-//        getPreferences(context)[KEY_USER_VIP_MEMBERSHIP_DETAILS] = ""
-//    }
-//
-//    fun saveMenuItem(context: Context, menuItem: MenuItem?) {
-//        getPreferences(context)[KEY_MENU_ITEM_COUNTRY] = menuItem?.country
-//        getPreferences(context)[KEY_MENU_ITEM_COUNTRY_ISO] = menuItem?.countryIso
-//        getPreferences(context)[KEY_MENU_ITEM_CITY] = menuItem?.city
-//        getPreferences(context)[KEY_MENU_ITEM_CITY_ID] = menuItem?.cityId
-//        getPreferences(context)[KEY_MENU_ITEM_PLACE_TYPE] = menuItem?.placeType
-//        getPreferences(context)[KEY_MENU_ITEM_EVENT_OCCURRENCE] = menuItem?.eventOccurrence
-//        getPreferences(context)[KEY_MENU_ITEM_DATE] = menuItem?.date
-//        getPreferences(context)[KEY_MENU_ITEM_CLUB_CITY_MEMBER_DISCOUNT] = menuItem?.clubCityRebate
-//        getPreferences(context)[KEY_MENU_ITEM_VISITED_BY_MY_FRIENDS] = menuItem?.visitedByMyFriends
-//        getPreferences(context)[KEY_MENU_ITEM_INCLUDE_NEARBY_CITES] = menuItem?.includeNearbyCities
-//    }
-//
-//    fun getCheckItemSelectCountry(context: Context) = getPreferences(context).getInt(KEY_SELECT_COUNTRY_DIALOG_CHECKED_ITEM, SELECT_COUNTRY_DIALOG_CHECKED_ITEM)
-//    fun saveCheckedItemSelectCountry(context: Context, item: Int) {
-//        getPreferences(context)[KEY_SELECT_COUNTRY_DIALOG_CHECKED_ITEM] = item
-//    }
-//
-//    fun getMenuDateformatedForApi(context: Context): String? {
-//        val date = getPreferences(context).getString(KEY_MENU_ITEM_DATE, "") as String
-//        if (TextUtils.isEmpty(date)) {
-//            return DateFormat.formatDate(Calendar.getInstance().time, DateFormat.DATE_FORMAT_MENU_DATE)
-//        }
-//        return DateFormat.formatDateEventsFilter(date)
-//    }
-//
-//    fun getMenuCountry(context: Context): String =
-//        getPreferences(context).getString(KEY_MENU_ITEM_COUNTRY, DEFAULT_COUNTRY) as String
-//
-//    fun getMenuCountryIso(context: Context): String =
-//        getPreferences(context).getString(KEY_MENU_ITEM_COUNTRY_ISO, DEFAULT_COUNTRY_ISO) as String
-//
-//    fun getMenuCity(context: Context): String =
-//        getPreferences(context).getString(KEY_MENU_ITEM_CITY, DEFAULT_CITY) as String
-//
-//    private fun getMenuCityId(context: Context): Int =
-//        getPreferences(context).getInt(KEY_MENU_ITEM_CITY_ID, DEFAULT_CITY_ID)
-//
-//    fun getMenuPlaceType(context: Context): Int =
-//        getPreferences(context).getInt(KEY_MENU_ITEM_PLACE_TYPE, DEFAULT_PLACE_TYPE)
-//
-//    fun getMenuEventOccurrence(context: Context): Int =
-//        getPreferences(context).getInt(KEY_MENU_ITEM_EVENT_OCCURRENCE, DEFAULT_EVENT_OCCURRENCE)
-//
-//    fun getMenuDate(context: Context): String {
-//        val date = getPreferences(context).getString(KEY_MENU_ITEM_DATE, "") as String
-//        if (TextUtils.isEmpty(date)) {
-//            return DateFormat.formatDate(Calendar.getInstance().time, DateFormat.DATE_FORMAT_MENU_DATE)
-//        }
-//        return date
-//    }
-//
-//    fun getMenuClubCityMemberDiscount(context: Context): Boolean =
-//        getPreferences(context).getBoolean(KEY_MENU_ITEM_CLUB_CITY_MEMBER_DISCOUNT, false)
-//
-//    fun getMenuVisitedByMyFriends(context: Context): Boolean =
-//        getPreferences(context).getBoolean(KEY_MENU_ITEM_VISITED_BY_MY_FRIENDS, false)
-//
-//    fun getMenuIncludeNearbyCities(context: Context): Boolean =
-//        getPreferences(context).getBoolean(KEY_MENU_ITEM_INCLUDE_NEARBY_CITES, true)
-//
-//    fun saveFilterSortBy(context: Context, sortBy: Int) {
-//        getPreferences(context)[KEY_FILTER_SORT_BY] = sortBy
-//    }
-//
-//    fun getFilterSortBy(context: Context): Int {
-//        return when (getPreferences(context).getInt(KEY_MENU_ITEM_PLACE_TYPE, DEFAULT_PLACE_TYPE)) {
-//            2 -> getPreferences(context).getInt(KEY_FILTER_SORT_BY, DEFAULT_SORT_BY)
-//            else -> {
-//                if (getPreferences(context).getInt(KEY_FILTER_SORT_BY, DEFAULT_SORT_BY) > 2) {
-//                    return DEFAULT_SORT_BY_CLUBS
-//                }
-//                return getPreferences(context).getInt(KEY_FILTER_SORT_BY, DEFAULT_SORT_BY_CLUBS)
-//            }
-//        }
-//    }
-//
-//    fun getPlaceSearchRequest(context: Context, pageNum: Int): HomeEventFilterRequest {
-//
-//        var eventDate: String? = null
-//        val eventOccurrance = getMenuEventOccurrence(context)
-//
-//        if (eventOccurrance == 1) {
-//            eventDate = PreferenceUtils.getMenuDateformatedForApi(context)
-//        }
-//
-//        val requestEvents = HomeEventFilterRequest(cityId = getMenuCityId(context),
-//            placeType = getMenuPlaceType(context),
-//            pageNumber = pageNum,
-//            pageSize = EventsFragment.PAGE_SIZE,
-//            sortBy = getFilterSortBy(context),
-//            eventOccurrence = getMenuEventOccurrence(context),
-//            clubCityRebate = getMenuClubCityMemberDiscount(context),
-//            visitedByMyFriends = getMenuVisitedByMyFriends(context),
-//            descending = getMenuPlaceType(context) == DEFAULT_PLACE_TYPE,
-//            showInNearbyCites = getMenuIncludeNearbyCities(context),
-//            eventDate = eventDate)
-//
-//        return requestEvents
-//    }
-//
-//    fun saveUser(context: Context, user: User) {
-//        getPreferences(context)[KEY_USER_PROFILE_PICTURE_STRING] = user.profilePictureString
-//        getPreferences(context)[KEY_PROFILE_USERNAME] = user.userName
-//        getPreferences(context)[KEY_USER_NICKNAME] = user.nickName
-//        getPreferences(context)[KEY_USER_CITY_ID] = user.cityId
-//        getPreferences(context)[KEY_USER_ID] = user.userId
-//        getPreferences(context)[KEY_PROFILE_NAME] = user.firstName
-//        getPreferences(context)[KEY_PROFILE_LASTNAME] = user.lastName
-//        getPreferences(context)[KEY_PROFILE_BIRTHDAY] = user.birthday
-//        getPreferences(context)[KEY_PROFILE_PHONE] = user.phoneNumber
-//        getPreferences(context)[KEY_PROFILE_EMAIL] = user.email
-//        getPreferences(context)[KEY_PROFILE_GENDER] = user.gender
-//        getPreferences(context)[KEY_PROFILE_HIDE_USERNAME] = user.hideMyRealName
-//        getPreferences(context)[KEY_IS_USER_VIP_MEMBER] = user.isVipMembershipConnected
-//    }
-//
-//    fun saveUserProfilePicture(context: Context, profilePictureRequest: ProfilePictureRequest) {
-//        getPreferences(context)[KEY_USER_PROFILE_PICTURE_STRING] = profilePictureRequest.pictureBase64
-//    }
-//
-//
-//    fun saveUserNotificationPrefernce(context: Context, prefNotifications: String) {
-//        getPreferences(context)[KEY_PERMISSIONS_NOTIFICATIONS_USER] = prefNotifications
-//    }
-//
-//    fun getUserNotificationPrefernce(context: Context): String = getPreferences(context).getString(KEY_PERMISSIONS_NOTIFICATIONS_USER, "") as String
-//
-//    fun getUserProfilePicture(context: Context): String = getPreferences(context).getString(KEY_USER_PROFILE_PICTURE_STRING, "") as String
-//
-//    fun getUsername(context: Context): String = getPreferences(context).getString(KEY_PROFILE_USERNAME, "") as String
-//
-//    fun getNickname(context: Context): String = getPreferences(context).getString(KEY_USER_NICKNAME, "") as String
-//
-//    fun updateNickname(context: Context, nickname: String) {
-//        getPreferences(context)[KEY_USER_NICKNAME] = nickname
-//    }
-//
-//    fun getUserCityId(context: Context): Int = getPreferences(context).getInt(KEY_USER_CITY_ID, DEFAULT_CITY_ID)
-//
-//    fun getUserId(context: Context): String = getPreferences(context).getString(KEY_USER_ID, "") as String
-//
-//    fun saveUserId(context: Context): String = getPreferences(context).getString(KEY_USER_ID, "") as String
-//
-//    fun getUserName(context: Context): String = getPreferences(context).getString(KEY_PROFILE_NAME, "") as String
-//
-//    fun getUserLastName(context: Context): String = getPreferences(context).getString(KEY_PROFILE_LASTNAME, "") as String
-//
-//    fun getUserBirthday(context: Context): String = getPreferences(context).getString(KEY_PROFILE_BIRTHDAY, "") as String
-//
-//    fun getUserPhone(context: Context): String = getPreferences(context).getString(KEY_PROFILE_PHONE, "") as String
-//
-//    fun getUserEmail(context: Context): String = getPreferences(context).getString(KEY_PROFILE_EMAIL, "") as String
-//
-//    fun getUserGender(context: Context): String = getPreferences(context).getString(KEY_PROFILE_GENDER, "") as String
-//
-//    fun getUserHideUsername(context: Context): Boolean = getPreferences(context).getBoolean(KEY_PROFILE_HIDE_USERNAME, false)
-//
-//    fun getVipMemberStatus(context: Context) = getPreferences(context).getBoolean(KEY_IS_USER_VIP_MEMBER, false)
-//
-//    fun saveVipmembershipDetails(context: Context, vipUser: VipMemberUserInfoResponse) {
-//        val userVip = Gson().toJson(vipUser)
-//        getPreferences(context)[KEY_USER_VIP_MEMBERSHIP_DETAILS] = userVip
-//        getPreferences(context)[KEY_IS_USER_VIP_MEMBER] = true
-//    }
-//
-//    fun getVipMembershipDetails(context: Context): VipMemberUserInfoResponse? {
-//
-//        if(getVipMemberStatus(context)){
-//            val jsonUserVip = getPreferences(context).get(KEY_USER_VIP_MEMBERSHIP_DETAILS, "") as String?
-//            return if (jsonUserVip.isNullOrEmpty()) {
-//                null
-//            } else {
-//                Gson().fromJson(jsonUserVip, VipMemberUserInfoResponse::class.java)
-//            }
-//        }
-//        else{
-//            return null
-//        }
-//    }
-//
-//    fun saveUserCity(context: Context, city: City) {
-//        getPreferences(context)[KEY_MENU_ITEM_CITY] = city.name
-//        getPreferences(context)[KEY_MENU_ITEM_CITY_ID] = city.id
-//    }
-//
-//    fun saveUserCountry(context: Context, supportedCountry: SupportedCountry) {
-//        getPreferences(context)[KEY_MENU_ITEM_COUNTRY] = supportedCountry.name
-//        getPreferences(context)[KEY_MENU_ITEM_COUNTRY_ISO] = supportedCountry.iso
-//    }
+    fun savePDFSize(context: Context, id: Int) {
+        getPreferences(context)[PDF_SIZE] = id
+    }
+    fun getPDFSize(context: Context): Int? = getPreferences(context).getInt(PDF_SIZE, 0)
+
+    fun savePNGSize(context: Context, id: Int) {
+        getPreferences(context)[PNG_SIZE] = id
+    }
+    fun getPNGSize(context: Context): Int? = getPreferences(context).getInt(PNG_SIZE, 0)
 }
