@@ -1,5 +1,4 @@
-package com.trackster.tracksterapp.adapters
-
+package com.trackster.tracksterapp.mainScreen.adapter_Double
 
 import android.app.Activity
 import android.support.v7.widget.RecyclerView
@@ -9,11 +8,13 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
+import com.trackster.tracksterapp.adapters.SelectColorAdapter
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.Colors
 import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
 import kotlinx.android.synthetic.main.color_items.view.*
 
-class SelectColorAdapter(private val activity: Activity)  : RecyclerView.Adapter<SelectColorAdapter.LoadsRecyclerViewHolder>()   {
+class SelectColorAdapterDouble (private val activity: Activity)  : RecyclerView.Adapter<SelectColorAdapterDouble.LoadsRecyclerViewHolder>()   {
 
     private val list: MutableList<Colors> = arrayListOf()
 
@@ -222,7 +223,7 @@ class SelectColorAdapter(private val activity: Activity)  : RecyclerView.Adapter
 
         holder.itemView.setOnClickListener {
             if (color != null) {
-                (activity as SelectTrailerActivity).getSelectedColor(color.name)
+               (activity as MainScreenActivity).getSelectedColorDouble(color.name)
             }
         }
 

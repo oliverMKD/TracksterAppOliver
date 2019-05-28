@@ -153,8 +153,9 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
         Toast.makeText(this@SelectTrailerActivity, "You selected : " + id + " truck", Toast.LENGTH_LONG).show()
         openSelectColorFragment()
     }
-    fun getSelectedColor() {
-        Toast.makeText(this@SelectTrailerActivity, "You selected :  color", Toast.LENGTH_LONG).show()
+
+    fun getSelectedColor(name_color : String) {
+        Toast.makeText(this@SelectTrailerActivity, "You selected : " +  name_color +  "color", Toast.LENGTH_LONG).show()
         startActivity(Intent(this@SelectTrailerActivity, MainScreenActivity::class.java))
     }
 

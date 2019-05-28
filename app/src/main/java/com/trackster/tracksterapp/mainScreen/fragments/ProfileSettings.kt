@@ -23,8 +23,9 @@ import kotlinx.android.synthetic.main.fragment_profil.*
 
 class ProfileSettings : BaseFragment(), View.OnClickListener {
 
-
-
+    var fullname = ""
+    var lastName = ""
+    var firstName = ""
     lateinit var apiService: PostApi
     private var userInfo: MutableList<User> = mutableListOf()
     var fragmentPosition: Int = 0
@@ -58,11 +59,26 @@ class ProfileSettings : BaseFragment(), View.OnClickListener {
     }
 
     private fun updateUser() {
+
+        val name1 = name.text.toString()
+
+        if (name1.split(("\\w+").toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray().size > 1)
+        {
+            lastName = name1.substring(name1.lastIndexOf(" ") + 1)
+            firstName = name1.substring(0, name1.lastIndexOf(' '))
+        }
+        else
+        {
+            firstName = name1
+        }
+        var middle = " "
+         fullname = firstName + middle + lastName
+
         apiService = PostApi.create(context!!)
         CompositeDisposable().add(
             apiService.updateUser(
                 PreferenceUtils.getAuthorizationToken(context!!),
-                UserRequest("Proba", "5c6c76eb17d4421770ae188d", "broker@brokertest.com")
+                UserRequest(fullname, PreferenceUtils.getUserId(context!!), email.text.toString())
             )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -97,10 +113,10 @@ class ProfileSettings : BaseFragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.color -> {
-//                (activity as MainScreenActivity).openSelectColorFragment()
+                (activity as MainScreenActivity).openSelectColorFragmentDouble()
             }
             R.id.type_truck ->{
-//                (activity as MainScreenActivity).openSelectTruckFragment()
+                (activity as MainScreenActivity).openSelectTruckFragmentDouble()
             }
             R.id.save_changes-> {
                 updateUser()

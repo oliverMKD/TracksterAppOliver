@@ -48,6 +48,7 @@ import com.shockwave.pdfium.PdfiumCore
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.cameraToPdf.CameraActivity
 import com.trackster.tracksterapp.chat.ChatDetails
+import com.trackster.tracksterapp.mainScreen.fragments.*
 import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
 import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
 import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
@@ -122,8 +123,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private val profileSettings: ProfileSettings = ProfileSettings.newInstance()
     private val historyList: HistoryList = HistoryList.newInstance()
     private val detailsList: DetailsLoad = DetailsLoad.newInstance()
-    private val selectTracksFragment: SelectTruckFragment = SelectTruckFragment.newInstance()
-    private val selectColorFragment: SelectColorFragment = SelectColorFragment.newInstance()
+    private val selectTracksFragment: SelectTruckFragmentDouble = SelectTruckFragmentDouble.newInstance()
+    private val selectColorFragment: SelectColorFragmentDouble = SelectColorFragmentDouble.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,7 +136,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         chat.setOnClickListener(this)
         attach.setOnClickListener(this)
 
-        floatBtn.setOnClickListener {
+
+
+        floatBtn.setOnClickListener { view ->
 
             val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             // Inflate a custom view using layout inflater
@@ -211,12 +214,20 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
+
+
+
     public fun show() {
         attach.visibility = View.VISIBLE
         hamburger.visibility = View.VISIBLE
         floatBtn.show()
         chat.visibility = View.VISIBLE
     }
+
+
+
+
+
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
@@ -230,8 +241,14 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             R.id.attach -> {
                 startActivity(Intent(this@MainScreenActivity, CameraActivity::class.java))
             }
+
+
         }
     }
+
+
+
+
 
     private fun getUserInfo() {
         apiService = PostApi.create(this!!)
@@ -756,7 +773,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         fragmentTransaction.commit()
     }
 
-    private fun openProfileSettingsFragment() {
+    public fun openProfileSettingsFragment() {
 
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -820,14 +837,20 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
+
         when (item.itemId) {
             R.id.action_settings -> return true
             else -> return super.onOptionsItemSelected(item)
         }
     }
 
+
+
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
+
         when (item.itemId) {
             R.id.map -> {
 
@@ -850,41 +873,62 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 hide()
 
             }
+
+
+
         }
+
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
 
-    public fun openSelectTruckFragment() {
+    public fun openSelectTruckFragmentDouble() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
 
         if (selectTracksFragment.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, selectTracksFragment)
+            fragmentTransaction.remove(profileSettings)
         } else {
             fragmentTransaction.add(R.id.fragment_container, selectTracksFragment)
             fragmentTransaction.addToBackStack("selectTrucksFragment")
+            fragmentTransaction.remove(profileSettings)
         }
 
         fragmentTransaction.commit()
     }
 
-    public fun openSelectColorFragment() {
+    public fun openSelectColorFragmentDouble() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-
+        fragmentTransaction.remove(profileSettings)
         if (selectColorFragment.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, selectColorFragment)
         } else {
             fragmentTransaction.add(R.id.fragment_container, selectColorFragment)
             fragmentTransaction.addToBackStack("selectColorFragment")
+            fragmentTransaction.remove(profileSettings)
         }
 
         fragmentTransaction.commit()
     }
 
     fun getSelectedTruck(id: String) {
-        Toast.makeText(this@MainScreenActivity, "You selected : " + " truck", Toast.LENGTH_LONG).show()
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        Toast.makeText(this@MainScreenActivity, "You selected : " + id + " truck", Toast.LENGTH_LONG).show()
+        fragmentTransaction.remove(selectTracksFragment)
+        openProfileSettingsFragment()
+        fragmentTransaction.commit()
     }
+    fun getSelectedColorDouble(name: String) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        Toast.makeText(this@MainScreenActivity, "You selected : " + name + " color", Toast.LENGTH_LONG).show()
+        fragmentTransaction.remove(selectColorFragment)
+        openProfileSettingsFragment()
+        fragmentTransaction.commit()
+    }
+
 }

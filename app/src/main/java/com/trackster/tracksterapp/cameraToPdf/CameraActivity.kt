@@ -31,6 +31,13 @@ import io.fotoapparat.view.CameraView
 import kotlinx.android.synthetic.main.content_camera.*
 import java.io.File
 import java.io.FileOutputStream
+import com.google.gson.Gson
+import android.R.id.edit
+import android.content.Context
+import android.content.SharedPreferences
+import android.widget.Switch
+import com.trackster.tracksterapp.R
+
 
 
 class CameraActivity : AppCompatActivity() {
@@ -90,10 +97,21 @@ class CameraActivity : AppCompatActivity() {
             intent.type = "application/pdf"
             startActivity(Intent.createChooser(intent, "Send"))
         }
+        fab_flash.setBackgroundResource(R.drawable.flash1)
 
         fab_flash.setOnClickListener {
-            changeFlashState()
+
+
+
+                changeFlashState()
+
+
+
+
+
+
         }
+
 
     }
 

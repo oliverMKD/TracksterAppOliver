@@ -117,6 +117,13 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         holder.messageImageView.visibility = View.GONE
         holder.dateTextView.visibility = View.VISIBLE
         holder.dateTextView.text = message.createTime
+      
+       if (TextUtils.isEmpty(message.createTime)) {
+            holder.dateTextView.visibility = View.GONE
+        } else {
+            holder.dateTextView.visibility = View.VISIBLE
+
+        }
         if (message.senderId == PreferenceUtils.getUserId(context))
             holder.messageRelativeLayout.setBackgroundResource(com.trackster.tracksterapp.R.drawable.rounded_rectangle_green)
         else
@@ -190,9 +197,10 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
                                 .load(u)
                                 .into(holder.messageImageView)
                         }
+                      
+       
 
-                    }
-                }
+                
             }
             else  {
                 holder.messagePlayImageView.visibility = View.VISIBLE
@@ -233,9 +241,24 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         if (!TextUtils.isEmpty(message.content)) {
             holder.messageTextView.visibility = View.VISIBLE
             holder.messageTextView.text = message.content
-        } else {
+} 
+              else {
             holder.messageTextView.visibility = View.GONE
         }
+
+        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
+        var previousDate2: String = ""
+        if (previousDate2 == messageDate) {
+            message.createTime = ""
+            holder.dateTextView.text = ""
+        } else {
+            previousDate2 = messageDate
+        }
+        holder.dateTextView.text = messageDate
+            var messageTime = DateFormat.formatTime(message.createTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
+        messageTime = DateFormat.formatTimeDetailsMessage(message.createTime, messageTime)
+        holder.timeTextView.text = messageTime
     }
 
     private fun setButtonPlayRecordingListener(source: String, holder: MessageRecyclerViewHolder) {

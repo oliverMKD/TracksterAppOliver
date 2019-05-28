@@ -12,7 +12,7 @@
 
 
     <color name="zuta">#ffd202</color>
-    <color name="White">#FFFFFF</color>
+
     <color name="Ivory">#FFFFF0</color>
     <color name="LightYellow">#FFFFE0</color>
     <color name="Yellow">#FFFF00</color>
@@ -41,7 +41,7 @@
     <color name="OrangeRed">#FF4500</color>
     <color name="DeepPink">#FF1493</color>
     <color name="Fuchsia">#FF00FF</color>
-    <color name="Magenta">#FF00FF</color>
+    <color name="Magenta1">#FF00FF</color>
     <color name="Red">#FF0000</color>
     <color name="OldLace">#FDF5E6</color>
     <color name="LightGoldenrodYellow">#FAFAD2</color>
@@ -51,7 +51,7 @@
     <color name="GhostWhite">#F8F8FF</color>
     <color name="MintCream">#F5FFFA</color>
     <color name="WhiteSmoke">#F5F5F5</color>
-    <color name="Beige">#F5F5DC</color>
+
     <color name="Wheat">#F5DEB3</color>
     <color name="SandyBrown">#F4A460</color>
     <color name="Azure">#F0FFFF</color>
@@ -99,13 +99,13 @@
     <color name="MediumPurple">#9370DB</color>
     <color name="LightGreen">#90EE90</color>
     <color name="DarkSeaGreen">#8FBC8F</color>
-    <color name="SaddleBrown">#8B4513</color>
+
     <color name="DarkMagenta">#8B008B</color>
     <color name="DarkRed">#8B0000</color>
     <color name="BlueViolet">#8A2BE2</color>
-    <color name="LightSkyBlue">#87CEFA</color>
+
     <color name="SkyBlue">#87CEEB</color>
-    <color name="Gray">#808080</color>
+
     <color name="Olive">#808000</color>
     <color name="Purple">#800080</color>
     <color name="Maroon">#800000</color>
@@ -126,7 +126,7 @@
     <color name="MediumTurquoise">#48D1CC</color>
     <color name="DarkSlateBlue">#483D8B</color>
     <color name="SteelBlue">#4682B4</color>
-    <color name="RoyalBlue">#4169E1</color>
+  
     <color name="Turquoise">#40E0D0</color>
     <color name="MediumSeaGreen">#3CB371</color>
     <color name="LimeGreen">#32CD32</color>
@@ -146,7 +146,7 @@
     <color name="DarkCyan">#008B8B</color>
     <color name="Teal">#008080</color>
     <color name="Green">#008000</color>
-    <color name="DarkGreen">#006400</color>
+    <color name="DarkGreen1">#006400</color>
     <color name="Blue">#0000FF</color>
     <color name="MediumBlue">#0000CD</color>
     <color name="DarkBlue">#00008B</color>
@@ -162,4 +162,54 @@
     <color name="colorSendMessageEditTextBackground">#f6f7f8</color>
     <color name="colorMessageDate">#5a5a5a</color>
     <color name="errorMessageBackground">#942343</color>
+
+    <color name="AppleGreen">#8db600</color>
+    <color name="AlbescentWhite">#f5e9d3</color>
+    <color name="White">#FFFFFF</color>
+    <color name="Beige">#F5F5DC</color>
+    <color name="Burgundy">#800020</color>
+    <color name="BrightRed">#b10000</color>
+    <color name="ChromeWhite">#e8f1d4</color>
+    <color name="ChromeYellow">#ffa700</color>
+
+    <color name="DarkGreen">#013220</color>
+    <color name="FireEngineRed">#ce2029</color>
+    <color name="Gray">#808080</color>
+
+    <color name="KellyGreen">#4cbb17</color>
+    <color name="RipeLemon">#f4d81c</color>
+    <color name="ArylideYellow">#e9d66b</color>
+
+    <color name="FuelYellow">#eca927</color>
+    <color name="Magenta">#ca1f7b</color>
+
+    <color name="MetallicCopper">#71291d</color>
+    <color name="MetallicGold">#d4af37</color>
+
+    <color name="MetallicBronze">#49371b</color>
+
+    <color name="QuickSilver">#a6a6a6</color>
+    <color name="Midnight">#702670</color>
+    <color name="DeepTeal">#003532</color>
+
+    <color name="OceanBlue">#4f42b5</color>
+
+    <color name="OrangePeel">#ff9f00</color>
+
+    <color name="Purpureus">#9a4eae</color>
+
+    <color name="RipePlum">#410056</color>
+
+    <color name="RoyalBlue">#4169e1</color>
+    <color name="SaddleBrown">#8b4513</color>
+
+    <color name="BlueSapphire">#126180</color>
+
+    <color name="LightSkyBlue">#87cefa</color>
+
+
+
+
+
+
 </resources>
