@@ -22,6 +22,7 @@ import com.trackster.tracksterapp.utils.PreferenceUtils
 import com.trackster.tracksterapp.utils.Utils
 import java.io.File
 import android.util.SparseIntArray
+import com.trackster.tracksterapp.utils.DateFormat
 
 class MessageRecyclerAdapter(private val context: Activity, private var list: MutableList<Message>) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageRecyclerViewHolder>() {
@@ -117,8 +118,8 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         holder.messageImageView.visibility = View.GONE
         holder.dateTextView.visibility = View.VISIBLE
         holder.dateTextView.text = message.createTime
-      
-       if (TextUtils.isEmpty(message.createTime)) {
+
+        if (TextUtils.isEmpty(message.createTime)) {
             holder.dateTextView.visibility = View.GONE
         } else {
             holder.dateTextView.visibility = View.VISIBLE
@@ -132,12 +133,10 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         if (message.senderId == PreferenceUtils.getBrokerId(context)) {
             holder.received_name!!.text =
                 PreferenceUtils.getBrokerName(context)
-        }
-        else if (message.senderId == PreferenceUtils.getCarrierId(context)){
+        } else if (message.senderId == PreferenceUtils.getCarrierId(context)) {
             holder.received_name!!.text =
                 PreferenceUtils.getCarrierName(context)
-        }
-        else{
+        } else {
             holder.sent_name!!.text =
                 PreferenceUtils.getDriverName(context)
         }
@@ -171,8 +170,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
                         }
                     }
                 }
-            }
-            else if (message.file?.filename!!.contains(".png")) {
+            } else if (message.file?.filename!!.contains(".png")) {
                 holder.messageImageView.visibility = View.VISIBLE
                 val sharedPref = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)
                 var modelString: MutableList<String?> = mutableListOf()
@@ -197,68 +195,66 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
                                 .load(u)
                                 .into(holder.messageImageView)
                         }
-                      
-       
 
-                
-            }
-            else  {
-                holder.messagePlayImageView.visibility = View.VISIBLE
-                holder.messageSeekBar.visibility = View.VISIBLE
-                val sharedPref = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)
-                var modelString: MutableList<String?> = mutableListOf()
-                val serializedObject = sharedPref.getString("aac", null)
-                if (serializedObject != null) {
-                    val gson = Gson()
-                    val type = object : TypeToken<List<String>>() {
-                    }.type
-                    modelString = gson.fromJson(serializedObject, type)
-                }
-                val iterator = modelString.listIterator()
-                for (item in iterator) {
-                    if (item!!.contains(message.file?.filename!!)) {
-                        val fileIn = File(item)
-                        val u = Uri.fromFile(fileIn)
-                        if (message.senderId == PreferenceUtils.getUserId(context)) {
-                            holder.messagePlayImageView.setOnClickListener {
-                                setButtonPlayRecordingListener(fileIn.toString(), holder)
-                            }
-                        } else {
-                            holder.messagePlayImageView.setOnClickListener {
-                                setButtonPlayRecordingListener(fileIn.toString(), holder)
+
+                    } else {
+                        holder.messagePlayImageView.visibility = View.VISIBLE
+                        holder.messageSeekBar.visibility = View.VISIBLE
+                        val sharedPref = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        var modelString: MutableList<String?> = mutableListOf()
+                        val serializedObject = sharedPref.getString("aac", null)
+                        if (serializedObject != null) {
+                            val gson = Gson()
+                            val type = object : TypeToken<List<String>>() {
+                            }.type
+                            modelString = gson.fromJson(serializedObject, type)
+                        }
+                        val iterator = modelString.listIterator()
+                        for (item in iterator) {
+                            if (item!!.contains(message.file?.filename!!)) {
+                                val fileIn = File(item)
+                                val u = Uri.fromFile(fileIn)
+                                if (message.senderId == PreferenceUtils.getUserId(context)) {
+                                    holder.messagePlayImageView.setOnClickListener {
+                                        //                                setButtonPlayRecordingListener(fileIn.toString(), holder)
+                                    }
+                                } else {
+                                    holder.messagePlayImageView.setOnClickListener {
+                                        //                                setButtonPlayRecordingListener(fileIn.toString(), holder)
+                                    }
+                                }
+
                             }
                         }
-
                     }
+
                 }
+            } else {
+                holder.messageTextView.visibility = View.VISIBLE
+
             }
 
-        } else {
-            holder.messageTextView.visibility = View.VISIBLE
+            if (!TextUtils.isEmpty(message.content)) {
+                holder.messageTextView.visibility = View.VISIBLE
+                holder.messageTextView.text = message.content
+            } else {
+                holder.messageTextView.visibility = View.GONE
+            }
 
-        }
-
-        if (!TextUtils.isEmpty(message.content)) {
-            holder.messageTextView.visibility = View.VISIBLE
-            holder.messageTextView.text = message.content
-} 
-              else {
-            holder.messageTextView.visibility = View.GONE
-        }
-
-        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
-        var previousDate2: String = ""
-        if (previousDate2 == messageDate) {
-            message.createTime = ""
-            holder.dateTextView.text = ""
-        } else {
-            previousDate2 = messageDate
-        }
-        holder.dateTextView.text = messageDate
+            var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+            messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
+            var previousDate2: String = ""
+            if (previousDate2 == messageDate) {
+                message.createTime = ""
+                holder.dateTextView.text = ""
+            } else {
+                previousDate2 = messageDate
+            }
+            holder.dateTextView.text = messageDate
             var messageTime = DateFormat.formatTime(message.createTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
-        messageTime = DateFormat.formatTimeDetailsMessage(message.createTime, messageTime)
-        holder.timeTextView.text = messageTime
+            messageTime = DateFormat.formatTimeDetailsMessage(message.createTime, messageTime)
+            holder.timeTextView.text = messageTime
+        }
     }
 
     private fun setButtonPlayRecordingListener(source: String, holder: MessageRecyclerViewHolder) {
