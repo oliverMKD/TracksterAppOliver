@@ -84,7 +84,12 @@ dependencies {
 
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.9.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'
+    implementation ("com.github.bumptech.glide:recyclerview-integration:4.4.0") {
+        /*Excludes the support library
+          because it's already included by Glide.*/
+        transitive = false
+    }
 
     //Cicrcular Image
     implementation 'de.hdodenhof:circleimageview:3.0.0'
