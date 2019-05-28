@@ -51,8 +51,16 @@ import kotlinx.android.synthetic.main.activity_chat_details.*
 import kotlinx.android.synthetic.main.activity_load_details.view.*
 import kotlinx.android.synthetic.main.recycler_history.*
 import okhttp3.*
+import org.joda.time.DateTime
+import org.joda.time.LocalDateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.ISODateTimeFormat
 import retrofit2.Response
 import java.io.*
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 class ChatDetails() : BaseChatActivity(), View.OnClickListener {
@@ -368,7 +376,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     private fun setData(result: MutableList<Message>) {
 //        result.reverse()
-        setDatesData(result)
+//        setDatesData(result)
         adapter.setData(result)
         scrollToBottom()
     }
@@ -380,18 +388,27 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun setDateForMessage(message: Message) {
-        val additionalData = DateFormat.formatDate(message.createTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
+       // val additionalData = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
 //
-        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
-        if (previousDate == messageDate) {
-            message.createTime = ""
-        } else {
-            message.createTime = messageDate
-            previousDate = messageDate
-        }
+//        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+//        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
+//        if (previousDate == messageDate) {
+//            message.createTime = ""
+//        } else {
+//            message.createTime = messageDate
+//            previousDate = messageDate
+//        }
 
-        message.createTime = messageDate
+      ///  var nova_data : String = ""
+        //nova_data = DateFormat.formatDate(additionalData,DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+       // LocalDateTime.parse(nova_data, ISODateTimeFormat.dateTimeParser())
+
+
+
+
+      //  message.createTime = nova_data
+
+
 
     }
 

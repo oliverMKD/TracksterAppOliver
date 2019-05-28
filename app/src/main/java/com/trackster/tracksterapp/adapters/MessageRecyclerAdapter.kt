@@ -58,7 +58,7 @@ class MessageRecyclerAdapter(
         val received_name = view.findViewById(R.id.received_name) as TextView?
         val sent_name = view.findViewById(R.id.sent_name) as TextView?
         val timeTextView = view.findViewById(R.id.time_text_view) as TextView
-        // val timeImageView = view.findViewById(R.id.time_image_view) as ImageView
+//         val timeImageView = view.findViewById(R.id.time_image_view) as ImageView
         val timeTryAgainTextView = view.findViewById(R.id.time_try_again_text_view) as TextView
     }
 
@@ -107,18 +107,18 @@ class MessageRecyclerAdapter(
         holder.messageTextView.visibility = View.GONE
         holder.messageImageView.visibility = View.GONE
 
-//        if (TextUtils.isEmpty(message.createTime)) {
-//            holder.dateTextView.visibility = View.GONE
-//        } else {
+        if (TextUtils.isEmpty(message.createTime)) {
+            holder.dateTextView.visibility = View.GONE
+        } else {
             holder.dateTextView.visibility = View.VISIBLE
-            holder.dateTextView.text = message.createTime
-//        }
+
+        }
 
         when (true) {
 //            message.additionalData.isSending -> setSendingUI(holder)
 //            message.additionalData.errorSending -> setErrorMessageUI(holder)
             else -> {
-                //  holder.timeImageView.setImageResource(R.drawable.ic_sent)
+
 
                 if (message.senderId == PreferenceUtils.getUserId(context))
                     holder.messageRelativeLayout.setBackgroundResource(R.drawable.rounded_rectangle_green)
@@ -132,37 +132,51 @@ class MessageRecyclerAdapter(
                 } else if (message.senderId == PreferenceUtils.getUserId(context)){
                     holder.sent_name!!.text = PreferenceUtils.getDriverName(context)
                 }
-                
-//                if (message.read && message.isMine) {
-//                    holder.timeTextView.text = context.getString(R.string.seen)
-//                    holder.timeTextView.setTextColor(Utils.getColor(context, R.color.colorSeenMessage))
-//                } else {
-////                    holder.timeTextView.text = message.additionalData.time
-////                    holder.timeTextView.setTextColor(Utils.getColor(context, R.color.colorAvatarBackground))
-//                }
 
-//                if (Utils.hasMessageMedia(message)) {
-//                    holder.messageImageView.visibility = View.VISIBLE
-//                    if (!TextUtils.isEmpty(message.imageUrl)) {
-//                        Glide.with(context)
-//                                .load(message.imageUrl)
-//                                .into(holder.messageImageView)
-//                    }
-//
-//                    if (!TextUtils.isEmpty(message.videoUrl)) {
-//                        holder.messageVideoImageView.visibility = View.VISIBLE
-//                        Glide.with(context)
-//                                .load(message.videoUrl)
-//                                .into(holder.messageImageView)
-//                    }
-//                }
             }
         }
 
         if (!TextUtils.isEmpty(message.content)) {
             holder.messageTextView.visibility = View.VISIBLE
             holder.messageTextView.text = message.content
+
         }
+
+        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
+        var previousDate2: String = ""
+        if (previousDate2 == messageDate) {
+            message.createTime = ""
+            holder.dateTextView.text = ""
+        } else {
+
+            previousDate2 = messageDate
+
+        }
+
+        holder.dateTextView.text = messageDate
+
+
+
+            var messageTime = DateFormat.formatTime(message.createTime, DateFormat.TIME_FORMAT_MESSAGE_DETAILS)
+        messageTime = DateFormat.formatTimeDetailsMessage(message.createTime, messageTime)
+//        var previousDate: String = ""
+//            if (previousDate == messageTime) {
+//                message.createTime = ""
+//                holder.timeTextView.text = " "
+//            } else {
+//                message.createTime = messageTime
+//                previousDate = messageTime
+//
+//            }
+
+            //message.createTime = messageDate
+
+        holder.timeTextView.text = messageTime
+
+
+
+
 //        Glide.with(context).load(avatar)
 //                .apply(RequestOptions.placeholderOf(R.drawable.ic_placeholder))
 //                .apply(RequestOptions.errorOf(R.drawable.ic_placeholder))

@@ -187,7 +187,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
         val number = phone1?.text.toString()
         val code = code1?.text.toString()
-        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNmM3NmViMTdkNDQyMTc3MGFlMTg4ZCIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6IlByb2JhIiwibGFzdE5hbWUiOiJCcm9rZXIyIiwidXNlclR5cGUiOjMsImlhdCI6MTU1ODcxOTA1MCwiZXhwIjoxNTU5MzIzODUwfQ.usN9c9PKq6rp3sdpelNpfoLGs9pOp133N-mkAZebEHU"
+        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6Ik9saXZlciIsImxhc3ROYW1lIjoiQm96aW5vdnNraSIsInVzZXJUeXBlIjo2LCJpYXQiOjE1NTg4NTc4OTQsImV4cCI6MTU1OTQ2MjY5NH0.op0O3BnID_VM_-QsWnTMIWK4Rsg3_ynJig4qcwxVKw8"
 val id = "5c7ac90b9ce4ba08c29a72b6"
         PreferenceUtils.saveUserId(this@LoginPane, id)
 

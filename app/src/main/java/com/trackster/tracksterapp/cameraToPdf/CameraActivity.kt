@@ -34,8 +34,8 @@ import com.google.gson.Gson
 import android.R.id.edit
 import android.content.Context
 import android.content.SharedPreferences
-
-
+import android.widget.Switch
+import com.trackster.tracksterapp.R
 
 
 class CameraActivity : AppCompatActivity() {
@@ -51,7 +51,8 @@ class CameraActivity : AppCompatActivity() {
     private val JPG_EXT = ".jpg"
     private val PNG_EXT = ".png"
     val REQUEST_IMAGE_CAPTURE = 3
-    var i : Int = 0
+    var i: Int = 0
+
 
 
     lateinit var fileName: String
@@ -82,7 +83,7 @@ class CameraActivity : AppCompatActivity() {
         }
 
         fab_switch_camera.setOnClickListener {
-//            switchCamera()
+            //            switchCamera()
             val intent = Intent(Intent.ACTION_SEND_MULTIPLE)
             val uris = ArrayList<Uri>()
             //convert from paths to Android friendly Parcelable Uri's
@@ -95,12 +96,24 @@ class CameraActivity : AppCompatActivity() {
             intent.type = "application/pdf"
             startActivity(Intent.createChooser(intent, "Send"))
         }
+        fab_flash.setBackgroundResource(R.drawable.flash1)
 
         fab_flash.setOnClickListener {
-            changeFlashState()
+
+
+
+                changeFlashState()
+
+
+
+
+
+
         }
 
+
     }
+
     private fun createFotoapparat() {
         val cameraView = findViewById<CameraView>(com.trackster.tracksterapp.R.id.camera_view)
 
@@ -163,12 +176,13 @@ class CameraActivity : AppCompatActivity() {
             activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         }
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if ((requestCode == REQUEST_IMAGE_CAPTURE )
-            && resultCode == Activity.RESULT_OK)
-        {
+        if ((requestCode == REQUEST_IMAGE_CAPTURE)
+            && resultCode == Activity.RESULT_OK
+        ) {
             probaPdf(tmpUri)
         }
     }
@@ -190,7 +204,7 @@ class CameraActivity : AppCompatActivity() {
         document.add(image)
         document.close()
         modelPDF.add(document)
-       modelString.add(directoryPath)
+        modelString.add(directoryPath)
         return f
     }
 

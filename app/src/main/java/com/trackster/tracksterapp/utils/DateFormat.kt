@@ -14,7 +14,7 @@ enum class DateFormat(val format: String) {
 
 
     companion object {
-        private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS Z", Locale.US)
+        private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
 
         fun formatDate(value: String?, dateFormat: DateFormat): String {
             if (value == null)
@@ -56,6 +56,38 @@ enum class DateFormat(val format: String) {
 
             return returnDate
         }
-    }
 
+
+        private val TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+
+        fun formatTime(value: String?, dateFormat: DateFormat): String {
+            if (value == null)
+                return ""
+
+            val date: Date?
+            try {
+                date = DateFormat.TIME_FORMAT.parse(value)
+            } catch (e: ParseException) {
+                Log.e("TVChat", String.format(Locale.US, "Could not parse date %s", value))
+                return value
+            }
+
+            return SimpleDateFormat(dateFormat.format, Locale.getDefault()).format(date)
+        }
+
+        fun formatTimeDetailsMessage(dateString: String, returnTime: String): String {
+            val nowDate = Calendar.getInstance()
+            val pastDate = Calendar.getInstance()
+            try {
+                pastDate.time = DateFormat.TIME_FORMAT.parse(dateString)
+            } catch (e: ParseException) {
+                Log.e("TVChat", String.format(Locale.US, "Could not parse date %s", dateString))
+            }
+
+
+            return returnTime
+        }
+    }
 }
+
+
