@@ -2,6 +2,7 @@ package com.trackster.tracksterapp.chat
 
 import android.Manifest
 import android.app.Activity
+import android.app.PendingIntent.getActivity
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -105,9 +106,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     // aws
     private var s3Client: AmazonS3Client? = null
-//    private var transferUtility: TransferUtility? = null
-
-    private var isMotherphone = false
 
     private val compositeDisposable = CompositeDisposable()
 //    override fun onClick(p0: View?) {
@@ -122,32 +120,18 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initViews()
+        getMessages()
 
         initMutualViews()
-
-
-//            initAWS()
-        initViews()
-//            handleIntent()
         initMessageList()
-        getMessages()
+
 
         FILE_RECORDING = "${externalCacheDir.absolutePath}/recorder.aac"
 
         setButtonRecordListener()
         setButtonPlayRecordingListener()
         enableDisableButtonPlayRecording()
-
-
-//            compositeDisposable.add(RxBus.listen(ClearPendingMessageEvent::class.java).subscribe {
-//                pendingMessageUploaded()
-//            })
-//
-//
-//            listenForUploadReady()
-//            if (FeedMediaManager.uploadsCounter > 0 || DetailsMediaManager.uploadsCounter > 0) {
-//                setPaddingSendMessageRelativeLayout(true)
-//            }
     }
 
     override fun onResume() {
@@ -339,24 +323,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    var brokerName = it.broker.firstName
-                    var brokerLastName = it.broker.lastName
-                    var brokerFullName = brokerName + " " + brokerLastName
-                    var driverName = it.driver.firstName
-                    var driverLastName = it.driver.lastName
-                    var driverFullName = driverName + " " + driverLastName
-                    var carrierName = it.carrier.firstName
-                    var carrierLastName = it.carrier.lastName
-                    var carrierFullName = carrierName + " " + carrierLastName
-
-                    var brokerId = it.broker.id
-                    var carrierId = it.carrier.id
-
-                    PreferenceUtils.saveBrokerName(this@ChatDetails, brokerFullName)
-                    PreferenceUtils.saveDriverName(this@ChatDetails, driverFullName)
-                    PreferenceUtils.saveCarrierName(this@ChatDetails, carrierFullName)
-                    PreferenceUtils.saveBrokerId(this@ChatDetails, brokerId)
-                    PreferenceUtils.saveCarrierId(this@ChatDetails, carrierId)
 //                    mutableListMessages = it.message
                     mutableListMessages = it.message
                     setData(mutableListMessages)
@@ -518,10 +484,8 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun postAudio() {
-
         val file = File(FILE_RECORDING)
         val requestBody: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-
 // MultipartBody.Part is used to send also the actual file name
         val body =
             MultipartBody.Part.createFormData("document", file.name, requestBody)
@@ -669,7 +633,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun postMessage(message: Message) {
-
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
             apiService.postMessage(
@@ -780,6 +743,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         document.add(image)
         document.close()
         postPDF(f)
+        adapter.notifyDataSetChanged()
         return f
     }
 
