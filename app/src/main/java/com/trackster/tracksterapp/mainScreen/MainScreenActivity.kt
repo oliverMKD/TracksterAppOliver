@@ -23,12 +23,10 @@ import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.transition.Slide
 import android.transition.TransitionManager
+import android.util.AttributeSet
 import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.Toast
+import android.widget.*
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -89,6 +87,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     var compositeDisposableContainer = CompositeDisposable()
     var modelStringPDF: MutableList<String?> = mutableListOf()
     var modelStringPNG: MutableList<String?> = mutableListOf()
+    var modelStringAudio: MutableList<String?> = mutableListOf()
     lateinit var modelProba: ArrayList<Message>
 
     private lateinit var locationCallback: LocationCallback
@@ -355,31 +354,50 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //                    this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
 //                    this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
 //                    var messageSize = PreferenceUtils.getSize(this@MainScreenActivity)
-                    if (PreferenceUtils.getSize(this@MainScreenActivity) == it.message.size) {
-                        Log.d("getFileFromServer", "1111")
-                    } else {
-                        val diff = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
-                        
-                        val iterator = it.message.listIterator()
+//                    if (PreferenceUtils.getSize(this@MainScreenActivity)!! == it.message.size) {
+//                        Log.d("getFileFromServer", "1111")
+//                    } else {
+//                        val diff = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
+                    val brokerName = it.broker.firstName
+                    val brokerLastName = it.broker.lastName
+                    val brokerFullName = "$brokerName $brokerLastName"
+                    val driverName = it.driver.firstName
+                    val driverLastName = it.driver.lastName
+                    val driverFullName = "$driverName $driverLastName"
+                    val carrierName = it.carrier.firstName
+                    val carrierLastName = it.carrier.lastName
+                    val carrierFullName = "$carrierName $carrierLastName"
+                    val brokerId = it.broker.id
+                    val carrierId = it.carrier.id
+                    PreferenceUtils.saveBrokerName(this@MainScreenActivity, brokerFullName)
+                    PreferenceUtils.saveDriverName(this@MainScreenActivity, driverFullName)
+                    PreferenceUtils.saveCarrierName(this@MainScreenActivity, carrierFullName)
+                    PreferenceUtils.saveBrokerId(this@MainScreenActivity, brokerId)
+                    PreferenceUtils.saveCarrierId(this@MainScreenActivity, carrierId)
+
+
+
+                    val iterator = it.message.listIterator()
                         for (item in iterator) {
                             if (item.file != null) {
                                 if (item.file!!.filename != null) {
                                     getFileFromServer(item.file!!.filename!!)
-                                    var size = it.message.size
-                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+//                                    val size = it.message.size
+//                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
                                 } else {
-                                    var size = it.message.size
-                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
-                                    Log.d("getFileFromServer", "1111")
+//                                    var size = it.message.size
+//                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+                                    Log.e("getFileFromServer", "1111")
                                 }
                             } else {
-                                var size = it.message.size
-                                PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+//                                var size = it.message.size
+//                                PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
                                 Log.d("getFileFromServer", "22222")
                             }
                         }
-                    }
-                }, {
+//                    }
+                },
+                    {
                     Log.d("getFileFromServer", "22222")
                 })
         )
@@ -408,7 +426,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         try {
 // todo change the file location/name according to your needs
 
-            var retrofitBetaFile = File(getExternalFilesDir(null).toString() + File.separator + fileName)
+            val retrofitBetaFile = File(getExternalFilesDir(null).toString() + File.separator + fileName)
             Timber.e(retrofitBetaFile.path)
             var inputStream: InputStream? = null
             var outputStream: OutputStream? = null
@@ -435,19 +453,31 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
                 outputStream!!.flush()
 
-                if (fileName.contains(".pdf")) {
-                    var uri = Uri.fromFile(retrofitBetaFile)
-                    generateImageFromPdf(uri)
-                }
-                if (fileName.contains(".png")) {
-                    var pngString = retrofitBetaFile.toString()
-                    modelStringPNG.add(pngString)
-                    var sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
-                    var editor = sharedPreferences.edit()
-                    var gson = Gson()
-                    var json = gson.toJson(modelStringPNG)
-                    editor.putString("png", json)
-                    editor.apply()
+                when {
+                    fileName.contains(".pdf") -> {
+                        val uri = Uri.fromFile(retrofitBetaFile)
+                        generateImageFromPdf(uri)
+                    }
+                    fileName.contains(".png") -> {
+                        val pngString = retrofitBetaFile.toString()
+                        modelStringPNG.add(pngString)
+                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        val gson = Gson()
+                        val json = gson.toJson(modelStringPNG)
+                        editor.putString("png", json)
+                        editor.apply()
+                    }
+                    fileName.contains(".aac") -> {
+                        val audioString = retrofitBetaFile.toString()
+                        modelStringAudio.add(audioString)
+                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        val gson = Gson()
+                        val json = gson.toJson(modelStringAudio)
+                        editor.putString("aac", json)
+                        editor.apply()
+                    }
                 }
 
                 return true
@@ -496,10 +526,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             val domain: String? = name.substringAfterLast("/")
             val file = File(folder, "$domain.png")
             modelStringPDF.add(file.toString())
-            var sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
-            var editor = sharedPreferences.edit()
-            var gson = Gson()
-            var json = gson.toJson(modelStringPDF)
+            val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            val gson = Gson()
+            val json = gson.toJson(modelStringPDF)
             editor.putString("sliki", json)
             editor.apply()
             out = FileOutputStream(file)
@@ -730,15 +760,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-
-
         if (profileSettings.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, profileSettings)
-
         } else {
             fragmentTransaction.add(R.id.fragment_container, profileSettings)
             fragmentTransaction.addToBackStack("profileSettingsFragment")
-
         }
         fragmentTransaction.commit()
     }

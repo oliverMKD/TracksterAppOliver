@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:targetApi="LOLLIPOP">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:targetApi="LOLLIPOP">
 
     <TextView
-        android:id="@+id/date_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/colorMessageDate"
-        android:textSize="12.3sp" />
+            android:id="@+id/date_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorMessageDate"
+            android:textSize="12.3sp"/>
 
     <ImageView
-        android:id="@+id/avatar_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
+            android:id="@+id/avatar_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
     <TextView
             android:id="@+id/sent_name"
             android:text="John Doe"
@@ -27,41 +27,59 @@
             android:textSize="12sp"
             android:layout_below="@id/date_text_view"
             android:textColor="@color/black"
-android:layout_alignParentEnd="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="12dp"
 
 
     />
     <RelativeLayout
-        android:id="@+id/message_relative_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+            android:id="@+id/message_relative_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
 
-        android:layout_below="@id/sent_name"
-android:background="@drawable/rounded_rectangle_green"
-        android:layout_marginEnd="@dimen/message_relative_layout_margin"
-        android:layout_marginStart="@dimen/message_relative_layout_marginStartEnd"
-        android:layout_marginTop="@dimen/message_relative_layout_margin"
-       >
+            android:layout_below="@id/sent_name"
+            android:background="@drawable/rounded_rectangle_green"
+            android:layout_marginEnd="@dimen/message_relative_layout_margin"
+            android:layout_marginStart="@dimen/message_relative_layout_marginStartEnd"
+            android:layout_marginTop="@dimen/message_relative_layout_margin"
+    >
         <ImageView
                 android:id="@+id/message_image_view"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/my_message_image_view_height"
                 android:padding="@dimen/message_image_view_padding"
-                android:visibility="gone" />
-        <!--<ImageView-->
-            <!--android:id="@+id/message_video_image_view"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignBottom="@id/message_image_view"-->
-            <!--android:layout_alignEnd="@id/message_image_view"-->
-            <!--android:layout_alignStart="@id/message_image_view"-->
-            <!--android:layout_alignTop="@id/message_image_view"-->
-            <!--android:visibility="gone"-->
-            <!--app:srcCompat="@drawable/ic_video" />-->
+                android:visibility="gone"/>
 
+        <Button
+                android:id="@+id/ivPlayPause"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerVertical="true"
+                android:visibility="gone"
+                android:layout_margin="8dp"
+                android:text="@string/playRecord"
+                android:src="@drawable/play_audio"
+        />
+
+        <SeekBar
+                android:id="@+id/sbProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:visibility="gone"
+                android:layout_toRightOf="@id/ivPlayPause"/>
+        <!--<ImageView-->
+        <!--android:id="@+id/message_video_image_view"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignBottom="@id/message_image_view"-->
+        <!--android:layout_alignEnd="@id/message_image_view"-->
+        <!--android:layout_alignStart="@id/message_image_view"-->
+        <!--android:layout_alignTop="@id/message_image_view"-->
+        <!--android:visibility="gone"-->
+        <!--app:srcCompat="@drawable/ic_video" />-->
 
 
         <TextView
@@ -73,17 +91,17 @@ android:background="@drawable/rounded_rectangle_green"
                 android:minWidth="@dimen/my_message_text_view_min_width"
                 android:padding="@dimen/message_text_view_padding"
                 android:textColor="@color/black"
-                android:textSize="16.7sp" />
+                android:textSize="16.7sp"/>
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/time_linear_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/message_relative_layout"
+            android:id="@+id/time_linear_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/message_relative_layout"
 
-        android:layout_marginEnd="@dimen/message_relative_layout_margin">
+            android:layout_marginEnd="@dimen/message_relative_layout_margin">
 
         <TextView
                 android:id="@+id/time_text_view"
@@ -99,24 +117,24 @@ android:background="@drawable/rounded_rectangle_green"
         />
 
         <!--<TextView-->
-            <!--android:id="@+id/time_text_view"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:layout_marginStart="@dimen/time_text_view_margin_right"-->
-            <!--android:textColor="@color/colorAccent"-->
-            <!--android:textSize="12sp" />-->
+        <!--android:id="@+id/time_text_view"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginStart="@dimen/time_text_view_margin_right"-->
+        <!--android:textColor="@color/colorAccent"-->
+        <!--android:textSize="12sp" />-->
 
         <TextView
-            android:id="@+id/time_try_again_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="@dimen/time_text_view_margin_right"
-            android:text="@string/try_again"
-            android:textColor="@color/errorMessageBackground"
-            android:textSize="16sp"
-            android:visibility="gone" />
+                android:id="@+id/time_try_again_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/time_text_view_margin_right"
+                android:text="@string/try_again"
+                android:textColor="@color/errorMessageBackground"
+                android:textSize="16sp"
+                android:visibility="gone"/>
 
     </LinearLayout>
 

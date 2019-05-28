@@ -33,7 +33,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:paddingTop="@dimen/nav_header_vertical_spacing"
-                    android:text="@string/nav_header_title"
                     android:textColor="@color/White"
             />
             <LinearLayout

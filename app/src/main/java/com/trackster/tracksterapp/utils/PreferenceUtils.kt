@@ -24,6 +24,7 @@ object PreferenceUtils {
     private const val MESS_SIZE = "mess_size"
     private const val PDF_SIZE = "pdf_size"
     private const val PNG_SIZE = "png_size"
+    private const val AAC_SIZE = "aac_size"
 
     private fun getPreferences(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -120,4 +121,9 @@ object PreferenceUtils {
         getPreferences(context)[PNG_SIZE] = id
     }
     fun getPNGSize(context: Context): Int? = getPreferences(context).getInt(PNG_SIZE, 0)
+
+    fun saveAudioSize(context: Context, id: Int) {
+        getPreferences(context)[AAC_SIZE] = id
+    }
+    fun getAudioSize(context: Context): Int? = getPreferences(context).getInt(AAC_SIZE, 0)
 }

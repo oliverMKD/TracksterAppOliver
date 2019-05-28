@@ -4,6 +4,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 tools:targetApi="LOLLIPOP">
 
     <TextView
@@ -60,6 +61,25 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/message_image_view_padding"
                 android:visibility="gone"/>
+
+        <Button
+                android:id="@+id/ivPlayPause"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerVertical="true"
+                android:text="@string/playRecord"
+                android:visibility="gone"
+                android:layout_margin="8dp"
+                android:src="@drawable/play_audio"
+                />
+
+        <SeekBar
+                android:id="@+id/sbProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:visibility="gone"
+                android:layout_toRightOf="@id/ivPlayPause"/>
 
         <!--<ImageView-->
         <!--android:id="@+id/message_video_image_view"-->
