@@ -2,15 +2,14 @@ package com.trackster.tracksterapp.chat
 
 import android.Manifest
 import android.app.Activity
-import android.app.PendingIntent.getActivity
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.media.ExifInterface
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -29,16 +28,18 @@ import android.widget.*
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.pdf.PdfWriter
-import com.shockwave.pdfium.PdfiumCore
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.MessageRecyclerAdapter
 import com.trackster.tracksterapp.base.BaseChatActivity
 import com.trackster.tracksterapp.base.TracksterApplication
 import com.trackster.tracksterapp.firebase.FirebaseUtils
+import com.trackster.tracksterapp.main.MainActivity
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.Contact
 import com.trackster.tracksterapp.model.Files
@@ -50,19 +51,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_chat_details.*
-import kotlinx.android.synthetic.main.activity_load_details.view.*
-import kotlinx.android.synthetic.main.recycler_history.*
-import okhttp3.*
+import kotlinx.coroutines.android.awaitFrame
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
-import timber.log.Timber
-import java.io.*
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.io.File
+import java.io.FileOutputStream
 
 
 class ChatDetails() : BaseChatActivity(), View.OnClickListener {
@@ -85,6 +79,8 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     private lateinit var adapter: MessageRecyclerAdapter
     private var mutableListMessages: MutableList<Message> = mutableListOf()
     private var audioListMessages: MutableList<Files> = mutableListOf()
+    private var listMessagesPhotos: ArrayList<String> = arrayListOf()
+
 
     private var files: Files? = null
     private var contact: Contact? = null
@@ -97,6 +93,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     private var observerId: Int? = null
     lateinit var apkStorage: File
     private var file: Files? = null
+    private var createdBy: String? = null
+    private var senderId : String? = null
+    private var createdTime : String? = null
+
+    private lateinit var preloader: RecyclerViewPreloader<Any>
 
     private var isActivityVisible = false
 
@@ -127,11 +128,21 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val intent = intent
+        if (intent.hasExtra("testPreLoad")) {
+            listMessagesPhotos = intent.getStringArrayListExtra("testPreLoad")
+        }
+        val preloadSizeProvider = ViewPreloadSizeProvider<Any>()
+        val modelProvider = MyPreloadModelProvider(listMessagesPhotos, this)
+        preloader = RecyclerViewPreloader(Glide.with(this), modelProvider, preloadSizeProvider, 200 /*maxPreload*/)
         initViews()
         getMessages()
 
         initMutualViews()
         initMessageList()
+
+
 
 
         FILE_RECORDING = "${externalCacheDir.absolutePath}/recorder.aac"
@@ -330,10 +341,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-//                    mutableListMessages = it.message
+                    //                    mutableListMessages = it.message
                     mutableListMessages = it.message
                     setData(mutableListMessages)
                     scrollToBottom()
+
                     //                Log.d("station", " "+ it[0].location)
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
@@ -356,7 +368,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun setDateForMessage(message: Message) {
-       // val additionalData = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
+        // val additionalData = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
 //
 //        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
 //        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
@@ -367,15 +379,12 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 //            previousDate = messageDate
 //        }
 
-      ///  var nova_data : String = ""
+        ///  var nova_data : String = ""
         //nova_data = DateFormat.formatDate(additionalData,DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-       // LocalDateTime.parse(nova_data, ISODateTimeFormat.dateTimeParser())
+        // LocalDateTime.parse(nova_data, ISODateTimeFormat.dateTimeParser())
 
 
-
-
-      //  message.createTime = nova_data
-
+        //  message.createTime = nova_data
 
 
     }
@@ -385,7 +394,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
             R.id.button_send_msg -> {
                 sendMessage(
                     DetailsMediaManager.createMessage(
-                        this, sendMessageEditText?.text.toString(), "1234", file
+                        this, sendMessageEditText?.text.toString(),
+                        PreferenceUtils.getUserId(this@ChatDetails),
+                        PreferenceUtils.getUserId(this@ChatDetails),
+                        PreferenceUtils.getUserId(this@ChatDetails),
+                        "123", file
                     )!!
                 )
                 clearMessage()
@@ -515,9 +528,23 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    setAudioFile(it)
-                    audioListMessages.add(it)
-                    scrollToBottom()
+                   val thread = object:Thread() {
+                       override fun run() {
+                           try
+                           {
+                               synchronized (this) {
+                                   runOnUiThread {
+                                      getMessages()
+                                   }
+                               }
+                           }
+                           catch (e:InterruptedException) {
+                               e.printStackTrace()
+                           }
+                       }
+                    }
+                    thread.start()
+
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
                     //                showProgress(false)
@@ -541,11 +568,22 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    setAudioFile(it)
-                    audioListMessages.add(it)
-
-//                    adapter.setAudioData(createAudioData())
-                    scrollToBottom()
+                    val thread = object:Thread() {
+                        override fun run() {
+                            try
+                            {
+                                synchronized (this) {
+                                    runOnUiThread {
+                                        getMessages()
+                                    }
+                                }
+                            }
+                            catch (e:InterruptedException) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                    thread.start()
 
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
@@ -561,20 +599,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     private fun createAudioData(): MutableList<Files> =
         audioListMessages.asSequence().toMutableList()
-
-
-//            R.id.img_selector_image_view -> addMedia()
-//            R.id.send_message_image_view -> {
-//                if (contact != null) {
-//                    AnswersAnalyticsHandler.logChatDetailsUserAction("Send_Message", contact!!.id, this)
-//
-//                    if (isMessageSendable) {
-//                        sendMessage(DetailsMediaManager.createMessage(this, contact!!.id, hasMedia, isMediaPortrait,
-//                            sendMessageEditText?.text.toString())!!)
-//                        clearMessage()
-//                    }
-//                }
-//            }
 
 
     private fun clearMessage() {
@@ -593,7 +617,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 //           uploadAudio(file)
 
         } else {
-            postAudio()
+            doAsync {
+                postAudio()
+            }.execute()
         }
 
 //        DetailsMediaManager.mutableListSendingAudio.add(file)
@@ -752,15 +778,23 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         PdfWriter.getInstance(document, FileOutputStream(f)) // Change pdf's name.
         document.open()
         val image = Image.getInstance(uri?.path!!) // Change image's name and extension.
-        val scaler = (((((document.getPageSize().getWidth() - document.leftMargin()
-                - document.rightMargin() - 0)) / image.getWidth())) * 100) // 0 means you have no indentation. If you have any, change it.
+        val scaler = (((((document.pageSize.width - document.leftMargin()
+                - document.rightMargin() - 0)) / image.width)) * 100) // 0 means you have no indentation. If you have any, change it.
         image.scalePercent(scaler)
-        image.setAlignment(Image.ALIGN_CENTER or Image.ALIGN_TOP)
+        image.alignment = Image.ALIGN_CENTER or Image.ALIGN_TOP
         document.add(image)
         document.close()
-        postPDF(f)
-        adapter.notifyDataSetChanged()
+        doAsync {
+            postPDF(f)
+        }.execute()
+
         return f
+    }
+    class doAsync(val handler: () -> Unit) : AsyncTask<Void, Void, Void>() {
+        override fun doInBackground(vararg params: Void?): Void? {
+            handler()
+            return null
+        }
     }
 
     private fun setMedia(uri: Uri?) {

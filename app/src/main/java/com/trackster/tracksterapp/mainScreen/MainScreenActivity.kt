@@ -6,15 +6,13 @@ import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
+import android.os.*
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
@@ -23,10 +21,12 @@ import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.transition.Slide
 import android.transition.TransitionManager
-import android.util.AttributeSet
 import android.util.Log
 import android.view.*
-import android.widget.*
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -49,16 +49,10 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.cameraToPdf.CameraActivity
 import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.mainScreen.fragments.*
-import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
-import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
-import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
-import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
 import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
-import com.trackster.tracksterapp.selectTrailer.fragments.SelectColorFragment
-import com.trackster.tracksterapp.selectTrailer.fragments.SelectTruckFragment
 import com.trackster.tracksterapp.utils.DialogUtils
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -68,6 +62,7 @@ import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
 import kotlinx.android.synthetic.main.nav_header_main_screen.*
 import okhttp3.ResponseBody
+import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
@@ -87,9 +82,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private var mDelayHandler: Handler? = null
     var compositeDisposableContainer = CompositeDisposable()
     var modelStringPDF: MutableList<String?> = mutableListOf()
-    var modelStringPNG: MutableList<String?> = mutableListOf()
+    var model: ArrayList<String?> = arrayListOf()
     var modelStringAudio: MutableList<String?> = mutableListOf()
-    lateinit var modelProba: ArrayList<Message>
 
     private lateinit var locationCallback: LocationCallback
     // 2
@@ -214,19 +208,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
-
-
-
     public fun show() {
         attach.visibility = View.VISIBLE
         hamburger.visibility = View.VISIBLE
         floatBtn.show()
         chat.visibility = View.VISIBLE
     }
-
-
-
-
 
 
     override fun onClick(p0: View?) {
@@ -236,7 +223,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 getUserInfo()
             }
             R.id.chat -> {
-                startActivity(Intent(this@MainScreenActivity, ChatDetails::class.java))
+                val intent : Intent = Intent(this@MainScreenActivity, ChatDetails::class.java)
+                intent.putStringArrayListExtra("testPreLoad",model)
+                startActivity(intent)
             }
             R.id.attach -> {
                 startActivity(Intent(this@MainScreenActivity, CameraActivity::class.java))
@@ -245,9 +234,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         }
     }
-
-
-
 
 
     private fun getUserInfo() {
@@ -393,34 +379,31 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     PreferenceUtils.saveCarrierId(this@MainScreenActivity, carrierId)
 
 
-
                     val iterator = it.message.listIterator()
-                        for (item in iterator) {
-                            if (item.file != null) {
-                                if (item.file!!.filename != null) {
+                    for (item in iterator) {
+                        if (item.file != null) {
+                            if (item.file!!.filename != null) {
+                                doAsync {
                                     getFileFromServer(item.file!!.filename!!)
-//                                    val size = it.message.size
-//                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
-                                } else {
-//                                    var size = it.message.size
-//                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
-                                    Log.e("getFileFromServer", "1111")
-                                }
+                                }.execute()
                             } else {
-//                                var size = it.message.size
-//                                PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
-                                Log.d("getFileFromServer", "22222")
+                                Log.e("getFileFromServer", "1111")
                             }
+                        } else {
+                            Log.d("getFileFromServer", "22222")
                         }
+                    }
 //                    }
                 },
                     {
-                    Log.d("getFileFromServer", "22222")
-                })
+                        Log.d("getFileFromServer", "22222")
+                    })
         )
     }
 
-    fun getFileFromServer(filename: String) {
+
+
+    private fun getFileFromServer(filename: String) {
         apiService = PostApi.create(this@MainScreenActivity)
         compositeDisposable.add(
             apiService.getFileById(
@@ -437,6 +420,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     Log.d("destinacija", "" + it.localizedMessage)
                 })
         )
+    }
+    class doAsync(val handler: () -> Unit) : AsyncTask<Void, Void, Void>() {
+        override fun doInBackground(vararg params: Void?): Void? {
+            handler()
+            return null
+        }
     }
 
     private fun writeResponseBodyToDisk(body: ResponseBody?, fileName: String): Boolean {
@@ -477,12 +466,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     }
                     fileName.contains(".png") -> {
                         val pngString = retrofitBetaFile.toString()
-                        modelStringPNG.add(pngString)
+                        modelStringPDF.add(pngString)
+                        model.add(pngString)
                         val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
                         val editor = sharedPreferences.edit()
                         val gson = Gson()
-                        val json = gson.toJson(modelStringPNG)
-                        editor.putString("png", json)
+                        val json = gson.toJson(modelStringPDF)
+                        editor.putString("sliki", json)
                         editor.apply()
                     }
                     fileName.contains(".aac") -> {
@@ -534,6 +524,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
     private fun saveImage(bmp: Bitmap, name: String) {
+        var o = BitmapFactory.Options()
+        o.inJustDecodeBounds = true
+        o.inSampleSize = 6
         val FOLDER = Environment.getExternalStorageDirectory().toString() + "/PDF"
         var out: FileOutputStream? = null
         try {
@@ -543,6 +536,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             val domain: String? = name.substringAfterLast("/")
             val file = File(folder, "$domain.png")
             modelStringPDF.add(file.toString())
+            model.add(file.toString())
             val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             val gson = Gson()
@@ -550,7 +544,29 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             editor.putString("sliki", json)
             editor.apply()
             out = FileOutputStream(file)
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, out) // bmp is your Bitmap instance
+
+            val REQUIRED_SIZE = 75
+
+            // Find the correct scale value. It should be the power of 2.
+            var scale = 1
+            while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                o.outHeight / scale / 2 >= REQUIRED_SIZE
+            ) {
+                scale *= 2
+            }
+
+            var o2 = BitmapFactory.Options()
+            o2.inSampleSize = scale;
+            var inputStream = FileInputStream(file)
+
+            var selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2)
+            inputStream.close()
+
+            // here i override the original image file
+            file.createNewFile()
+            var outputStream = FileOutputStream(file)
+
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream) // bmp is your Bitmap instance
         } catch (e: Exception) {
             //todo with exception
         } finally {
@@ -846,8 +862,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
-
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
 
@@ -873,7 +887,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 hide()
 
             }
-
 
 
         }
@@ -922,6 +935,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         openProfileSettingsFragment()
         fragmentTransaction.commit()
     }
+
     fun getSelectedColorDouble(name: String) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()

@@ -182,8 +182,8 @@ object DetailsMediaManager {
 
     private fun createUrl(activity: Activity): String = ConfigManager.getAWSCDNUrl(activity) + MESSAGES + File.separator + fileName
 
-    fun createMessage(activity: Activity, content: String?,id : String, file : Files?): Message? {
-        return Message(id, content!!,"","","",file)
+    fun createMessage(activity: Activity, content: String?,createdBy : String?,senderId : String?,createdTime : String?, id : String, file : Files?): Message? {
+        return Message(id, content!!,createdBy!!,senderId!!,createdTime!!,file)
     }
     fun createAudio(activity: Activity, document: String): File? {
         return File(document)

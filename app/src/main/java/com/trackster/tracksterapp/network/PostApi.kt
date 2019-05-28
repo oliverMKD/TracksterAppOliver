@@ -92,7 +92,7 @@ interface PostApi {
     @Multipart
     @POST("/chats/upload/{chatId}")
     fun postAudio(@Header("x-auth-token") authorization: String,
-                  @Path("chatId") chatId: String, @Part  image : MultipartBody.Part) : Single<Files>
+                  @Path("chatId") chatId: String, @Part  image : MultipartBody.Part) : Single<Message>
 
 
     @GET("/chats/{chatId}/files/{filename}")
