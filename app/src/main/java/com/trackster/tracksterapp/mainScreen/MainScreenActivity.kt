@@ -5,12 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
@@ -20,6 +23,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.transition.Slide
 import android.transition.TransitionManager
+import android.util.AttributeSet
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -29,7 +33,6 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -41,11 +44,16 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import com.priyankvasa.android.cameraviewex.ErrorLevel
+import com.shockwave.pdfium.PdfiumCore
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.cameraToPdf.CameraActivity
 import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.mainScreen.fragments.*
+import com.trackster.tracksterapp.mainScreen.fragments.Current_Load
+import com.trackster.tracksterapp.mainScreen.fragments.DetailsLoad
+import com.trackster.tracksterapp.mainScreen.fragments.HistoryList
+import com.trackster.tracksterapp.mainScreen.fragments.ProfileSettings
+import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
@@ -56,14 +64,14 @@ import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_login_pane.*
 import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
 import kotlinx.android.synthetic.main.nav_header_main_screen.*
-
+import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.HttpException
-import java.io.IOException
+import timber.log.Timber
+import java.io.*
 import java.net.SocketTimeoutException
 
 class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
@@ -78,7 +86,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private lateinit var mapsId: String
     private var mDelayHandler: Handler? = null
     var compositeDisposableContainer = CompositeDisposable()
-
+    var modelStringPDF: MutableList<String?> = mutableListOf()
+    var modelStringPNG: MutableList<String?> = mutableListOf()
+    var modelStringAudio: MutableList<String?> = mutableListOf()
+    lateinit var modelProba: ArrayList<Message>
 
     private lateinit var locationCallback: LocationCallback
     // 2
@@ -246,13 +257,14 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 PreferenceUtils.getAuthorizationToken(this!!)
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
                 {
-                    name_user.setText(it.body()!!.firstName+" "+it.body()!!.lastName)
+                    name_user.text = it.body()!!.firstName + " " + it.body()!!.lastName
 
                     Glide.with(this!!)
                         .load(it.body()!!.image)
                         .apply(RequestOptions.circleCropTransform())
                         .into(imageView_Drawer)
                 }, {
+                    handleApiError(it.cause)
                     Log.d("test", "error" + it.localizedMessage)
                 }
             )
@@ -268,8 +280,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         //Navigate with delay
         mDelayHandler!!.postDelayed(mRunnable, 5000)
     }
-
-
 
 
     private fun setUpMap() {
@@ -335,13 +345,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 .subscribe({
                     mapsId = it[0].id
                     PreferenceUtils.saveChatId(this, mapsId)
-//                getChatById(mapsId)
+                    getChatById(mapsId)
                     getWeightStations()
-
-                    //                Log.d("station", " "+ it[0].location)
                 }, {
-                    //                showProgress(false)
-                    handleApiError(it)
+                    handleApiError(it.cause)
                 })
 
         )
@@ -354,23 +361,205 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    val a = it.pickupAddress.location.lat
-                    val b = it.pickupAddress.location.long
-                    val c = it.destinationAddress.location.lat
-                    val d = it.destinationAddress.location.long
-                    latLngOrigin = LatLng(a, b)
-                    latLngDestination = LatLng(c, d)
-                    this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
-                    this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
-                    this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
+                    //                    val a = it.pickupAddress.location.lat
+//                    val b = it.pickupAddress.location.long
+//                    val c = it.destinationAddress.location.lat
+//                    val d = it.destinationAddress.location.long
+//                    latLngOrigin = LatLng(a, b)
+//                    latLngDestination = LatLng(c, d)
+//                    this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
+//                    this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
+//                    this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
+//                    var messageSize = PreferenceUtils.getSize(this@MainScreenActivity)
+//                    if (PreferenceUtils.getSize(this@MainScreenActivity)!! == it.message.size) {
+//                        Log.d("getFileFromServer", "1111")
+//                    } else {
+//                        val diff = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
+                    val brokerName = it.broker.firstName
+                    val brokerLastName = it.broker.lastName
+                    val brokerFullName = "$brokerName $brokerLastName"
+                    val driverName = it.driver.firstName
+                    val driverLastName = it.driver.lastName
+                    val driverFullName = "$driverName $driverLastName"
+                    val carrierName = it.carrier.firstName
+                    val carrierLastName = it.carrier.lastName
+                    val carrierFullName = "$carrierName $carrierLastName"
+                    val brokerId = it.broker.id
+                    val carrierId = it.carrier.id
+                    PreferenceUtils.saveBrokerName(this@MainScreenActivity, brokerFullName)
+                    PreferenceUtils.saveDriverName(this@MainScreenActivity, driverFullName)
+                    PreferenceUtils.saveCarrierName(this@MainScreenActivity, carrierFullName)
+                    PreferenceUtils.saveBrokerId(this@MainScreenActivity, brokerId)
+                    PreferenceUtils.saveCarrierId(this@MainScreenActivity, carrierId)
 
-                    //                Log.d("station", " "+ it[0].location)
-                }, {
-                    Log.d("destinacija", "" + it.localizedMessage)
-                    //                showProgress(false)
-//                    Utils.handleApiError(it)
+
+
+                    val iterator = it.message.listIterator()
+                        for (item in iterator) {
+                            if (item.file != null) {
+                                if (item.file!!.filename != null) {
+                                    getFileFromServer(item.file!!.filename!!)
+//                                    val size = it.message.size
+//                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+                                } else {
+//                                    var size = it.message.size
+//                                    PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+                                    Log.e("getFileFromServer", "1111")
+                                }
+                            } else {
+//                                var size = it.message.size
+//                                PreferenceUtils.saveMessSize(this@MainScreenActivity, size)
+                                Log.d("getFileFromServer", "22222")
+                            }
+                        }
+//                    }
+                },
+                    {
+                    Log.d("getFileFromServer", "22222")
                 })
         )
+    }
+
+    fun getFileFromServer(filename: String) {
+        apiService = PostApi.create(this@MainScreenActivity)
+        compositeDisposable.add(
+            apiService.getFileById(
+                PreferenceUtils.getAuthorizationToken(this@MainScreenActivity),
+                PreferenceUtils.getChatId(this@MainScreenActivity), filename
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    val writtenToDisk = writeResponseBodyToDisk(it.body(), filename)
+                    Log.d("writtenToDisk", "" + writtenToDisk.toString())
+
+                }, {
+                    Log.d("destinacija", "" + it.localizedMessage)
+                })
+        )
+    }
+
+    private fun writeResponseBodyToDisk(body: ResponseBody?, fileName: String): Boolean {
+        try {
+// todo change the file location/name according to your needs
+
+            val retrofitBetaFile = File(getExternalFilesDir(null).toString() + File.separator + fileName)
+            Timber.e(retrofitBetaFile.path)
+            var inputStream: InputStream? = null
+            var outputStream: OutputStream? = null
+
+            try {
+                val fileReader = ByteArray(4096)
+
+                val fileSize = body?.contentLength()
+                var fileSizeDownloaded: Long = 0
+
+                inputStream = body?.byteStream()
+                outputStream = FileOutputStream(retrofitBetaFile)
+
+                while (true) {
+                    val read = inputStream!!.read(fileReader)
+                    if (read == -1) {
+                        break
+                    }
+                    outputStream!!.write(fileReader, 0, read)
+                    fileSizeDownloaded += read.toLong()
+                    Log.d("writeResponseBodyToDisk", "file download: $fileSizeDownloaded of $fileSize")
+                }
+
+
+                outputStream!!.flush()
+
+                when {
+                    fileName.contains(".pdf") -> {
+                        val uri = Uri.fromFile(retrofitBetaFile)
+                        generateImageFromPdf(uri)
+                    }
+                    fileName.contains(".png") -> {
+                        val pngString = retrofitBetaFile.toString()
+                        modelStringPNG.add(pngString)
+                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        val gson = Gson()
+                        val json = gson.toJson(modelStringPNG)
+                        editor.putString("png", json)
+                        editor.apply()
+                    }
+                    fileName.contains(".aac") -> {
+                        val audioString = retrofitBetaFile.toString()
+                        modelStringAudio.add(audioString)
+                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        val gson = Gson()
+                        val json = gson.toJson(modelStringAudio)
+                        editor.putString("aac", json)
+                        editor.apply()
+                    }
+                }
+
+                return true
+            } catch (e: IOException) {
+                return false
+            } finally {
+                if (inputStream != null) {
+                    inputStream!!.close()
+                }
+
+                if (outputStream != null) {
+                    outputStream!!.close()
+                }
+            }
+        } catch (e: IOException) {
+            return false
+        }
+    }
+
+    public fun generateImageFromPdf(pdfUri: Uri) {
+        val pageNumber = 0
+        val pdfiumCore = PdfiumCore(this)
+        try {
+            //http://www.programcreek.com/java-api-examples/index.php?api=android.os.ParcelFileDescriptor
+            val fd = contentResolver.openFileDescriptor(pdfUri, "r")
+            val pdfDocument = pdfiumCore.newDocument(fd)
+            pdfiumCore.openPage(pdfDocument, pageNumber)
+            val width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber)
+            val height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber)
+            val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height)
+            saveImage(bmp, pdfUri.toString())
+            pdfiumCore.closeDocument(pdfDocument) // important!
+        } catch (e: Exception) {
+            //todo with exception
+        }
+    }
+
+    private fun saveImage(bmp: Bitmap, name: String) {
+        val FOLDER = Environment.getExternalStorageDirectory().toString() + "/PDF"
+        var out: FileOutputStream? = null
+        try {
+            val folder = File(FOLDER)
+            if (!folder.exists())
+                folder.mkdirs()
+            val domain: String? = name.substringAfterLast("/")
+            val file = File(folder, "$domain.png")
+            modelStringPDF.add(file.toString())
+            val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            val gson = Gson()
+            val json = gson.toJson(modelStringPDF)
+            editor.putString("sliki", json)
+            editor.apply()
+            out = FileOutputStream(file)
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, out) // bmp is your Bitmap instance
+        } catch (e: Exception) {
+            //todo with exception
+        } finally {
+            try {
+                out?.close()
+            } catch (e: Exception) {
+                //todo with exception
+            }
+        }
     }
 
     private fun placeMarkerOnMap(location: LatLng) {
@@ -526,7 +715,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 }
 
 
-            }, Response.ErrorListener { _ ->
+            }, Response.ErrorListener {
+                handleApiError(it)
             }) {}
         val requestQueue = Volley.newRequestQueue(this)
         requestQueue.add(directionsRequest)
@@ -587,15 +777,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-
-
         if (profileSettings.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, profileSettings)
-
         } else {
             fragmentTransaction.add(R.id.fragment_container, profileSettings)
             fragmentTransaction.addToBackStack("profileSettingsFragment")
-
         }
         fragmentTransaction.commit()
     }

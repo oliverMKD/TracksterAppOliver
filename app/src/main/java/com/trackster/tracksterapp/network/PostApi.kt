@@ -99,6 +99,9 @@ interface PostApi {
     fun getFiles(@Header("x-auth-token") authorization: String,
                     @Path("chatId") chatId: String, @Path("filename") filename : String ) : Observable<Response<ResponseBody>>
 
+    @GET("/chats/{chatId}/files/{filename}")
+    fun getFileById(@Header("x-auth-token") authorization: String,
+                    @Path("chatId") chatId: String, @Path("filename") filename: String) : Observable<Response<ResponseBody>>
 
     companion object Factory {
         fun create(context: Context): PostApi {

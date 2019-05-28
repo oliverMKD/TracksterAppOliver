@@ -27,8 +27,8 @@ class OkHttpClientModule {
         val builder = OkHttpClient.Builder()
             .addInterceptor(ConnectivityInterceptor(context))
             .addNetworkInterceptor(httpLoggingInterceptor)
-            .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-            .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+            .connectTimeout(CONNECT_TIMEOUT, TimeUnit.MINUTES)
+            .readTimeout(READ_TIMEOUT, TimeUnit.MINUTES)
 
 
         return builder.build()

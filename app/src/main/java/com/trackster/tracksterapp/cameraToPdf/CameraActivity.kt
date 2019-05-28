@@ -17,6 +17,7 @@ import android.util.Log
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.pdf.PdfWriter
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import io.fotoapparat.Fotoapparat
 import io.fotoapparat.configuration.CameraConfiguration
 import io.fotoapparat.log.logcat
@@ -38,6 +39,7 @@ import android.widget.Switch
 import com.trackster.tracksterapp.R
 
 
+
 class CameraActivity : AppCompatActivity() {
 
     var fotoapparat: Fotoapparat? = null
@@ -52,7 +54,6 @@ class CameraActivity : AppCompatActivity() {
     private val PNG_EXT = ".png"
     val REQUEST_IMAGE_CAPTURE = 3
     var i: Int = 0
-
 
 
     lateinit var fileName: String
@@ -281,6 +282,9 @@ class CameraActivity : AppCompatActivity() {
         return Uri.fromFile(uploadFile)
     }
 
+    override fun onBackPressed() {
+        startActivity(Intent(this@CameraActivity, MainScreenActivity::class.java))
+    }
 }
 
 enum class CameraState {

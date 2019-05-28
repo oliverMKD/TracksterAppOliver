@@ -38,6 +38,7 @@
                     android:focusableInTouchMode="true"
                     android:clickable="true"
                     android:text="@string/nav_header_title"
+
                     android:textColor="@color/White"
             />
             <LinearLayout

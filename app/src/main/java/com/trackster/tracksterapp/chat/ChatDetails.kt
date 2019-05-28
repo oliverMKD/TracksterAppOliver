@@ -2,20 +2,21 @@ package com.trackster.tracksterapp.chat
 
 import android.Manifest
 import android.app.Activity
+import android.app.PendingIntent.getActivity
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.ExifInterface
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -32,6 +33,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.pdf.PdfWriter
+import com.shockwave.pdfium.PdfiumCore
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.MessageRecyclerAdapter
 import com.trackster.tracksterapp.base.BaseChatActivity
@@ -51,11 +53,11 @@ import kotlinx.android.synthetic.main.activity_chat_details.*
 import kotlinx.android.synthetic.main.activity_load_details.view.*
 import kotlinx.android.synthetic.main.recycler_history.*
 import okhttp3.*
-import org.joda.time.DateTime
-import org.joda.time.LocalDateTime
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.ISODateTimeFormat
-import retrofit2.Response
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import timber.log.Timber
 import java.io.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -93,7 +95,8 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     private var hasMedia = false
     private var isMediaPortrait = false
     private var observerId: Int? = null
-    lateinit var apkStorage : File
+    lateinit var apkStorage: File
+    private var file: Files? = null
 
     private var isActivityVisible = false
 
@@ -110,9 +113,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     // aws
     private var s3Client: AmazonS3Client? = null
-//    private var transferUtility: TransferUtility? = null
-
-    private var isMotherphone = false
 
     private val compositeDisposable = CompositeDisposable()
 //    override fun onClick(p0: View?) {
@@ -127,32 +127,18 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initViews()
+        getMessages()
 
         initMutualViews()
-
-
-//            initAWS()
-        initViews()
-//            handleIntent()
         initMessageList()
-        getMessages()
+
 
         FILE_RECORDING = "${externalCacheDir.absolutePath}/recorder.aac"
 
         setButtonRecordListener()
         setButtonPlayRecordingListener()
         enableDisableButtonPlayRecording()
-
-
-//            compositeDisposable.add(RxBus.listen(ClearPendingMessageEvent::class.java).subscribe {
-//                pendingMessageUploaded()
-//            })
-//
-//
-//            listenForUploadReady()
-//            if (FeedMediaManager.uploadsCounter > 0 || DetailsMediaManager.uploadsCounter > 0) {
-//                setPaddingSendMessageRelativeLayout(true)
-//            }
     }
 
     override fun onResume() {
@@ -344,24 +330,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    var brokerName = it.broker.firstName
-                    var brokerLastName = it.broker.lastName
-                    var brokerFullName = brokerName + " " + brokerLastName
-                    var driverName = it.driver.firstName
-                    var driverLastName = it.driver.lastName
-                    var driverFullName = driverName + " " + driverLastName
-                    var carrierName = it.carrier.firstName
-                    var carrierLastName = it.carrier.lastName
-                    var carrierFullName = carrierName + " " + carrierLastName
-
-                    var brokerId = it.broker.id
-                    var carrierId = it.carrier.id
-
-                    PreferenceUtils.saveBrokerName(this@ChatDetails, brokerFullName)
-                    PreferenceUtils.saveDriverName(this@ChatDetails, driverFullName)
-                    PreferenceUtils.saveCarrierName(this@ChatDetails, carrierFullName)
-                    PreferenceUtils.saveBrokerId(this@ChatDetails, brokerId)
-                    PreferenceUtils.saveCarrierId(this@ChatDetails, carrierId)
 //                    mutableListMessages = it.message
                     mutableListMessages = it.message
                     setData(mutableListMessages)
@@ -417,7 +385,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
             R.id.button_send_msg -> {
                 sendMessage(
                     DetailsMediaManager.createMessage(
-                        this, sendMessageEditText?.text.toString(), "1234"
+                        this, sendMessageEditText?.text.toString(), "1234", file
                     )!!
                 )
                 clearMessage()
@@ -427,8 +395,8 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
             }
             R.id.img_selector_image_view -> addMedia()
 
-           // R.id.cam ->
-               // authenticateWithFB()
+            // R.id.cam ->
+            // authenticateWithFB()
         }
 
     }
@@ -532,16 +500,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun postAudio() {
-
         val file = File(FILE_RECORDING)
         val requestBody: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-
 // MultipartBody.Part is used to send also the actual file name
         val body =
             MultipartBody.Part.createFormData("document", file.name, requestBody)
-
-
-
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
             apiService.postAudio(
@@ -554,11 +517,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .subscribe({
                     setAudioFile(it)
                     audioListMessages.add(it)
-
-//                    adapter.setAudioData(createAudioData())
                     scrollToBottom()
-                    //                    mutableListMessages = it.message
-                    //                Log.d("station", " "+ it[0].location)
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
                     //                showProgress(false)
@@ -569,13 +528,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     private fun postPDF(file: File) {
         val requestBody: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-
 // MultipartBody.Part is used to send also the actual file name
         val body =
             MultipartBody.Part.createFormData("document", file.name, requestBody)
-
-
-
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
             apiService.postAudio(
@@ -591,45 +546,17 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
 //                    adapter.setAudioData(createAudioData())
                     scrollToBottom()
-                    //                    mutableListMessages = it.message
-                    //                Log.d("station", " "+ it[0].location)
+
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
-                    //                showProgress(false)
                 })
         )
     }
-
-    private fun authenticateWithFB(fileName : String) {
-        apiService = PostApi.create(this)
-        CompositeDisposable().add(
-            apiService.getFiles(
-                PreferenceUtils.getAuthorizationToken(this@ChatDetails), PreferenceUtils.getChatId(this@ChatDetails),
-                fileName
-            )
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    fileName
-                    Log.d("authenticateWithFB",""+it)
-
-                }, {
-                    Log.d("pane", "error")
-                })
-        )
-    }
-
-    private fun DownloadImage(body:ResponseBody) {
-
-    }
-
 
     private fun setAudioFile(file: Files) {
 
         // var files = FILE_RECORDING
         file.filename = FILE_RECORDING
-
-
     }
 
     private fun createAudioData(): MutableList<Files> =
@@ -722,7 +649,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun postMessage(message: Message) {
-
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
             apiService.postMessage(
@@ -737,11 +663,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
                     adapter.setData(createNewData())
                     scrollToBottom()
-                    //                    mutableListMessages = it.message
-                    //                Log.d("station", " "+ it[0].location)
+
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
-                    //                showProgress(false)
                 })
         )
     }
@@ -806,7 +730,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         startActivity(Intent(this@ChatDetails, MainScreenActivity::class.java))
     }
 
-
     private fun setIsMediaPortrait(uri: Uri?) {
 //        Glide.with(this).load(uri)
 //            .into(object : SimpleTarget<Drawable>() {
@@ -825,14 +748,8 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
         val document = Document()
         val f = File(Environment.getExternalStorageDirectory(), "PDF_Images.pdf")
-
-          //  PdfWriter.getInstance(document, FileOutputStream(f))
-
-
         val directoryPath = android.os.Environment.getExternalStorageDirectory().toString()
         PdfWriter.getInstance(document, FileOutputStream(f)) // Change pdf's name.
-
-
         document.open()
         val image = Image.getInstance(uri?.path!!) // Change image's name and extension.
         val scaler = (((((document.getPageSize().getWidth() - document.leftMargin()
@@ -842,6 +759,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         document.add(image)
         document.close()
         postPDF(f)
+        adapter.notifyDataSetChanged()
         return f
     }
 

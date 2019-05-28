@@ -96,6 +96,8 @@ dependencies {
     //Fotoapparat
     implementation 'io.fotoapparat:fotoapparat:2.6.1'
 
+    implementation 'com.github.barteksc:pdfium-android:1.4.0'
+
     apply plugin: 'com.google.gms.google-services'
     com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
 
