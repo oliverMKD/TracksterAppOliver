@@ -39,6 +39,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
@@ -95,15 +96,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     private val compositeDisposable = CompositeDisposable()
 
-    internal val mRunnable: Runnable = Runnable {
-
-
+    private val mRunnable: Runnable = Runnable {
         setUpMap()
-
-
-        val url = getUrl(LatLng(-122.5, 37.7), LatLng(-122.5, 37.7))
-        getRoute(url)
-
     }
 
 
@@ -125,15 +119,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_screen)
         setSupportActionBar(toolbar)
-        getChats()
         hamburger.visibility = View.VISIBLE
         hamburger.setOnClickListener(this)
         chat.setOnClickListener(this)
         attach.setOnClickListener(this)
 
-
-
-        floatBtn.setOnClickListener { view ->
+        floatBtn.setOnClickListener {
 
             val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             // Inflate a custom view using layout inflater
@@ -206,8 +197,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
 //
         createLocationRequest()
-    }
 
+    }
 
     public fun show() {
         attach.visibility = View.VISIBLE
@@ -215,7 +206,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         floatBtn.show()
         chat.visibility = View.VISIBLE
     }
-
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
@@ -231,17 +221,14 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             R.id.attach -> {
                 startActivity(Intent(this@MainScreenActivity, CameraActivity::class.java))
             }
-
-
         }
     }
 
-
     private fun getUserInfo() {
-        apiService = PostApi.create(this!!)
+        apiService = PostApi.create(this@MainScreenActivity)
         compositeDisposableContainer.add(
             apiService.getInfoUser(
-                PreferenceUtils.getAuthorizationToken(this!!)
+                PreferenceUtils.getAuthorizationToken(this@MainScreenActivity)
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
                 {
                     name_user.text = it.body()!!.firstName + " " + it.body()!!.lastName
@@ -295,28 +282,35 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //                getWeightStations(currentLatLng)
                 placeMarkerOnMap(currentLatLng)
                 googleMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14.5f))
+
+                getWeightStations(currentLatLng)
+                getChats()
             }
         }
     }
 
-
-    private fun getWeightStations() {
+    private fun getWeightStations(location: LatLng) {
         apiService = PostApi.create(this)
-        val coordinates = "42.0151079,21.4526962"
+        val coordinates = location.latitude.toString() + "," + location.longitude.toString()
         val newCoordinates = coordinates.replace("\\,", "%2C")
-
         compositeDisposable.add(
             apiService.getWeighStations(
-                PreferenceUtils.getAuthorizationToken(this), newCoordinates, 1
+                PreferenceUtils.getAuthorizationToken(this), newCoordinates, 100
             )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    //                Log.d("station", " "+ it[0].location)
+                    val iterator = it.listIterator()
+                    for (item in iterator) {
+                        val lat = item.location.lat
+                        val lng = item.location.long
+                        val markerOptions = MarkerOptions().position(LatLng(lat, lng))
+                        googleMap!!.addMarker(markerOptions)
+                            .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.warehouse))
+                    }
                 },
                     {
-                        //                showProgress(false)
-//                    handleApiError(it)
+                        Log.d("weight stations", "" + it.localizedMessage)
                     })
         )
     }
@@ -333,11 +327,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     mapsId = it[0].id
                     PreferenceUtils.saveChatId(this, mapsId)
                     getChatById(mapsId)
-                    getWeightStations()
                 }, {
                     handleApiError(it.cause)
                 })
-
         )
     }
 
@@ -348,20 +340,24 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    //                    val a = it.pickupAddress.location.lat
-//                    val b = it.pickupAddress.location.long
-//                    val c = it.destinationAddress.location.lat
-//                    val d = it.destinationAddress.location.long
-//                    latLngOrigin = LatLng(a, b)
-//                    latLngDestination = LatLng(c, d)
-//                    this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
-//                    this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
-//                    this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
-//                    var messageSize = PreferenceUtils.getSize(this@MainScreenActivity)
-//                    if (PreferenceUtils.getSize(this@MainScreenActivity)!! == it.message.size) {
-//                        Log.d("getFileFromServer", "1111")
-//                    } else {
-//                        val diff = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
+
+                    val iterator = it.pickupAddress.listIterator()
+                    for (item in iterator) {
+                        val lat = item.location.lat
+                        val lng = item.location.long
+                        latLngOrigin = LatLng(lat,lng)
+                    }
+                    val iteratorDestination = it.destinationAddress.listIterator()
+                    for (item in iteratorDestination) {
+                        val lat = item.location.lat
+                        val lng = item.location.long
+                        latLngDestination = LatLng(lat, lng)
+                    }
+                    this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
+                    this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
+                    this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
+                    val url = getUrl(latLngOrigin, latLngDestination)
+                    getRoute(url)
                     val brokerName = it.broker.firstName
                     val brokerLastName = it.broker.lastName
                     val brokerFullName = "$brokerName $brokerLastName"
