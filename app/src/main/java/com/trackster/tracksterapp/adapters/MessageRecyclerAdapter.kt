@@ -3,6 +3,7 @@ package com.trackster.tracksterapp.adapters
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.media.MediaPlayer
 import android.net.Uri
 import android.support.annotation.NonNull
@@ -149,6 +150,12 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
                     val iterator = modelString.listIterator()
                     for (item in iterator) {
                         if (item!!.contains(message.file?.filename!!)) {
+                            val sharedPreferences = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)
+                            val editor = sharedPreferences.edit()
+                            val gson = Gson()
+                            val json = gson.toJson(modelString)
+                            editor.putString("sliki", json)
+                            editor.apply()
                             val fileIn = File(item)
                             val u = Uri.fromFile(fileIn)
                             holder.messageImageView.visibility = View.VISIBLE
@@ -168,7 +175,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
                 } else {
                     holder.messageImageView.visibility = View.GONE
                 }
-                if (message.file?.filename!!.contains(".aac")) {
+                if (message.file?.filename!!.contains(".aac") || message.file?.filename!!.contains(".mp3") ) {
                     holder.messagePlayImageView.visibility = View.VISIBLE
                     holder.messageSeekBar.visibility = View.VISIBLE
                     val sharedPref = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)
@@ -183,6 +190,12 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
                     val iterator = modelAudio.listIterator()
                     for (item in iterator) {
                         if (item!!.contains(message.file?.filename!!)) {
+                            val sharedPreferences = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)
+                            val editor = sharedPreferences.edit()
+                            val gson = Gson()
+                            val json = gson.toJson(modelAudio)
+                            editor.putString("aac", json)
+                            editor.apply()
                             val fileIn = File(item)
                             val u = Uri.fromFile(fileIn)
                             if (message.senderId == PreferenceUtils.getUserId(context)) {
