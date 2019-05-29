@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.ExifInterface
 import android.media.MediaPlayer
 import android.media.MediaRecorder
@@ -31,9 +33,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.util.ViewPreloadSizeProvider
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.pdf.PdfWriter
+import com.shockwave.pdfium.PdfiumCore
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.MessageRecyclerAdapter
 import com.trackster.tracksterapp.base.BaseChatActivity
@@ -55,8 +60,9 @@ import kotlinx.coroutines.android.awaitFrame
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import java.io.File
-import java.io.FileOutputStream
+import okhttp3.ResponseBody
+import timber.log.Timber
+import java.io.*
 
 
 class ChatDetails() : BaseChatActivity(), View.OnClickListener {
@@ -80,6 +86,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     private var mutableListMessages: MutableList<Message> = mutableListOf()
     private var audioListMessages: MutableList<Files> = mutableListOf()
     private var listMessagesPhotos: ArrayList<String> = arrayListOf()
+    var listMessagesCheckSize: MutableList<Message> = mutableListOf()
 
 
     private var files: Files? = null
@@ -94,8 +101,8 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     lateinit var apkStorage: File
     private var file: Files? = null
     private var createdBy: String? = null
-    private var senderId : String? = null
-    private var createdTime : String? = null
+    private var senderId: String? = null
+    private var createdTime: String? = null
 
     private lateinit var preloader: RecyclerViewPreloader<Any>
 
@@ -341,12 +348,46 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    //                    mutableListMessages = it.message
-                    mutableListMessages = it.message
-                    setData(mutableListMessages)
-                    scrollToBottom()
-
-                    //                Log.d("station", " "+ it[0].location)
+                    if (it.message.size == PreferenceUtils.getSize(this@ChatDetails)) {
+                        Log.d("same list", "" + it.message.size + " " + listMessagesCheckSize.size)
+                    } else {
+                        var aa = (it.message.size - PreferenceUtils.getSize(this@ChatDetails)!!)
+                        var list: List<Message> = it.message.takeLast(aa)
+                        val iterator = list.listIterator()
+                        for (item in iterator) {
+                            listMessagesCheckSize.add(item)
+                            var preffList = PreferenceUtils.getSize(this@ChatDetails)
+                            var sumList = (preffList!! + 1)
+                            PreferenceUtils.saveMessSize(this@ChatDetails, sumList)
+                            if (item.file != null) {
+                                if (item.file!!.filename != null) {
+                                    doAsync {
+                                        getFileFromServer(item.file!!.filename!!)
+                                    }.execute()
+                                } else {
+                                    Log.e("getFileFromServer", "1111")
+                                }
+                            } else {
+                                Log.d("getFileFromServer", "22222")
+                            }
+                        }
+                    }
+                    val thread = object : Thread() {
+                        override fun run() {
+                            try {
+                                synchronized(this) {
+                                    runOnUiThread {
+                                        mutableListMessages = it.message
+                                        setData(mutableListMessages)
+                                        scrollToBottom()
+                                    }
+                                }
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                    thread.start()
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
                     //                showProgress(false)
@@ -354,10 +395,209 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         )
     }
 
+    private fun getFileFromServer(filename: String) {
+        apiService = PostApi.create(this@ChatDetails)
+        compositeDisposable.add(
+            apiService.getFileById(
+                PreferenceUtils.getAuthorizationToken(this@ChatDetails),
+                PreferenceUtils.getChatId(this@ChatDetails), filename
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+
+                    doAsync {
+                        val writtenToDisk = writeResponseBodyToDisk(it.body(), filename)
+                        Log.d("writtenToDisk", "" + writtenToDisk.toString())
+                    }.execute()
+
+
+                }, {
+                    Log.d("destinacija", "" + it.localizedMessage)
+                })
+        )
+    }
+
+    private fun writeResponseBodyToDisk(body: ResponseBody?, fileName: String): Boolean {
+        try {
+// todo change the file location/name according to your needs
+
+            val retrofitBetaFile = File(getExternalFilesDir(null).toString() + File.separator + fileName)
+            Timber.e(retrofitBetaFile.path)
+            var inputStream: InputStream? = null
+            var outputStream: OutputStream? = null
+
+            try {
+                val fileReader = ByteArray(4096)
+
+                val fileSize = body?.contentLength()
+                var fileSizeDownloaded: Long = 0
+
+                inputStream = body?.byteStream()
+                outputStream = FileOutputStream(retrofitBetaFile)
+
+                while (true) {
+                    val read = inputStream!!.read(fileReader)
+                    if (read == -1) {
+                        break
+                    }
+                    outputStream!!.write(fileReader, 0, read)
+                    fileSizeDownloaded += read.toLong()
+                    Log.d("writeResponseBodyToDisk", "file download: $fileSizeDownloaded of $fileSize")
+                }
+
+
+                outputStream!!.flush()
+
+                when {
+                    fileName.contains(".pdf") -> {
+                        val uri = Uri.fromFile(retrofitBetaFile)
+                        generateImageFromPdf(uri)
+                    }
+                    fileName.contains(".png") -> {
+                        val pngString = retrofitBetaFile.toString()
+                        val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        var modelString: MutableList<String?> = mutableListOf()
+                        val serializedObject = sharedPref.getString("sliki", null)
+                        if (serializedObject != null) {
+                            val gson = Gson()
+                            val type = object : TypeToken<List<String>>() {
+                            }.type
+                            modelString = gson.fromJson(serializedObject, type)
+                        }
+                        modelString.add(pngString)
+                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        val gson = Gson()
+                        val json = gson.toJson(modelString)
+                        editor.putString("sliki", json)
+                        editor.apply()
+                    }
+                    fileName.contains(".aac") || fileName.contains(".mp3") -> {
+                        val audioString = retrofitBetaFile.toString()
+                        val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        var modelString: MutableList<String?> = mutableListOf()
+                        val serializedObject = sharedPref.getString("aac", null)
+                        if (serializedObject != null) {
+                            val gson = Gson()
+                            val type = object : TypeToken<List<String>>() {
+                            }.type
+                            modelString = gson.fromJson(serializedObject, type)
+                        }
+                        modelString.add(audioString)
+                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        val gson = Gson()
+                        val json = gson.toJson(modelString)
+                        editor.putString("aac", json)
+                        editor.apply()
+                    }
+                }
+
+                return true
+            } catch (e: IOException) {
+                return false
+            } finally {
+                if (inputStream != null) {
+                    inputStream!!.close()
+                }
+
+                if (outputStream != null) {
+                    outputStream!!.close()
+                }
+            }
+        } catch (e: IOException) {
+            return false
+        }
+    }
+
+    public fun generateImageFromPdf(pdfUri: Uri) {
+        val pageNumber = 0
+        val pdfiumCore = PdfiumCore(this)
+        try {
+            //http://www.programcreek.com/java-api-examples/index.php?api=android.os.ParcelFileDescriptor
+            val fd = contentResolver.openFileDescriptor(pdfUri, "r")
+            val pdfDocument = pdfiumCore.newDocument(fd)
+            pdfiumCore.openPage(pdfDocument, pageNumber)
+            val width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber)
+            val height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber)
+            val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height)
+            saveImage(bmp, pdfUri.toString())
+            pdfiumCore.closeDocument(pdfDocument) // important!
+        } catch (e: Exception) {
+            //todo with exception
+        }
+    }
+
+    private fun saveImage(bmp: Bitmap, name: String) {
+        var o = BitmapFactory.Options()
+        o.inJustDecodeBounds = true
+        o.inSampleSize = 6
+        val FOLDER = Environment.getExternalStorageDirectory().toString() + "/PDF"
+        var out: FileOutputStream? = null
+        try {
+            val folder = File(FOLDER)
+            if (!folder.exists())
+                folder.mkdirs()
+            val domain: String? = name.substringAfterLast("/")
+            val file = File(folder, "$domain.png")
+            val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+            var modelString: MutableList<String?> = mutableListOf()
+            val serializedObject = sharedPref.getString("sliki", null)
+            if (serializedObject != null) {
+                val gson = Gson()
+                val type = object : TypeToken<List<String>>() {
+                }.type
+                modelString = gson.fromJson(serializedObject, type)
+            }
+            modelString.add(file.toString())
+            val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            val gson = Gson()
+            val json = gson.toJson(modelString)
+            editor.putString("sliki", json)
+            editor.apply()
+            out = FileOutputStream(file)
+
+            val REQUIRED_SIZE = 75
+
+            // Find the correct scale value. It should be the power of 2.
+            var scale = 1
+            while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                o.outHeight / scale / 2 >= REQUIRED_SIZE
+            ) {
+                scale *= 2
+            }
+
+            var o2 = BitmapFactory.Options()
+            o2.inSampleSize = scale;
+            var inputStream = FileInputStream(file)
+
+            var selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2)
+            inputStream.close()
+
+            // here i override the original image file
+            file.createNewFile()
+            var outputStream = FileOutputStream(file)
+
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream) // bmp is your Bitmap instance
+        } catch (e: Exception) {
+            //todo with exception
+        } finally {
+            try {
+                out?.close()
+            } catch (e: Exception) {
+                //todo with exception
+            }
+        }
+    }
+
     private fun setData(result: MutableList<Message>) {
 //        result.reverse()
 //        setDatesData(result)
         adapter.setData(result)
+        adapter.notifyDataSetChanged()
         scrollToBottom()
     }
 
@@ -528,22 +768,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                   val thread = object:Thread() {
-                       override fun run() {
-                           try
-                           {
-                               synchronized (this) {
-                                   runOnUiThread {
-                                      getMessages()
-                                   }
-                               }
-                           }
-                           catch (e:InterruptedException) {
-                               e.printStackTrace()
-                           }
-                       }
-                    }
-                    thread.start()
+                    doAsync {
+                        getMessages()
+                    }.execute()
 
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
@@ -568,22 +795,10 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    val thread = object:Thread() {
-                        override fun run() {
-                            try
-                            {
-                                synchronized (this) {
-                                    runOnUiThread {
-                                        getMessages()
-                                    }
-                                }
-                            }
-                            catch (e:InterruptedException) {
-                                e.printStackTrace()
-                            }
-                        }
-                    }
-                    thread.start()
+
+                    doAsync {
+                        getMessages()
+                    }.execute()
 
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
@@ -790,6 +1005,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
         return f
     }
+
     class doAsync(val handler: () -> Unit) : AsyncTask<Void, Void, Void>() {
         override fun doInBackground(vararg params: Void?): Void? {
             handler()

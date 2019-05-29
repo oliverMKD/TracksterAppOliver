@@ -44,6 +44,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.google.gson.reflect.TypeToken
 import com.shockwave.pdfium.PdfiumCore
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.cameraToPdf.CameraActivity
@@ -62,7 +63,6 @@ import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
 import kotlinx.android.synthetic.main.nav_header_main_screen.*
 import okhttp3.ResponseBody
-import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
@@ -82,6 +82,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private var mDelayHandler: Handler? = null
     var compositeDisposableContainer = CompositeDisposable()
     var modelStringPDF: MutableList<String?> = mutableListOf()
+    var listMessagesCheckSize: MutableList<Message> = mutableListOf()
     var model: ArrayList<String?> = arrayListOf()
     var modelStringAudio: MutableList<String?> = mutableListOf()
 
@@ -223,8 +224,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 getUserInfo()
             }
             R.id.chat -> {
-                val intent : Intent = Intent(this@MainScreenActivity, ChatDetails::class.java)
-                intent.putStringArrayListExtra("testPreLoad",model)
+                val intent: Intent = Intent(this@MainScreenActivity, ChatDetails::class.java)
+                intent.putStringArrayListExtra("testPreLoad", model)
                 startActivity(intent)
             }
             R.id.attach -> {
@@ -264,7 +265,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         googleMap!!.uiSettings.isMyLocationButtonEnabled = false
         mDelayHandler = Handler()
         //Navigate with delay
-        mDelayHandler!!.postDelayed(mRunnable, 5000)
+        mDelayHandler!!.postDelayed(mRunnable, 1500)
     }
 
 
@@ -378,29 +379,36 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     PreferenceUtils.saveBrokerId(this@MainScreenActivity, brokerId)
                     PreferenceUtils.saveCarrierId(this@MainScreenActivity, carrierId)
 
-
-                    val iterator = it.message.listIterator()
-                    for (item in iterator) {
-                        if (item.file != null) {
-                            if (item.file!!.filename != null) {
-                                doAsync {
-                                    getFileFromServer(item.file!!.filename!!)
-                                }.execute()
+                    if (it.message.size == PreferenceUtils.getSize(this@MainScreenActivity)) {
+                        Log.d("same list", "" + it.message.size + " " + listMessagesCheckSize.size)
+                    } else {
+                        var aa = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
+                        var list: List<Message> = it.message.takeLast(aa)
+                        val iterator = list.listIterator()
+                        for (item in iterator) {
+                            listMessagesCheckSize.add(item)
+                            var preffList = PreferenceUtils.getSize(this@MainScreenActivity)
+                            var sumList = (preffList!! + 1)
+                            PreferenceUtils.saveMessSize(this@MainScreenActivity, sumList)
+                            if (item.file != null) {
+                                if (item.file!!.filename != null) {
+                                    doAsync {
+                                        getFileFromServer(item.file!!.filename!!)
+                                    }.execute()
+                                } else {
+                                    Log.e("getFileFromServer", "1111")
+                                }
                             } else {
-                                Log.e("getFileFromServer", "1111")
+                                Log.d("getFileFromServer", "22222")
                             }
-                        } else {
-                            Log.d("getFileFromServer", "22222")
                         }
                     }
-//                    }
                 },
                     {
                         Log.d("getFileFromServer", "22222")
                     })
         )
     }
-
 
 
     private fun getFileFromServer(filename: String) {
@@ -421,6 +429,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 })
         )
     }
+
     class doAsync(val handler: () -> Unit) : AsyncTask<Void, Void, Void>() {
         override fun doInBackground(vararg params: Void?): Void? {
             handler()
@@ -466,22 +475,40 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     }
                     fileName.contains(".png") -> {
                         val pngString = retrofitBetaFile.toString()
-                        modelStringPDF.add(pngString)
+                        val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        var modelString: MutableList<String?> = mutableListOf()
+                        val serializedObject = sharedPref.getString("sliki", null)
+                        if (serializedObject != null) {
+                            val gson = Gson()
+                            val type = object : TypeToken<List<String>>() {
+                            }.type
+                            modelString = gson.fromJson(serializedObject, type)
+                        }
+                        modelString.add(pngString)
                         model.add(pngString)
                         val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
                         val editor = sharedPreferences.edit()
                         val gson = Gson()
-                        val json = gson.toJson(modelStringPDF)
+                        val json = gson.toJson(modelString)
                         editor.putString("sliki", json)
                         editor.apply()
                     }
-                    fileName.contains(".aac") -> {
+                    fileName.contains(".aac") || fileName.contains(".mp3") -> {
                         val audioString = retrofitBetaFile.toString()
-                        modelStringAudio.add(audioString)
+                        val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        var modelString: MutableList<String?> = mutableListOf()
+                        val serializedObject = sharedPref.getString("aac", null)
+                        if (serializedObject != null) {
+                            val gson = Gson()
+                            val type = object : TypeToken<List<String>>() {
+                            }.type
+                            modelString = gson.fromJson(serializedObject, type)
+                        }
+                        modelString.add(audioString)
                         val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
                         val editor = sharedPreferences.edit()
                         val gson = Gson()
-                        val json = gson.toJson(modelStringAudio)
+                        val json = gson.toJson(modelString)
                         editor.putString("aac", json)
                         editor.apply()
                     }
@@ -535,12 +562,21 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 folder.mkdirs()
             val domain: String? = name.substringAfterLast("/")
             val file = File(folder, "$domain.png")
-            modelStringPDF.add(file.toString())
+            val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+            var modelString: MutableList<String?> = mutableListOf()
+            val serializedObject = sharedPref.getString("sliki", null)
+            if (serializedObject != null) {
+                val gson = Gson()
+                val type = object : TypeToken<List<String>>() {
+                }.type
+                modelString = gson.fromJson(serializedObject, type)
+            }
+            modelString.add(file.toString())
             model.add(file.toString())
             val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             val gson = Gson()
-            val json = gson.toJson(modelStringPDF)
+            val json = gson.toJson(modelString)
             editor.putString("sliki", json)
             editor.apply()
             out = FileOutputStream(file)
