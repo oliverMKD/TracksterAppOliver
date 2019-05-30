@@ -57,6 +57,9 @@
     <string name="type_your_message">New Message</string>
     <string name="try_again">try_again</string>
     <string name="title_activity_camera">CameraActivity</string>
+    <string name="preff">preff</string>
+    <string name="sliki">sliki</string>
+    <string name="aac">aac</string>
 
 
 </resources>

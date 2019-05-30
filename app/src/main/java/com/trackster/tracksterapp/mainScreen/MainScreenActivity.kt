@@ -1,5 +1,6 @@
 package com.trackster.tracksterapp.mainScreen
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -27,10 +28,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.Toast
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.api.ResolvableApiException
@@ -46,6 +43,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
+import com.google.maps.android.PolyUtil
 import com.shockwave.pdfium.PdfiumCore
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.cameraToPdf.CameraActivity
@@ -64,7 +62,6 @@ import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
 import kotlinx.android.synthetic.main.nav_header_main_screen.*
 import okhttp3.ResponseBody
-import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.*
@@ -82,10 +79,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private lateinit var mapsId: String
     private var mDelayHandler: Handler? = null
     var compositeDisposableContainer = CompositeDisposable()
-    var modelStringPDF: MutableList<String?> = mutableListOf()
     var listMessagesCheckSize: MutableList<Message> = mutableListOf()
     var model: ArrayList<String?> = arrayListOf()
-    var modelStringAudio: MutableList<String?> = mutableListOf()
 
     private lateinit var locationCallback: LocationCallback
     // 2
@@ -138,7 +133,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             // Set an elevation for the popup window
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 popupWindow.elevation = 10.0F
-                popupWindow.setOutsideTouchable(true);
+                popupWindow.isOutsideTouchable = true;
             }
             // If API level 23 or higher then execute the code
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -200,7 +195,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     }
 
-    public fun show() {
+    fun show() {
         attach.visibility = View.VISIBLE
         hamburger.visibility = View.VISIBLE
         floatBtn.show()
@@ -214,7 +209,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 getUserInfo()
             }
             R.id.chat -> {
-                val intent: Intent = Intent(this@MainScreenActivity, ChatDetails::class.java)
+                val intent = Intent(this@MainScreenActivity, ChatDetails::class.java)
                 intent.putStringArrayListExtra("testPreLoad", model)
                 startActivity(intent)
             }
@@ -231,15 +226,14 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 PreferenceUtils.getAuthorizationToken(this@MainScreenActivity)
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
                 {
-                    name_user.text = it.body()!!.firstName + " " + it.body()!!.lastName
+                    name_user.text = "${it.body()!!.firstName} ${it.body()!!.lastName}"
 
-                    Glide.with(this!!)
+                    Glide.with(this@MainScreenActivity)
                         .load(it.body()!!.image)
                         .apply(RequestOptions.circleCropTransform())
                         .into(imageView_Drawer)
                 }, {
                     handleApiError(it.cause)
-                    Log.d("test", "error" + it.localizedMessage)
                 }
             )
         )
@@ -306,11 +300,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                         val lng = item.location.long
                         val markerOptions = MarkerOptions().position(LatLng(lat, lng))
                         googleMap!!.addMarker(markerOptions)
-                            .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.warehouse))
+                            .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.weighstations))
                     }
                 },
                     {
-                        Log.d("weight stations", "" + it.localizedMessage)
                     })
         )
     }
@@ -333,6 +326,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         )
     }
 
+    @SuppressLint("LogNotTimber")
     private fun getChatById(id: String) {
         apiService = PostApi.create(this@MainScreenActivity)
         compositeDisposable.add(
@@ -342,22 +336,39 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 .subscribe({
 
                     val iterator = it.pickupAddress.listIterator()
-                    for (item in iterator) {
+                    iterator.forEach { item ->
                         val lat = item.location.lat
                         val lng = item.location.long
-                        latLngOrigin = LatLng(lat,lng)
+                        latLngOrigin = LatLng(lat, lng)
                     }
                     val iteratorDestination = it.destinationAddress.listIterator()
-                    for (item in iteratorDestination) {
+                    iteratorDestination.forEach { item ->
                         val lat = item.location.lat
                         val lng = item.location.long
                         latLngDestination = LatLng(lat, lng)
                     }
                     this.googleMap!!.addMarker(MarkerOptions().position(latLngOrigin))
+                        .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.warehouse))
                     this.googleMap!!.addMarker(MarkerOptions().position(latLngDestination))
+                        .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.warehouse))
                     this.googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngOrigin, 14.5f))
-                    val url = getUrl(latLngOrigin, latLngDestination)
-                    getRoute(url)
+                    val iteratorPoly = it.routes.listIterator()
+                    iteratorPoly.forEach { item ->
+                        val route = item.routes
+                        val iteratorRoute = route.listIterator()
+                        iteratorRoute.forEach { i ->
+                            val poly = i.overview_polyline
+                            val polyString = poly.points
+                            val aa = PolyUtil.decode(polyString)
+                            val ruta = PolylineOptions()
+                            (0 until aa.size)
+                                .forEach { x ->
+                                    ruta.add(LatLng(aa[x].latitude,aa[x].longitude))
+                                }
+                            ruta.color(Color.BLUE)
+                            googleMap!!.addPolyline(ruta)
+                        }
+                    }
                     val brokerName = it.broker.firstName
                     val brokerLastName = it.broker.lastName
                     val brokerFullName = "$brokerName $brokerLastName"
@@ -374,17 +385,15 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     PreferenceUtils.saveCarrierName(this@MainScreenActivity, carrierFullName)
                     PreferenceUtils.saveBrokerId(this@MainScreenActivity, brokerId)
                     PreferenceUtils.saveCarrierId(this@MainScreenActivity, carrierId)
-
                     if (it.message.size == PreferenceUtils.getSize(this@MainScreenActivity)) {
-                        Log.d("same list", "" + it.message.size + " " + listMessagesCheckSize.size)
                     } else {
-                        var aa = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
-                        var list: List<Message> = it.message.takeLast(aa)
-                        val iterator = list.listIterator()
-                        for (item in iterator) {
+                        val aa = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
+                        val list: List<Message> = it.message.takeLast(aa)
+                        val message = list.listIterator()
+                        message.forEach { item ->
                             listMessagesCheckSize.add(item)
-                            var preffList = PreferenceUtils.getSize(this@MainScreenActivity)
-                            var sumList = (preffList!! + 1)
+                            val preffList = PreferenceUtils.getSize(this@MainScreenActivity)
+                            val sumList = (preffList!! + 1)
                             PreferenceUtils.saveMessSize(this@MainScreenActivity, sumList)
                             if (item.file != null) {
                                 if (item.file!!.filename != null) {
@@ -407,6 +416,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
+    @SuppressLint("LogNotTimber")
     private fun getFileFromServer(filename: String) {
         apiService = PostApi.create(this@MainScreenActivity)
         compositeDisposable.add(
@@ -433,10 +443,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
+    @SuppressLint("LogNotTimber")
     private fun writeResponseBodyToDisk(body: ResponseBody?, fileName: String): Boolean {
         try {
-// todo change the file location/name according to your needs
-
             val retrofitBetaFile = File(getExternalFilesDir(null).toString() + File.separator + fileName)
             Timber.e(retrofitBetaFile.path)
             var inputStream: InputStream? = null
@@ -456,13 +465,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     if (read == -1) {
                         break
                     }
-                    outputStream!!.write(fileReader, 0, read)
+                    outputStream.write(fileReader, 0, read)
                     fileSizeDownloaded += read.toLong()
                     Log.d("writeResponseBodyToDisk", "file download: $fileSizeDownloaded of $fileSize")
                 }
 
 
-                outputStream!!.flush()
+                outputStream.flush()
 
                 when {
                     fileName.contains(".pdf") -> {
@@ -471,9 +480,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     }
                     fileName.contains(".png") -> {
                         val pngString = retrofitBetaFile.toString()
-                        val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
                         var modelString: MutableList<String?> = mutableListOf()
-                        val serializedObject = sharedPref.getString("sliki", null)
+                        val serializedObject = sharedPref.getString(getString(R.string.sliki), null)
                         if (serializedObject != null) {
                             val gson = Gson()
                             val type = object : TypeToken<List<String>>() {
@@ -482,18 +491,18 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                         }
                         modelString.add(pngString)
                         model.add(pngString)
-                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
                         val editor = sharedPreferences.edit()
                         val gson = Gson()
                         val json = gson.toJson(modelString)
-                        editor.putString("sliki", json)
+                        editor.putString(getString(R.string.sliki), json)
                         editor.apply()
                     }
                     fileName.contains(".aac") || fileName.contains(".mp3") -> {
                         val audioString = retrofitBetaFile.toString()
-                        val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
                         var modelString: MutableList<String?> = mutableListOf()
-                        val serializedObject = sharedPref.getString("aac", null)
+                        val serializedObject = sharedPref.getString(getString(R.string.aac), null)
                         if (serializedObject != null) {
                             val gson = Gson()
                             val type = object : TypeToken<List<String>>() {
@@ -501,11 +510,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                             modelString = gson.fromJson(serializedObject, type)
                         }
                         modelString.add(audioString)
-                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
                         val editor = sharedPreferences.edit()
                         val gson = Gson()
                         val json = gson.toJson(modelString)
-                        editor.putString("aac", json)
+                        editor.putString(getString(R.string.aac), json)
                         editor.apply()
                     }
                 }
@@ -515,11 +524,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 return false
             } finally {
                 if (inputStream != null) {
-                    inputStream!!.close()
+                    inputStream.close()
                 }
 
                 if (outputStream != null) {
-                    outputStream!!.close()
+                    outputStream.close()
                 }
             }
         } catch (e: IOException) {
@@ -527,7 +536,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         }
     }
 
-    public fun generateImageFromPdf(pdfUri: Uri) {
+    private fun generateImageFromPdf(pdfUri: Uri) {
         val pageNumber = 0
         val pdfiumCore = PdfiumCore(this)
         try {
@@ -542,25 +551,25 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             saveImage(bmp, pdfUri.toString())
             pdfiumCore.closeDocument(pdfDocument) // important!
         } catch (e: Exception) {
-            //todo with exception
+
         }
     }
 
     private fun saveImage(bmp: Bitmap, name: String) {
-        var o = BitmapFactory.Options()
+        val o = BitmapFactory.Options()
         o.inJustDecodeBounds = true
         o.inSampleSize = 6
-        val FOLDER = Environment.getExternalStorageDirectory().toString() + "/PDF"
+        val folder = Environment.getExternalStorageDirectory().toString() + "/PDF"
         var out: FileOutputStream? = null
         try {
-            val folder = File(FOLDER)
-            if (!folder.exists())
-                folder.mkdirs()
+            val newFolder = File(folder)
+            if (!newFolder.exists())
+                newFolder.mkdirs()
             val domain: String? = name.substringAfterLast("/")
-            val file = File(folder, "$domain.png")
-            val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+            val file = File(newFolder, "$domain.png")
+            val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
             var modelString: MutableList<String?> = mutableListOf()
-            val serializedObject = sharedPref.getString("sliki", null)
+            val serializedObject = sharedPref.getString(getString(R.string.sliki), null)
             if (serializedObject != null) {
                 val gson = Gson()
                 val type = object : TypeToken<List<String>>() {
@@ -569,11 +578,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
             modelString.add(file.toString())
             model.add(file.toString())
-            val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+            val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             val gson = Gson()
             val json = gson.toJson(modelString)
-            editor.putString("sliki", json)
+            editor.putString(getString(R.string.sliki), json)
             editor.apply()
             out = FileOutputStream(file)
 
@@ -587,16 +596,15 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 scale *= 2
             }
 
-            var o2 = BitmapFactory.Options()
+            val o2 = BitmapFactory.Options()
             o2.inSampleSize = scale;
-            var inputStream = FileInputStream(file)
+            val inputStream = FileInputStream(file)
 
-            var selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2)
             inputStream.close()
 
             // here i override the original image file
             file.createNewFile()
-            var outputStream = FileOutputStream(file)
+            val outputStream = FileOutputStream(file)
 
             bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream) // bmp is your Bitmap instance
         } catch (e: Exception) {
@@ -618,11 +626,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         markerOptions.title(titleStr)
         // 2
         googleMap!!.addMarker(markerOptions)
-//        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(
-//            BitmapFactory.decodeResource(resources, R.mipmap.ic_user_location)))
-
     }
 
+    @SuppressLint("LogNotTimber")
     private fun getAddress(latLng: LatLng): String {
         // 1
         val geocoder = Geocoder(this)
@@ -643,7 +649,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         } catch (e: IOException) {
             Log.e("MapsActivity", e.localizedMessage)
         }
-
         return addressText
     }
 
@@ -715,61 +720,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null /* Looper */)
     }
 
-    private fun getUrl(origin: LatLng, dest: LatLng): String {
-
-        // Origin of route
-        val str_origin = "origin=" + origin.latitude + "," + origin.longitude
-
-        // Destination of route
-        val str_dest = "destination=" + dest.latitude + "," + dest.longitude
-
-
-        // Api Key
-        val key = R.string.google_maps_key
-        val sensor = "key=" + "AIzaSyD2kBqzaanSMkp9iX9J2JFtm1c7LjPFNW4"
-
-        // Building the parameters to the web service
-        val parameters = "$str_origin&$str_dest&$sensor"
-
-        // Output format
-        val output = "json"
-
-        // Building the url to the web service
-        val url = "https://maps.googleapis.com/maps/api/directions/$output?$parameters"
-
-
-        return url
-    }
-
-    private fun getRoute(url: String) {
-        val path: MutableList<List<LatLng>> = ArrayList()
-        val directionsRequest = object : StringRequest(
-            Request.Method.GET, url, Response.Listener<String> { response ->
-                val jsonResponse = JSONObject(response)
-                // Get routes
-                val routes = jsonResponse.getJSONArray("routes")
-                if (routes.length() > 0) {
-                    val legs = routes.getJSONObject(0).getJSONArray("legs")
-                    val steps = legs.getJSONObject(0).getJSONArray("steps")
-                    for (i in 0 until steps.length()) {
-                        val points = steps.getJSONObject(i).getJSONObject("polyline").getString("points")
-                        path.add(com.google.maps.android.PolyUtil.decode(points))
-                    }
-                    for (i in 0 until path.size) {
-                        this.googleMap!!.addPolyline(PolylineOptions().addAll(path[i]).color(Color.RED))
-                    }
-                } else {
-                    Log.d("no_path_found", "No path found")
-                }
-
-
-            }, Response.ErrorListener {
-                handleApiError(it)
-            }) {}
-        val requestQueue = Volley.newRequestQueue(this)
-        requestQueue.add(directionsRequest)
-    }
-
     fun handleApiError(error: Throwable?) {
         when (error) {
             is HttpException -> {
@@ -806,23 +756,18 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
 
     private fun openCurrentLoadFragment() {
-
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-
         if (currentLoad.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, currentLoad)
-
         } else {
             fragmentTransaction.add(R.id.fragment_container, currentLoad)
             fragmentTransaction.addToBackStack("currentLoadFragment")
-
         }
         fragmentTransaction.commit()
     }
 
     public fun openProfileSettingsFragment() {
-
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         if (profileSettings.isAdded) {
@@ -835,13 +780,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
     private fun openHistoryList() {
-
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-
         if (historyList.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, historyList)
-
         } else {
             fragmentTransaction.add(R.id.fragment_container, historyList)
             fragmentTransaction.addToBackStack("historyListFragment")
@@ -850,19 +792,14 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
 
-    private fun opendetailsList() {
-
+    private fun openDetailsList() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-
-
         if (detailsList.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, detailsList)
-
         } else {
             fragmentTransaction.add(R.id.fragment_container, detailsList)
             fragmentTransaction.addToBackStack("detailsListFragment")
-
         }
         fragmentTransaction.commit()
     }
@@ -885,8 +822,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-
-
         when (item.itemId) {
             R.id.action_settings -> return true
             else -> return super.onOptionsItemSelected(item)
@@ -902,7 +837,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
             }
             R.id.routes -> {
-                opendetailsList()
+                openDetailsList()
                 hide()
 
             }
@@ -917,13 +852,8 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             R.id.settings -> {
                 openProfileSettingsFragment()
                 hide()
-
             }
-
-
         }
-
-
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
@@ -931,7 +861,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     public fun openSelectTruckFragmentDouble() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-
         if (selectTracksFragment.isAdded) {
             fragmentTransaction.replace(R.id.fragment_container, selectTracksFragment)
             fragmentTransaction.remove(profileSettings)
@@ -940,7 +869,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             fragmentTransaction.addToBackStack("selectTrucksFragment")
             fragmentTransaction.remove(profileSettings)
         }
-
         fragmentTransaction.commit()
     }
 
@@ -955,14 +883,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             fragmentTransaction.addToBackStack("selectColorFragment")
             fragmentTransaction.remove(profileSettings)
         }
-
         fragmentTransaction.commit()
     }
 
     fun getSelectedTruck(id: String) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-        Toast.makeText(this@MainScreenActivity, "You selected : " + id + " truck", Toast.LENGTH_LONG).show()
+        Toast.makeText(this@MainScreenActivity, "You selected : $id truck", Toast.LENGTH_LONG).show()
         fragmentTransaction.remove(selectTracksFragment)
         openProfileSettingsFragment()
         fragmentTransaction.commit()
@@ -971,10 +898,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     fun getSelectedColorDouble(name: String) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-        Toast.makeText(this@MainScreenActivity, "You selected : " + name + " color", Toast.LENGTH_LONG).show()
+        Toast.makeText(this@MainScreenActivity, "You selected : $name color", Toast.LENGTH_LONG).show()
         fragmentTransaction.remove(selectColorFragment)
         openProfileSettingsFragment()
         fragmentTransaction.commit()
     }
-
 }
