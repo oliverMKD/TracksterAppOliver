@@ -9,6 +9,7 @@ import com.trackster.tracksterapp.network.connectivity.HeaderInterceptor
 import com.trackster.tracksterapp.network.requests.*
 
 import com.trackster.tracksterapp.network.responce.ChatResponse
+import com.trackster.tracksterapp.network.responce.ChatResponseId
 import com.trackster.tracksterapp.network.responce.InitialAccessToken
 import io.reactivex.Observable
 import okhttp3.logging.HttpLoggingInterceptor
@@ -68,7 +69,7 @@ interface PostApi {
 
     @GET("/chats/{chatId}")
     fun getChatById(@Header("x-auth-token") authorization: String,
-                    @Path("chatId") chatId: String) : Single<ChatResponse>
+                    @Path("chatId") chatId: String) : Single<ChatResponseId>
 
     @GET("/users/me")
     fun getInfoUser(@Header("x-auth-token") authorization : String): Observable<Response<User>>

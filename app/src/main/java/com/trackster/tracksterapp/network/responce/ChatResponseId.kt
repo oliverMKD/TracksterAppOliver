@@ -1,9 +1,12 @@
 package com.trackster.tracksterapp.network.responce
 
 import com.google.gson.annotations.SerializedName
-import com.trackster.tracksterapp.model.*
+import com.trackster.tracksterapp.model.Address
+import com.trackster.tracksterapp.model.Message
+import com.trackster.tracksterapp.model.Route
+import com.trackster.tracksterapp.model.User
 
-data class ChatResponse(
+data class ChatResponseId (
     @SerializedName("id") var id: String,
     @SerializedName("description") var description: String,
     @SerializedName("plannedPickupTime") var plannedPickupTime: String,
@@ -17,5 +20,5 @@ data class ChatResponse(
     @SerializedName("carrier") var carrier: User,
     @SerializedName("driver") var driver: User,
     @SerializedName("messages") var message: ArrayList<Message>,
-    @SerializedName("routes") var routes: Route
+    @SerializedName("routes") var routes : ArrayList<Route>
 )
