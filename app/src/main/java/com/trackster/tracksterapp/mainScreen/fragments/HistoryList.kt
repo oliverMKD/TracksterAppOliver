@@ -1,42 +1,49 @@
 package com.trackster.tracksterapp.mainScreen.fragments
 
-import android.os.Bundle
 
+import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import android.widget.ProgressBar
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.HistoryRecyclerAdapter
-
 import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
-
-
+import com.trackster.tracksterapp.model.History
 import com.trackster.tracksterapp.network.PostApi
-import com.trackster.tracksterapp.network.responce.ChatResponse
 import com.trackster.tracksterapp.utils.PreferenceUtils
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-
-import kotlinx.android.synthetic.main.history_fragment.*
+import org.json.JSONArray
 
 class HistoryList : BaseFragment() {
 
     private lateinit var historyAdapter: HistoryRecyclerAdapter
     lateinit var apiService: PostApi
-    private var historyList: MutableList<ChatResponse> = mutableListOf()
-    var fragmentPosition: Int = 0
     var compositeDisposableContainer = CompositeDisposable()
+    private lateinit var description: String
+    private lateinit var price: String
+    private var distance: Int? = null
+    private var lista : MutableList<History> = mutableListOf()
+    private lateinit var recyclerHistory: RecyclerView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         historyAdapter = HistoryRecyclerAdapter(activity!!)
-        getHistory()
+        val s = PreferenceUtils.getString(context!!)
+        val array = JSONArray(s)
+        for (i in 0 until array.length()) {
+            val row = array.getJSONObject(i)
+            description = row.getString("description")
+            price = row.getString("price")
+            distance = row.getInt("distance")
+            val aa = distance.toString()
+            val cc  = History(description,price,aa)
+            lista.add(cc)
+        }
     }
 
     override fun onBackStackChanged() {
@@ -50,7 +57,6 @@ class HistoryList : BaseFragment() {
         fun newInstance() = HistoryList()
     }
 
-
     override fun onDestroy() {
         compositeDisposableContainer.clear()
         (activity as MainScreenActivity).show()
@@ -61,31 +67,18 @@ class HistoryList : BaseFragment() {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-    private fun initRecyclerView(list: ArrayList<ChatResponse>) {
+        recyclerHistory = view.findViewById(R.id.recyclerHistory)
+        initRecyclerView(lista)
+
+    }
+
+    private fun initRecyclerView(lista: MutableList<History>) {
         recyclerHistory.setHasFixedSize(true)
         recyclerHistory.layoutManager = LinearLayoutManager(context)
         recyclerHistory.adapter = historyAdapter
-        historyAdapter.setData(list)
+        historyAdapter.setData(lista)
     }
-
-
-    private fun getHistory() {
-        apiService = PostApi.create(context!!)
-        compositeDisposableContainer.add(
-            apiService.getHistory(
-                PreferenceUtils.getAuthorizationToken(context!!))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    initRecyclerView(it)
-                    Log.d("getHistory", "" + it.size)
-                },
-                    {
-                        Log.d("getHistory", "" + it.localizedMessage)
-                    })
-        )
-    }
-
 
 }

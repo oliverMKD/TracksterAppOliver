@@ -126,4 +126,10 @@ object PreferenceUtils {
         getPreferences(context)[AAC_SIZE] = id
     }
     fun getAudioSize(context: Context): Int? = getPreferences(context).getInt(AAC_SIZE, 0)
+
+    fun saveString(context: Context, id: String) {
+        getPreferences(context)["string"] = id
+    }
+    fun getString(context: Context): String = getPreferences(context).getString("string", "") as String
+
 }

@@ -1,25 +1,24 @@
 package com.trackster.tracksterapp.mainScreen.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
-import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.requests.UserRequest
-import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_profil.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 class ProfileSettings : BaseFragment(), View.OnClickListener {
 
@@ -27,52 +26,42 @@ class ProfileSettings : BaseFragment(), View.OnClickListener {
     var lastName = ""
     var firstName = ""
     lateinit var apiService: PostApi
-    private var userInfo: MutableList<User> = mutableListOf()
-    var fragmentPosition: Int = 0
-    var compositeDisposableContainer = CompositeDisposable()
+    lateinit var driver: JSONObject
+    private lateinit var emailJson: String
+    private lateinit var firstNameJson: String
+    private lateinit var lastNameJson: String
+    private lateinit var phone: String
 
+
+    var compositeDisposableContainer = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getUserInfo()
+        val s = PreferenceUtils.getString(context!!)
+        val array = JSONArray(s)
+        for (i in 0 until array.length()) {
+            val row = array.getJSONObject(i)
+            driver = row.getJSONObject("driver")
+            firstNameJson = driver.getString("firstName")
+            lastNameJson = driver.getString("lastName")
+            phone = driver.getString("phone")
+            emailJson = driver.getString("email")
+        }
     }
 
-    private fun getUserInfo() {
-        apiService = PostApi.create(context!!)
-        compositeDisposableContainer.add(
-            apiService.getInfoUser(
-                PreferenceUtils.getAuthorizationToken(context!!)
-            ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
-                {
-                    name.setText(it.body()!!.firstName+" "+it.body()!!.lastName)
-                    email.setText(it.body()!!.email)
-                    phone_number.setText(it.body()!!.phone)
-                    Glide.with(activity!!)
-                        .load(it.body()!!.image)
-                        .apply(RequestOptions.circleCropTransform())
-                        .into(profile_image)
-                }, {
-                    Log.d("test", "error" + it.localizedMessage)
-                }
-            )
-        )
-    }
-
+    @SuppressLint("LogNotTimber")
     private fun updateUser() {
 
         val name1 = name.text.toString()
 
-        if (name1.split(("\\w+").toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray().size > 1)
-        {
+        if (name1.split(("\\w+").toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray().size > 1) {
             lastName = name1.substring(name1.lastIndexOf(" ") + 1)
             firstName = name1.substring(0, name1.lastIndexOf(' '))
-        }
-        else
-        {
+        } else {
             firstName = name1
         }
         var middle = " "
-         fullname = firstName + middle + lastName
+        fullname = firstName + middle + lastName
 
         apiService = PostApi.create(context!!)
         CompositeDisposable().add(
@@ -110,24 +99,29 @@ class ProfileSettings : BaseFragment(), View.OnClickListener {
         return super.onCreateView(inflater, container, savedInstanceState)
 
     }
+
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.color -> {
                 (activity as MainScreenActivity).openSelectColorFragmentDouble()
             }
-            R.id.type_truck ->{
+            R.id.type_truck -> {
                 (activity as MainScreenActivity).openSelectTruckFragmentDouble()
             }
-            R.id.save_changes-> {
+            R.id.save_changes -> {
                 updateUser()
                 (activity as MainScreenActivity).onBackPressed()
             }
         }
     }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         color.setOnClickListener(this)
         type_truck.setOnClickListener(this)
         save_changes.setOnClickListener(this)
+        name.setText("$firstNameJson$lastNameJson")
+        email.setText(emailJson)
+        phone_number.setText(phone)
     }
 }

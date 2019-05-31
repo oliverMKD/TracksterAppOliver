@@ -1,19 +1,17 @@
 package com.trackster.tracksterapp.mainScreen.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import com.trackster.tracksterapp.R
-import com.trackster.tracksterapp.adapters.SelectTruckAdapter
 import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.mainScreen.adapter_Double.SelectTruckAdapterDouble
 import com.trackster.tracksterapp.model.Trucks
 import com.trackster.tracksterapp.network.PostApi
-import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
-import com.trackster.tracksterapp.selectTrailer.fragments.SelectTruckFragment
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -25,15 +23,11 @@ class SelectTruckFragmentDouble  : BaseFragment(), View.OnClickListener {
 
     private lateinit var selectTruckAdapter: SelectTruckAdapterDouble
     lateinit var apiService: PostApi
-    private var trucksList: MutableList<Trucks> = mutableListOf()
-
     var compositeDisposableContainer = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         selectTruckAdapter = SelectTruckAdapterDouble(activity!!)
-
         getTrucks()
     }
 
@@ -61,13 +55,11 @@ class SelectTruckFragmentDouble  : BaseFragment(), View.OnClickListener {
         selectTruckAdapter.setData(list)
     }
 
-
+    @SuppressLint("LogNotTimber")
     private fun getTrucks() {
-
         apiService = PostApi.create(context!!)
         compositeDisposableContainer.add(apiService.getTrucks(
-            PreferenceUtils.getAuthorizationToken(context!!)
-        )
+            PreferenceUtils.getAuthorizationToken(context!!))
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -77,7 +69,6 @@ class SelectTruckFragmentDouble  : BaseFragment(), View.OnClickListener {
                     Log.d("getTrucks",""+it.localizedMessage)
                 })
         )
-
     }
     override fun onDestroy() {
         compositeDisposableContainer.clear()
@@ -87,6 +78,5 @@ class SelectTruckFragmentDouble  : BaseFragment(), View.OnClickListener {
         when (p0?.id) {
             R.id.select_manufactor -> (activity as MainScreenActivity).openProfileSettingsFragment()
         }
-
     }
 }

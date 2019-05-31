@@ -1,5 +1,6 @@
 package com.trackster.tracksterapp.mainScreen.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,7 +12,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
-import com.trackster.tracksterapp.model.ChatResponse
 
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.utils.PreferenceUtils
@@ -20,29 +20,21 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_load_screen.*
 
-class Current_Load : BaseFragment() {
+class CurrentLoad : BaseFragment() {
 
 
     lateinit var apiService: PostApi
-
-    var fragmentPosition: Int = 0
-
-    //    private var disposable: CompositeDisposable? = null
     var compositeDisposableContainer = CompositeDisposable()
-
 
     override fun onBackStackChanged() {
 
     }
-
-
-
     override fun getProgressBar(): ProgressBar? = null
 
     override fun getLayoutId(): Int = R.layout.fragment_load_screen
 
     companion object {
-        fun newInstance() = Current_Load()
+        fun newInstance() = CurrentLoad()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,17 +50,14 @@ class Current_Load : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return super.onCreateView(inflater, container, savedInstanceState)
-
-//        imageView5.set
-
     }
 
+    @SuppressLint("LogNotTimber")
     private fun getLoad() {
         apiService = PostApi.create(context!!)
         compositeDisposableContainer.add(
             apiService.getHistory(
-                PreferenceUtils.getAuthorizationToken(context!!)
-            )
+                PreferenceUtils.getAuthorizationToken(context!!))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({

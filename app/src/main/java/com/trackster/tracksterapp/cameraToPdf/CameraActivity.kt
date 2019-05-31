@@ -1,6 +1,7 @@
 package com.trackster.tracksterapp.cameraToPdf
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +18,7 @@ import android.util.Log
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.pdf.PdfWriter
+import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import io.fotoapparat.Fotoapparat
 import io.fotoapparat.configuration.CameraConfiguration
@@ -31,33 +33,19 @@ import io.fotoapparat.view.CameraView
 import kotlinx.android.synthetic.main.content_camera.*
 import java.io.File
 import java.io.FileOutputStream
-import com.google.gson.Gson
-import android.R.id.edit
-import android.content.Context
-import android.content.SharedPreferences
-import android.widget.Switch
-import com.trackster.tracksterapp.R
-
 
 
 class CameraActivity : AppCompatActivity() {
 
     var fotoapparat: Fotoapparat? = null
-
     var fotoapparatState: FotoapparatState? = null
     var cameraStatus: CameraState? = null
     var flashState: FlashState? = null
     val model: MutableList<File> = mutableListOf()
-    private val PROVIDER_EXT = ".provider"
     var tmpId: Int? = null
     private val JPG_EXT = ".jpg"
-    private val PNG_EXT = ".png"
     val REQUEST_IMAGE_CAPTURE = 3
-    var i: Int = 0
-
-
     lateinit var fileName: String
-
     var uploadFile: File? = null
     lateinit var tmpUri: Uri
     val modelPDF: MutableList<Document> = mutableListOf()
@@ -72,9 +60,7 @@ class CameraActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(com.trackster.tracksterapp.R.layout.activity_camera)
-
         createFotoapparat()
-
         cameraStatus = CameraState.BACK
         flashState = FlashState.OFF
         fotoapparatState = FotoapparatState.OFF
@@ -98,21 +84,9 @@ class CameraActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(intent, "Send"))
         }
         fab_flash.setBackgroundResource(R.drawable.flash1)
-
         fab_flash.setOnClickListener {
-
-
-
                 changeFlashState()
-
-
-
-
-
-
         }
-
-
     }
 
     private fun createFotoapparat() {
@@ -139,22 +113,14 @@ class CameraActivity : AppCompatActivity() {
             )
         )
 
-        if (flashState == FlashState.TORCH) flashState = FlashState.OFF
-        else flashState = FlashState.TORCH
-    }
-
-    private fun switchCamera() {
-        fotoapparat?.switchTo(
-            lensPosition = if (cameraStatus == CameraState.BACK) front() else back(),
-            cameraConfiguration = CameraConfiguration()
-        )
-
-        if (cameraStatus == CameraState.BACK) cameraStatus = CameraState.FRONT
-        else cameraStatus = CameraState.BACK
+        flashState = when (flashState) {
+            FlashState.TORCH -> FlashState.OFF
+            else -> FlashState.TORCH
+        }
     }
 
     private fun takePhoto() {
-        var tmpId = System.currentTimeMillis().toString()
+        val tmpId = System.currentTimeMillis().toString()
         val filename = "$tmpId.jpg"
         val sd = android.os.Environment.getExternalStorageDirectory()
         val dest = File(sd, filename)
@@ -189,19 +155,17 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun probaPdf(uri: Uri?): File {
-        val selectedImageUri = uri
-        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-        var tmpId = System.currentTimeMillis().toString()
+        val tmpId = System.currentTimeMillis().toString()
         val document = Document()
         val f = File(Environment.getExternalStorageDirectory(), "$tmpId.pdf")
         val directoryPath = f.toString()
         PdfWriter.getInstance(document, FileOutputStream(f)) // Change pdf's name.
         document.open()
         val image = Image.getInstance(uri?.path!!) // Change image's name and extension.
-        val scaler = (((((document.getPageSize().getWidth() - document.leftMargin()
-                - document.rightMargin() - 0)) / image.getWidth())) * 100) // 0 means you have no indentation. If you have any, change it.
+        val scaler = (((((document.pageSize.width - document.leftMargin()
+                - document.rightMargin() - 0)) / image.width)) * 100) // 0 means you have no indentation. If you have any, change it.
         image.scalePercent(scaler)
-        image.setAlignment(Image.ALIGN_CENTER or Image.ALIGN_TOP)
+        image.alignment = Image.ALIGN_CENTER or Image.ALIGN_TOP
         document.add(image)
         document.close()
         modelPDF.add(document)
@@ -251,6 +215,7 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("LogNotTimber")
     private fun getMediaUri(extension: String, activity: Activity): Uri {
         tmpId = System.currentTimeMillis().toInt()
         fileName = System.currentTimeMillis().toString() + extension
@@ -261,12 +226,8 @@ class CameraActivity : AppCompatActivity() {
         if (!mediaStorageDir!!.exists() && !mediaStorageDir.mkdirs()) {
             Log.d("DetailsMediaManager", "failed to create directory")
         }
-
         uploadFile = File(mediaStorageDir.path + File.separator + fileName)
-
-
         tmpUri = getUri(activity)
-//        probaPdf(tmpUri)
         return tmpUri
     }
 

@@ -1,6 +1,7 @@
 package com.trackster.tracksterapp.chat
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
@@ -27,8 +28,6 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.*
-import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.services.s3.AmazonS3Client
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.request.RequestOptions
@@ -44,7 +43,6 @@ import com.trackster.tracksterapp.adapters.MessageRecyclerAdapter
 import com.trackster.tracksterapp.base.BaseChatActivity
 import com.trackster.tracksterapp.base.TracksterApplication
 import com.trackster.tracksterapp.firebase.FirebaseUtils
-import com.trackster.tracksterapp.main.MainActivity
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.Contact
 import com.trackster.tracksterapp.model.Files
@@ -56,7 +54,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_chat_details.*
-import kotlinx.coroutines.android.awaitFrame
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -65,12 +62,8 @@ import timber.log.Timber
 import java.io.*
 
 
-class ChatDetails() : BaseChatActivity(), View.OnClickListener {
+class ChatDetails : BaseChatActivity(), View.OnClickListener {
 
-    object Day {
-        const val TODAY = "today"
-        const val YESTERDAY = "yesterday"
-    }
 
     // UI components
     private var sendMessageRelativeLayout: LinearLayout? = null
@@ -84,25 +77,15 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     private lateinit var adapter: MessageRecyclerAdapter
     private var mutableListMessages: MutableList<Message> = mutableListOf()
-    private var audioListMessages: MutableList<Files> = mutableListOf()
     private var listMessagesPhotos: ArrayList<String> = arrayListOf()
     var listMessagesCheckSize: MutableList<Message> = mutableListOf()
 
 
-    private var files: Files? = null
     private var contact: Contact? = null
-    private var sender: Contact? = null
-    private var recipient: Contact? = null
-    private var previousDate: String = ""
     private var isMessageSendable = false
     private var hasMedia = false
     private var isMediaPortrait = false
-    private var observerId: Int? = null
-    lateinit var apkStorage: File
     private var file: Files? = null
-    private var createdBy: String? = null
-    private var senderId: String? = null
-    private var createdTime: String? = null
 
     private lateinit var preloader: RecyclerViewPreloader<Any>
 
@@ -119,13 +102,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     val PERMISSION_REQUEST_CODE = 100
 
 
-    // aws
-    private var s3Client: AmazonS3Client? = null
-
     private val compositeDisposable = CompositeDisposable()
-//    override fun onClick(p0: View?) {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//    }
 
     override fun getLayoutId(): Int = R.layout.activity_chat_details
 
@@ -145,15 +122,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         preloader = RecyclerViewPreloader(Glide.with(this), modelProvider, preloadSizeProvider, 200 /*maxPreload*/)
         initViews()
         getMessages()
-
         initMutualViews()
         initMessageList()
-
-
-
-
         FILE_RECORDING = "${externalCacheDir.absolutePath}/recorder.aac"
-
         setButtonRecordListener()
         setButtonPlayRecordingListener()
         enableDisableButtonPlayRecording()
@@ -187,70 +158,15 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         unregisterReceiver(firebaseMessageBroadcastReceiver)
     }
 
-    private fun listenForUploadReady() {
-//        compositeDisposable.add(RxBus.listen(UploadReadyEvent::class.java).subscribe {
-//            if (it.message != null) {
-//                DetailsMediaManager.mutableListSendingMessages.remove(it.message)
-//                if (isActivityVisible && it.message.recipient == contact?.id) {
-//                    adapter.removeMessage(it.message.additionalData.id)
-//                    DetailsMediaManager.mutableListSendingMessages.remove(it.message)
-//                    setDateForMessage(it.message)
-//                    mutableListMessages.add(it.message)
-//
-//                    adapter.setData(createNewData())
-//                    scrollToBottom()
-//                }
-//            }
-//        })
-    }
-
-    private fun setPaddingSendMessageRelativeLayout(isSnackbarVisible: Boolean) {
-        val sendMessageViewPadding = resources.getDimensionPixelSize(R.dimen.design_bottom_navigation_margin)
-
-        if (isSnackbarVisible) {
-            sendMessageRelativeLayout?.setPadding(
-                sendMessageViewPadding,
-                sendMessageViewPadding,
-                sendMessageViewPadding,
-                resources.getDimensionPixelSize(R.dimen.design_bottom_navigation_margin)
-            )
-        } else {
-            sendMessageRelativeLayout?.setPadding(
-                sendMessageViewPadding,
-                sendMessageViewPadding,
-                sendMessageViewPadding,
-                sendMessageViewPadding
-            )
-        }
-    }
-
     private fun initMutualViews() {
         sendMessageRelativeLayout = findViewById(R.id.send_message_relative_layout)
         recyclerView = findViewById(R.id.recycler_view_details)
         val linearLayoutManager = LinearLayoutManager(this)
-//        linearLayoutManager.reverseLayout = true
-//        linearLayoutManager.stackFromEnd = true
         recyclerView?.layoutManager = linearLayoutManager
         adapter = MessageRecyclerAdapter(this, mutableListMessages)
         recyclerView?.adapter = adapter
         recyclerView?.scrollToPosition(adapter.itemCount - 1)
         progressBar = findViewById(R.id.progress_bar)
-    }
-
-    private fun initAWS() {
-        val s3Client = AmazonS3Client(
-            BasicAWSCredentials(
-                ConfigManager.getAWSAccessKey(this),
-                ConfigManager.getAWSSecretKey(this)
-            ), Utils.getAWSConfigurationClient()
-        )
-        this.s3Client = s3Client
-//        transferUtility = TransferUtility(s3Client, applicationContext)
-    }
-
-    private fun handleIntent() {
-        contact = intent.getSerializableExtra(CONTACT_KEY) as Contact?
-        setToolbarTitleAndLogo(contact?.nickname, contact?.avatar)
     }
 
     private fun initMessageList() {
@@ -264,25 +180,16 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun initViews() {
-
-
         imgSelectorImageView = findViewById(R.id.img_selector_image_view)
         imgSelectorImageView?.setOnClickListener(this)
         sendMessageImageView = findViewById(R.id.button_send_msg)
         sendMessageImageView?.setOnClickListener(this)
-
         microfon = findViewById(R.id.microfon)
         microfon?.setOnClickListener(this)
-
-
         sendMessageEditText = findViewById(R.id.send_message_edit_text)
 
         cam = findViewById(R.id.cam)
         cam!!.setOnClickListener(this)
-//        sendMessageEditText?.setOnFocusChangeListener { _, hasFocus ->
-//            if (!hasFocus) {   sendMessageImageView?.setImageResource(R.drawable.spajalica)}
-//        }
-
         microfon?.visibility = View.VISIBLE
         microfon?.setBackgroundResource(R.drawable.mic)
         sendMessageImageView?.visibility = View.GONE
@@ -302,13 +209,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                         isMessageSendable = false
                     }
                 }
-
-                if (message!!.trim().length > 0) {
+                if (message!!.trim().isNotEmpty()) {
                     sendMessageImageView?.visibility = View.VISIBLE
                     microfon?.visibility = View.GONE
                     imgSelectorImageView?.visibility = View.GONE
                     cam?.visibility = View.GONE
-
                 } else {
                     microfon?.visibility = View.VISIBLE
                     sendMessageImageView?.visibility = View.GONE
@@ -322,22 +227,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         })
     }
 
-//    fun openMediaDetails(intent: Intent) {
-//        if (isMotherphone) {
-//            intent.putExtra(Constants.SENDER_KEY, sender)
-//            intent.putExtra(Constants.RECIPIENT_KEY, recipient)
-//        } else {
-//            intent.putExtra(CONTACT_KEY, contact)
-//        }
-//
-//        startActivity(intent)
-//    }
-
     private fun scrollToBottom() {
         recyclerView?.scrollToPosition(adapter.itemCount - 1)
     }
 
-
+    @SuppressLint("LogNotTimber")
     public fun getMessages() {
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
@@ -351,13 +245,13 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                     if (it.message.size == PreferenceUtils.getSize(this@ChatDetails)) {
                         Log.d("same list", "" + it.message.size + " " + listMessagesCheckSize.size)
                     } else {
-                        var aa = (it.message.size - PreferenceUtils.getSize(this@ChatDetails)!!)
-                        var list: List<Message> = it.message.takeLast(aa)
+                        val difference = (it.message.size - PreferenceUtils.getSize(this@ChatDetails)!!)
+                        val list: List<Message> = it.message.takeLast(difference)
                         val iterator = list.listIterator()
-                        for (item in iterator) {
+                        iterator.forEach { item ->
                             listMessagesCheckSize.add(item)
-                            var preffList = PreferenceUtils.getSize(this@ChatDetails)
-                            var sumList = (preffList!! + 1)
+                            val preffList = PreferenceUtils.getSize(this@ChatDetails)
+                            val sumList = (preffList!! + 1)
                             PreferenceUtils.saveMessSize(this@ChatDetails, sumList)
                             if (item.file != null) {
                                 if (item.file!!.filename != null) {
@@ -390,11 +284,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                     thread.start()
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
-                    //                showProgress(false)
                 })
         )
     }
 
+    @SuppressLint("LogNotTimber")
     private fun getFileFromServer(filename: String) {
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
@@ -405,23 +299,19 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-
                     doAsync {
                         val writtenToDisk = writeResponseBodyToDisk(it.body(), filename)
                         Log.d("writtenToDisk", "" + writtenToDisk.toString())
                     }.execute()
-
-
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
                 })
         )
     }
 
+    @SuppressLint("LogNotTimber")
     private fun writeResponseBodyToDisk(body: ResponseBody?, fileName: String): Boolean {
         try {
-// todo change the file location/name according to your needs
-
             val retrofitBetaFile = File(getExternalFilesDir(null).toString() + File.separator + fileName)
             Timber.e(retrofitBetaFile.path)
             var inputStream: InputStream? = null
@@ -441,13 +331,13 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                     if (read == -1) {
                         break
                     }
-                    outputStream!!.write(fileReader, 0, read)
+                    outputStream.write(fileReader, 0, read)
                     fileSizeDownloaded += read.toLong()
                     Log.d("writeResponseBodyToDisk", "file download: $fileSizeDownloaded of $fileSize")
                 }
 
 
-                outputStream!!.flush()
+                outputStream.flush()
 
                 when {
                     fileName.contains(".pdf") -> {
@@ -456,9 +346,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                     }
                     fileName.contains(".png") -> {
                         val pngString = retrofitBetaFile.toString()
-                        val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
                         var modelString: MutableList<String?> = mutableListOf()
-                        val serializedObject = sharedPref.getString("sliki", null)
+                        val serializedObject = sharedPref.getString(getString(R.string.sliki), null)
                         if (serializedObject != null) {
                             val gson = Gson()
                             val type = object : TypeToken<List<String>>() {
@@ -466,18 +356,18 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                             modelString = gson.fromJson(serializedObject, type)
                         }
                         modelString.add(pngString)
-                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
                         val editor = sharedPreferences.edit()
                         val gson = Gson()
                         val json = gson.toJson(modelString)
-                        editor.putString("sliki", json)
+                        editor.putString(getString(R.string.sliki), json)
                         editor.apply()
                     }
                     fileName.contains(".aac") || fileName.contains(".mp3") -> {
                         val audioString = retrofitBetaFile.toString()
-                        val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+                        val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
                         var modelString: MutableList<String?> = mutableListOf()
-                        val serializedObject = sharedPref.getString("aac", null)
+                        val serializedObject = sharedPref.getString(getString(R.string.aac), null)
                         if (serializedObject != null) {
                             val gson = Gson()
                             val type = object : TypeToken<List<String>>() {
@@ -485,11 +375,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                             modelString = gson.fromJson(serializedObject, type)
                         }
                         modelString.add(audioString)
-                        val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+                        val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
                         val editor = sharedPreferences.edit()
                         val gson = Gson()
                         val json = gson.toJson(modelString)
-                        editor.putString("aac", json)
+                        editor.putString(getString(R.string.aac), json)
                         editor.apply()
                     }
                 }
@@ -499,11 +389,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 return false
             } finally {
                 if (inputStream != null) {
-                    inputStream!!.close()
+                    inputStream.close()
                 }
 
                 if (outputStream != null) {
-                    outputStream!!.close()
+                    outputStream.close()
                 }
             }
         } catch (e: IOException) {
@@ -531,20 +421,20 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun saveImage(bmp: Bitmap, name: String) {
-        var o = BitmapFactory.Options()
+        val o = BitmapFactory.Options()
         o.inJustDecodeBounds = true
         o.inSampleSize = 6
-        val FOLDER = Environment.getExternalStorageDirectory().toString() + "/PDF"
+        val folder = Environment.getExternalStorageDirectory().toString() + "/PDF"
         var out: FileOutputStream? = null
         try {
-            val folder = File(FOLDER)
-            if (!folder.exists())
-                folder.mkdirs()
+            val newFolder = File(folder)
+            if (!newFolder.exists())
+                newFolder.mkdirs()
             val domain: String? = name.substringAfterLast("/")
-            val file = File(folder, "$domain.png")
-            val sharedPref = applicationContext.getSharedPreferences("preff", Context.MODE_PRIVATE)
+            val file = File(newFolder, "$domain.png")
+            val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
             var modelString: MutableList<String?> = mutableListOf()
-            val serializedObject = sharedPref.getString("sliki", null)
+            val serializedObject = sharedPref.getString(getString(R.string.sliki), null)
             if (serializedObject != null) {
                 val gson = Gson()
                 val type = object : TypeToken<List<String>>() {
@@ -552,11 +442,11 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 modelString = gson.fromJson(serializedObject, type)
             }
             modelString.add(file.toString())
-            val sharedPreferences = getSharedPreferences("preff", MODE_PRIVATE)
+            val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             val gson = Gson()
             val json = gson.toJson(modelString)
-            editor.putString("sliki", json)
+            editor.putString(getString(R.string.sliki), json)
             editor.apply()
             out = FileOutputStream(file)
 
@@ -570,16 +460,15 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
                 scale *= 2
             }
 
-            var o2 = BitmapFactory.Options()
-            o2.inSampleSize = scale;
-            var inputStream = FileInputStream(file)
+            val o2 = BitmapFactory.Options()
+            o2.inSampleSize = scale
+            val inputStream = FileInputStream(file)
 
-            var selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2)
             inputStream.close()
 
             // here i override the original image file
             file.createNewFile()
-            var outputStream = FileOutputStream(file)
+            val outputStream = FileOutputStream(file)
 
             bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream) // bmp is your Bitmap instance
         } catch (e: Exception) {
@@ -594,39 +483,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun setData(result: MutableList<Message>) {
-//        result.reverse()
-//        setDatesData(result)
         adapter.setData(result)
         adapter.notifyDataSetChanged()
         scrollToBottom()
-    }
-
-    private fun setDatesData(list: MutableList<Message>) {
-        for (message: Message in list) {
-            setDateForMessage(message)
-        }
-    }
-
-    private fun setDateForMessage(message: Message) {
-        // val additionalData = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-//
-//        var messageDate = DateFormat.formatDate(message.createTime, DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-//        messageDate = DateFormat.formatDateDetailsMessage(message.createTime, messageDate)
-//        if (previousDate == messageDate) {
-//            message.createTime = ""
-//        } else {
-//            message.createTime = messageDate
-//            previousDate = messageDate
-//        }
-
-        ///  var nova_data : String = ""
-        //nova_data = DateFormat.formatDate(additionalData,DateFormat.DATE_FORMAT_MESSAGE_DETAILS)
-        // LocalDateTime.parse(nova_data, ISODateTimeFormat.dateTimeParser())
-
-
-        //  message.createTime = nova_data
-
-
     }
 
     override fun onClick(v: View?) {
@@ -649,7 +508,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
            // R.id.img_selector_image_view -> addMedia()
 
             R.id.cam -> addMedia()
-            // authenticateWithFB()
+
         }
 
     }
@@ -752,26 +611,23 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         mediaPlayer = null
     }
 
+    @SuppressLint("LogNotTimber")
     private fun postAudio() {
         val file = File(FILE_RECORDING)
         val requestBody: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-// MultipartBody.Part is used to send also the actual file name
         val body =
-            MultipartBody.Part.createFormData("document", file.name, requestBody)
+            MultipartBody.Part.createFormData(getString(R.string.document), file.name, requestBody)
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
             apiService.postAudio(
                 PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails), body
-
-            )
+                PreferenceUtils.getChatId(this@ChatDetails), body)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     doAsync {
                         getMessages()
                     }.execute()
-
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
                     //                showProgress(false)
@@ -779,27 +635,22 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         )
     }
 
-
+    @SuppressLint("LogNotTimber")
     private fun postPDF(file: File) {
         val requestBody: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-// MultipartBody.Part is used to send also the actual file name
         val body =
-            MultipartBody.Part.createFormData("document", file.name, requestBody)
+            MultipartBody.Part.createFormData(getString(R.string.document), file.name, requestBody)
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
             apiService.postAudio(
                 PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails), body
-
-            )
+                PreferenceUtils.getChatId(this@ChatDetails), body)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-
                     doAsync {
                         getMessages()
                     }.execute()
-
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
                 })
@@ -812,126 +663,53 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         file.filename = FILE_RECORDING
     }
 
-    private fun createAudioData(): MutableList<Files> =
-        audioListMessages.asSequence().toMutableList()
-
-
     private fun clearMessage() {
         sendMessageEditText?.setText("")
         hasMedia = false
-        removeMedia()
-        //  sendMessageImageView?.setImageResource(R.drawable.spajalica)
     }
-
 
     private fun sendAudio() {
         if (hasMedia) {
             hasMedia = false
-
-            DetailsMediaManager.editUploadsCounter(true, null)
-//           uploadAudio(file)
-
         } else {
             doAsync {
                 postAudio()
             }.execute()
         }
-
-//        DetailsMediaManager.mutableListSendingAudio.add(file)
-//        adapter.addAudio(file)
         scrollToBottom()
     }
 
     private fun sendMessage(message: Message) {
         if (hasMedia) {
             hasMedia = false
-
-            DetailsMediaManager.editUploadsCounter(true, null)
-            uploadMedia(message)
-
         } else {
             postMessage(message)
         }
-
-//        DetailsMediaManager.mutableListSendingMessages.add(message)
         adapter.addMessage(message)
         scrollToBottom()
     }
 
-
-//    private fun messageNotSent(message: Message) {
-//        adapter.removeMessage(message.additionalData.id)
-//        DetailsMediaManager.removeMessage(message.additionalData.id)
-//        message.additionalData.isSending = false
-//        message.additionalData.errorSending = true
-//        mutableListMessages.add(message)
-//
-//        adapter.setData(createNewData())
-//        scrollToBottom()
-//    }
-
-    private fun uploadAudio(file: Files) {
-        val fileName = DetailsMediaManager.MESSAGES + File.separator + DetailsMediaManager.fileName
-
-    }
-
-
-    private fun uploadMedia(message: Message) {
-        val fileName = DetailsMediaManager.MESSAGES + File.separator + DetailsMediaManager.fileName
-//        val observer = transferUtility?.upload(
-//            ConfigManager.getAWSBucketName(this@ChatDetails),     /* The bucket to upload to */
-//            fileName,    /* The key for the uploaded object */
-//            DetailsMediaManager.uploadFile        /* The file where the data to upload exists */
-//        )
-
-//        observerId = observer?.id
-//        message.additionalData.observerId = observerId!!
-//        observer?.setTransferListener(this@ChatDetails)
-    }
-
+    @SuppressLint("LogNotTimber")
     private fun postMessage(message: Message) {
         apiService = PostApi.create(this@ChatDetails)
         compositeDisposable.add(
             apiService.postMessage(
                 PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails), message
-            )
+                PreferenceUtils.getChatId(this@ChatDetails), message)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    setDateForMessage(it)
                     mutableListMessages.add(it)
-
                     adapter.setData(createNewData())
                     scrollToBottom()
-
                 }, {
                     Log.d("destinacija", "" + it.localizedMessage)
                 })
         )
     }
 
-
-    private fun stopProgress(error: Throwable?) {
-        DetailsMediaManager.editUploadsCounter(false, error)
-        setupUploadFinished()
-    }
-
-    private fun setupUploadFinished() {
-        imgSelectorImageView?.isEnabled = true
-        sendMessageEditText?.isEnabled = true
-        sendMessageImageView?.isEnabled = true
-    }
-
-    private fun pendingMessageUploaded() {
-        setupUploadFinished()
-    }
-
     private fun createNewData(): MutableList<Message> =
         mutableListMessages.asSequence().toMutableList()
-
-//    private fun getSendingMessage(messageId: Int?): Message? =
-//        mutableListMessages.asSequence().find { message -> message.additionalData.observerId == messageId }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -962,7 +740,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         } else if ((requestCode == DetailsMediaManager.REQUEST_IMAGE_CAPTURE || requestCode == DetailsMediaManager.REQUEST_VIDEO_CAPTURE)
             && resultCode == Activity.RESULT_OK
         ) {
-//            setMedia(DetailsMediaManager.tmpUri)
             probaPdf(DetailsMediaManager.tmpUri)
         }
     }
@@ -971,25 +748,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         startActivity(Intent(this@ChatDetails, MainScreenActivity::class.java))
     }
 
-    private fun setIsMediaPortrait(uri: Uri?) {
-//        Glide.with(this).load(uri)
-//            .into(object : SimpleTarget<Drawable>() {
-//                override fun onResourceReady(resource: Drawable?, transition: Transition<in Drawable>?) {
-//                    val width = resource?.intrinsicWidth
-//                    val height = resource?.intrinsicHeight
-//                    if (width != null && height != null) {
-//                        isMediaPortrait = height > width
-//                    }
-//                }
-//            })
-    }
-
     private fun probaPdf(uri: Uri?): File {
-        val selectedImageUri = uri
-        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
         val document = Document()
         val f = File(Environment.getExternalStorageDirectory(), "PDF_Images.pdf")
-        val directoryPath = android.os.Environment.getExternalStorageDirectory().toString()
         PdfWriter.getInstance(document, FileOutputStream(f)) // Change pdf's name.
         document.open()
         val image = Image.getInstance(uri?.path!!) // Change image's name and extension.
@@ -1019,16 +780,15 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
         isMediaPortrait = false
 
-        when (orientation.toInt()) {
+        isMediaPortrait = when (orientation.toInt()) {
             6 -> {
-                isMediaPortrait = true
+                true
             }
             8 -> {
-                isMediaPortrait = true
+                true
             }
-            0 -> setIsMediaPortrait(uri)
             else -> {
-                isMediaPortrait = false
+                false
             }
         }
 
@@ -1040,12 +800,6 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
         isMessageSendable = true
         hasMedia = true
     }
-
-    private fun removeMedia() {
-        isMessageSendable = false
-        //  Glide.with(this).load(R.drawable.add_media).apply(RequestOptions.circleCropTransform()).into(imgSelectorImageView!!)
-    }
-
 
     private var firebaseMessageBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -1078,115 +832,7 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-
         compositeDisposable.dispose()
-    }
-
-
-    fun getPathFromURI(context: Context, uri: Uri): String? {
-        // DocumentProvider
-        if (DocumentsContract.isDocumentUri(context, uri)) {
-            // ExternalStorageProvider
-            if (isExternalStorageDocument(uri)) {
-                val docId = DocumentsContract.getDocumentId(uri)
-                val split = docId.split((":").toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                val type = split[0]
-                if ("primary".equals(type, ignoreCase = true)) {
-                    return Environment.getExternalStorageDirectory().path + "/" + split[1]
-                } else {
-                    val splitIndex = docId.indexOf(':', 1)
-                    val tag = docId.substring(0, splitIndex)
-                    val path = docId.substring(splitIndex + 1)
-                    val nonPrimaryVolume = getPathToNonPrimaryVolume(context, tag)
-                    if (nonPrimaryVolume != null) {
-                        val result = nonPrimaryVolume + "/" + path
-                        val file = File(result)
-                        if (file.exists() && file.canRead()) {
-                            return result
-                        }
-                    }
-                }
-            } else if (isDownloadsDocument(uri)) {
-                val id = DocumentsContract.getDocumentId(uri)
-                val contentUri = ContentUris.withAppendedId(
-                    Uri.parse("content://downloads/public_downloads"),
-                    java.lang.Long.valueOf(id)
-                )
-                return getDataColumn(context, contentUri, null!!, null!!)
-            } else if (isMediaDocument(uri)) {
-                val docId = DocumentsContract.getDocumentId(uri)
-                val split = docId.split((":").toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                val type = split[0]
-                var contentUri: Uri? = null
-                if ("image" == type) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                } else if ("video" == type) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                } else if ("audio" == type) {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                }
-                val selection = "_id=?"
-                val selectionArgs = arrayOf<String>(split[1])
-                return getDataColumn(context, contentUri!!, selection, selectionArgs)
-            }// MediaProvider
-            // DownloadsProvider
-        } else if ("content".equals(uri.getScheme(), ignoreCase = true)) {
-            return getDataColumn(context, uri, null!!, null!!)
-        } else if ("file".equals(uri.getScheme(), ignoreCase = true)) {
-            return uri.getPath()
-        }// File
-        // MediaStore (and general)
-        return null
-    }
-
-    fun getPathToNonPrimaryVolume(context: Context, tag: String): String? {
-        val volumes = context.getExternalCacheDirs()
-        if (volumes != null) {
-            for (volume in volumes) {
-                if (volume != null) {
-                    val path = volume.getAbsolutePath()
-                    if (path != null) {
-                        val index = path.indexOf(tag)
-                        if (index != -1) {
-                            return path.substring(0, index) + tag
-                        }
-                    }
-                }
-            }
-        }
-        return null
-    }
-
-    fun getDataColumn(
-        context: Context, uri: Uri, selection: String?,
-        selectionArgs: Array<String>
-    ): String? {
-        var cursor: Cursor? = null
-        val column = "_data"
-        val projection = arrayOf<String>(column)
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null)
-            if (cursor != null && cursor.moveToFirst()) {
-                val column_index = cursor.getColumnIndexOrThrow(column)
-                return cursor.getString(column_index)
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close()
-        }
-        return null
-    }
-
-    fun isExternalStorageDocument(uri: Uri): Boolean {
-        return "com.android.externalstorage.documents" == uri.getAuthority()
-    }
-
-    fun isDownloadsDocument(uri: Uri): Boolean {
-        return "com.android.providers.downloads.documents" == uri.getAuthority()
-    }
-
-    fun isMediaDocument(uri: Uri): Boolean {
-        return "com.android.providers.media.documents" == uri.getAuthority()
     }
 
 }
