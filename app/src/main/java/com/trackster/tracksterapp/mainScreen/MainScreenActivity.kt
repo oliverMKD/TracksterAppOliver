@@ -24,10 +24,7 @@ import android.transition.Slide
 import android.transition.TransitionManager
 import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.Toast
+import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.api.ResolvableApiException
@@ -171,6 +168,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             )
         }
 
+
+
+
+
+
+
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
             R.string.navigation_drawer_open,
@@ -194,7 +197,43 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         createLocationRequest()
 
     }
+    fun firstTimeWindow (){
+        val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
+        val view = inflater.inflate(R.layout.warning_dialog, null)
+
+        val popupWindow = PopupWindow(
+            view,
+            LinearLayout.LayoutParams.MATCH_PARENT, // Width of popup window
+            LinearLayout.LayoutParams.MATCH_PARENT // Window height
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            popupWindow.elevation = 10.0F
+            popupWindow.setOutsideTouchable(true);
+        }
+
+
+        val passenger = view.findViewById<TextView>(R.id.pasenger)
+        val driver = view.findViewById<TextView>(R.id.driver)
+
+        passenger.setOnClickListener {
+            Toast.makeText(applicationContext, "Passenger", Toast.LENGTH_SHORT).show()
+        }
+        driver.setOnClickListener {
+            Toast.makeText(applicationContext, "Driver", Toast.LENGTH_SHORT).show()
+        }
+
+
+        TransitionManager.beginDelayedTransition(root_layout)
+        popupWindow.showAtLocation(
+            root_layout,
+            Gravity.CENTER,
+            0,// X offset
+            0 // Y offset
+        )
+
+    }
     fun show() {
         attach.visibility = View.VISIBLE
         hamburger.visibility = View.VISIBLE
