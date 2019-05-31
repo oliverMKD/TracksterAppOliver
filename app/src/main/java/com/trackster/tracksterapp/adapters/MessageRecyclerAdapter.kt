@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Handler
 import android.support.annotation.NonNull
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
@@ -24,11 +25,29 @@ import com.trackster.tracksterapp.utils.PreferenceUtils
 import com.trackster.tracksterapp.utils.Utils
 import java.io.File
 
+
 class MessageRecyclerAdapter(private val context: Activity, private var list: MutableList<Message>) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageRecyclerViewHolder>() {
 
+//    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+//        if (fromUser)
+//        {
+//            mediaPlayer?.seekTo(progress)
+//        }
+//    }
+//
+//    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+//
+//    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+
     var mediaPlayer: MediaPlayer? = null
 
+    private val MSG_UPDATE_SEEK_BAR = 1845
+    private val uiUpdateHandler : Handler? = null
 
     private var messageParamsLandscape = RelativeLayout.LayoutParams(
         RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -55,6 +74,8 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         messageParamsLandscape.width = imageWidthHeight.toInt()
     }
 
+
+
     inner class MessageRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val dateTextView = view.findViewById(R.id.date_text_view) as TextView
         val messageRelativeLayout = view.findViewById(R.id.message_relative_layout) as RelativeLayout
@@ -66,6 +87,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         val sent_name = view.findViewById(R.id.sent_name) as TextView?
         val timeTextView = view.findViewById(R.id.time_text_view) as TextView
         val timeTryAgainTextView = view.findViewById(R.id.time_try_again_text_view) as TextView
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageRecyclerViewHolder {
@@ -90,6 +112,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
     }
 
     override fun getItemViewType(position: Int): Int {
+
         if (list[position].senderId == PreferenceUtils.getUserId(context)) {
             return 1
         }
@@ -101,6 +124,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
 
         setViewsLayoutParams(message, holder)
         setContent(message, holder)
+
 //        setClickListener(message, holder)
     }
 
@@ -116,6 +140,11 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         holder.messageImageView.visibility = View.GONE
         holder.dateTextView.visibility = View.VISIBLE
         holder.dateTextView.text = message.createTime
+        holder.messagePlayImageView.setBackgroundResource(R.drawable.play_audio)
+
+      //  holder.messageSeekBar.setMax(mediaPlayer!!.getDuration())
+
+
 
         if (TextUtils.isEmpty(message.createTime)) {
             holder.dateTextView.visibility = View.GONE
@@ -250,17 +279,38 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
     }
 
 
+
+
+
     private fun setButtonPlayRecordingListener(source: String, holder: MessageRecyclerViewHolder) {
-        holder.messagePlayImageView.setOnClickListener() {
+
+
+        holder.messagePlayImageView.setOnClickListener {
+
+
             if (holder.messagePlayImageView.text.toString().equals(context.getString(R.string.playRecord), true)) {
                 holder.messagePlayImageView.text = context.getString(R.string.stopPlayingRecord)
+                holder.messagePlayImageView.setBackgroundResource(R.drawable.stop)
+           //     mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 0);
                 playRecording(source, holder)
             } else {
+             // holder. messageSeekBar.setOnSeekBarChangeListener(this)
+//                holder.messageSeekBar.setEnabled(false)
+//                holder.messageSeekBar.setProgress(0)
                 holder.messagePlayImageView.text = context.getString(R.string.playRecord)
+                holder.messagePlayImageView.setBackgroundResource(R.drawable.play_audio)
+               // mSeekbarUpdateHandler.removeCallbacks(mUpdateSeekbar);
                 stopPlayingRecording()
             }
         }
     }
+//    private val mSeekbarUpdateHandler = Handler()
+//    private val mUpdateSeekbar = object:Runnable {
+//        public override fun run() {
+//        //   messageSeekBar.setProgress(mediaPlayer!!.getCurrentPosition())
+//            mSeekbarUpdateHandler.postDelayed(this, 50)
+//        }
+//    }
 
     private fun playRecording(source: String, holder: MessageRecyclerViewHolder) {
         mediaPlayer = MediaPlayer()
@@ -269,6 +319,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         mediaPlayer!!.start()
         mediaPlayer!!.setOnCompletionListener {
             holder.messagePlayImageView.text = context.getString(R.string.playRecord)
+            holder.messagePlayImageView.setBackgroundResource(R.drawable.play_audio)
         }
     }
 
@@ -276,6 +327,7 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
         mediaPlayer?.stop()
         mediaPlayer?.release()
         mediaPlayer = null
+
     }
 
     override fun getItemCount(): Int = list.size

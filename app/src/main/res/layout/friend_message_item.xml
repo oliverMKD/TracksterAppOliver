@@ -68,9 +68,10 @@
                 android:layout_height="48dp"
                 android:layout_centerVertical="true"
                 android:text="@string/playRecord"
+                android:textColor="@color/transparent"
                 android:visibility="gone"
                 android:layout_margin="8dp"
-                android:src="@drawable/play_audio"
+
                 />
 
         <SeekBar

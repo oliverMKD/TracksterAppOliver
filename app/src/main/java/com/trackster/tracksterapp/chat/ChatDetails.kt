@@ -646,9 +646,9 @@ class ChatDetails() : BaseChatActivity(), View.OnClickListener {
             R.id.microfon -> {
                 startRecording()
             }
-            R.id.img_selector_image_view -> addMedia()
+           // R.id.img_selector_image_view -> addMedia()
 
-            // R.id.cam ->
+            R.id.cam -> addMedia()
             // authenticateWithFB()
         }
 
