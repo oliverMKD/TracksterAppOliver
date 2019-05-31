@@ -28,8 +28,6 @@ class SelectColorFragment : BaseFragment(), View.OnClickListener {
 
     private lateinit var selectColorAdapter: SelectColorAdapter
     lateinit var apiService: PostApi
-    private var trucksList: MutableList<Colors> = mutableListOf()
-
     var compositeDisposableContainer = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {

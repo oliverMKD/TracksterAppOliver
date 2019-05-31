@@ -56,8 +56,6 @@ abstract class BaseChatActivity : AppCompatActivity() {
 
         initApiService()
 
-        // Listen for media uploads
-        setupMediaUploadListeners()
     }
 
     private fun initApiService() {
@@ -120,26 +118,7 @@ abstract class BaseChatActivity : AppCompatActivity() {
     }
 
     private fun setupMediaUploadListeners() {
-        compositeDisposable.add(RxBus.listen(FeedMediaUploadEvent::class.java).subscribe {
 
-            if (FeedMediaManager.uploadsCounter == 0 && isActivityVisible) {
-                if (it.error == null)
-                    DialogUtils.showMessage(this@BaseChatActivity, getString(R.string.media_message_sent),
-                            DialogInterface.OnDismissListener { dialogInterface: DialogInterface ->
-                                RxBus.publish(ClearFeedDataEvent(true))
-                                dialogInterface.dismiss()
-                            })
-                else
-                    handleApiError(it.error)
-            }
-        })
-
-        compositeDisposable.add(RxBus.listen(DetailsMediaUploadEvent::class.java).subscribe {
-
-            if (DetailsMediaManager.uploadsCounter == 0 && isActivityVisible) {
-                RxBus.publish(ClearPendingMessageEvent(it.error))
-            }
-        })
     }
 
     override fun onResume() {

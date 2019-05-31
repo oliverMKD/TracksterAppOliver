@@ -6,14 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
-import android.net.Uri
-import android.os.*
+import android.os.AsyncTask
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
@@ -39,9 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import com.google.gson.reflect.TypeToken
 import com.google.maps.android.PolyUtil
-import com.shockwave.pdfium.PdfiumCore
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.cameraToPdf.CameraActivity
 import com.trackster.tracksterapp.chat.ChatDetails
@@ -58,15 +56,12 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
 import kotlinx.android.synthetic.main.nav_header_main_screen.*
-import okhttp3.ResponseBody
 import retrofit2.HttpException
-import timber.log.Timber
-import java.io.*
+import java.io.IOException
 import java.net.SocketTimeoutException
 
 class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
     View.OnClickListener {
-
 
     private var googleMap: GoogleMap? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -92,15 +87,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setUpMap()
     }
 
-
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         // 3
         private const val REQUEST_CHECK_SETTINGS = 2
     }
 
-
-    private val currentLoad: Current_Load = Current_Load.newInstance()
+    private val currentLoad: CurrentLoad = CurrentLoad.newInstance()
     private val profileSettings: ProfileSettings = ProfileSettings.newInstance()
     private val historyList: HistoryList = HistoryList.newInstance()
     private val detailsList: DetailsLoad = DetailsLoad.newInstance()
@@ -193,7 +186,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
             }
         }
-//
+
         createLocationRequest()
 
     }
@@ -266,7 +259,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
                 {
                     name_user.text = "${it.body()!!.firstName} ${it.body()!!.lastName}"
-
                     Glide.with(this@MainScreenActivity)
                         .load(it.body()!!.image)
                         .apply(RequestOptions.circleCropTransform())
@@ -312,7 +304,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             if (location != null) {
                 lastLocation = location
                 val currentLatLng = LatLng(location.latitude, location.longitude)
-//                getWeightStations(currentLatLng)
                 placeMarkerOnMap(currentLatLng)
                 googleMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14.5f))
 
@@ -356,6 +347,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                    val gson = Gson()
+                    val dataJson: String = gson.toJson(it)
+                    PreferenceUtils.saveString(this@MainScreenActivity, dataJson)
                     mapsId = it[0].id
                     PreferenceUtils.saveChatId(this, mapsId)
                     getChatById(mapsId)
@@ -400,9 +394,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                             val polyString = poly.points
                             val aa = PolyUtil.decode(polyString)
                             val ruta = PolylineOptions()
-                            (0 until aa.size)
+                            (0.until(aa.size))
                                 .forEach { x ->
-                                    ruta.add(LatLng(aa[x].latitude,aa[x].longitude))
+                                    ruta.add(LatLng(aa[x].latitude, aa[x].longitude))
                                 }
                             ruta.color(Color.BLUE)
                             googleMap!!.addPolyline(ruta)
@@ -424,29 +418,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     PreferenceUtils.saveCarrierName(this@MainScreenActivity, carrierFullName)
                     PreferenceUtils.saveBrokerId(this@MainScreenActivity, brokerId)
                     PreferenceUtils.saveCarrierId(this@MainScreenActivity, carrierId)
-                    if (it.message.size == PreferenceUtils.getSize(this@MainScreenActivity)) {
-                    } else {
-                        val aa = (it.message.size - PreferenceUtils.getSize(this@MainScreenActivity)!!)
-                        val list: List<Message> = it.message.takeLast(aa)
-                        val message = list.listIterator()
-                        message.forEach { item ->
-                            listMessagesCheckSize.add(item)
-                            val preffList = PreferenceUtils.getSize(this@MainScreenActivity)
-                            val sumList = (preffList!! + 1)
-                            PreferenceUtils.saveMessSize(this@MainScreenActivity, sumList)
-                            if (item.file != null) {
-                                if (item.file!!.filename != null) {
-                                    doAsync {
-                                        getFileFromServer(item.file!!.filename!!)
-                                    }.execute()
-                                } else {
-                                    Log.e("getFileFromServer", "1111")
-                                }
-                            } else {
-                                Log.d("getFileFromServer", "22222")
-                            }
-                        }
-                    }
                 },
                     {
                         Log.d("getFileFromServer", "22222")
@@ -454,206 +425,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         )
     }
 
-
-    @SuppressLint("LogNotTimber")
-    private fun getFileFromServer(filename: String) {
-        apiService = PostApi.create(this@MainScreenActivity)
-        compositeDisposable.add(
-            apiService.getFileById(
-                PreferenceUtils.getAuthorizationToken(this@MainScreenActivity),
-                PreferenceUtils.getChatId(this@MainScreenActivity), filename
-            )
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    val writtenToDisk = writeResponseBodyToDisk(it.body(), filename)
-                    Log.d("writtenToDisk", "" + writtenToDisk.toString())
-
-                }, {
-                    Log.d("destinacija", "" + it.localizedMessage)
-                })
-        )
-    }
-
     class doAsync(val handler: () -> Unit) : AsyncTask<Void, Void, Void>() {
         override fun doInBackground(vararg params: Void?): Void? {
             handler()
             return null
-        }
-    }
-
-    @SuppressLint("LogNotTimber")
-    private fun writeResponseBodyToDisk(body: ResponseBody?, fileName: String): Boolean {
-        try {
-            val retrofitBetaFile = File(getExternalFilesDir(null).toString() + File.separator + fileName)
-            Timber.e(retrofitBetaFile.path)
-            var inputStream: InputStream? = null
-            var outputStream: OutputStream? = null
-
-            try {
-                val fileReader = ByteArray(4096)
-
-                val fileSize = body?.contentLength()
-                var fileSizeDownloaded: Long = 0
-
-                inputStream = body?.byteStream()
-                outputStream = FileOutputStream(retrofitBetaFile)
-
-                while (true) {
-                    val read = inputStream!!.read(fileReader)
-                    if (read == -1) {
-                        break
-                    }
-                    outputStream.write(fileReader, 0, read)
-                    fileSizeDownloaded += read.toLong()
-                    Log.d("writeResponseBodyToDisk", "file download: $fileSizeDownloaded of $fileSize")
-                }
-
-
-                outputStream.flush()
-
-                when {
-                    fileName.contains(".pdf") -> {
-                        val uri = Uri.fromFile(retrofitBetaFile)
-                        generateImageFromPdf(uri)
-                    }
-                    fileName.contains(".png") -> {
-                        val pngString = retrofitBetaFile.toString()
-                        val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
-                        var modelString: MutableList<String?> = mutableListOf()
-                        val serializedObject = sharedPref.getString(getString(R.string.sliki), null)
-                        if (serializedObject != null) {
-                            val gson = Gson()
-                            val type = object : TypeToken<List<String>>() {
-                            }.type
-                            modelString = gson.fromJson(serializedObject, type)
-                        }
-                        modelString.add(pngString)
-                        model.add(pngString)
-                        val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
-                        val editor = sharedPreferences.edit()
-                        val gson = Gson()
-                        val json = gson.toJson(modelString)
-                        editor.putString(getString(R.string.sliki), json)
-                        editor.apply()
-                    }
-                    fileName.contains(".aac") || fileName.contains(".mp3") -> {
-                        val audioString = retrofitBetaFile.toString()
-                        val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
-                        var modelString: MutableList<String?> = mutableListOf()
-                        val serializedObject = sharedPref.getString(getString(R.string.aac), null)
-                        if (serializedObject != null) {
-                            val gson = Gson()
-                            val type = object : TypeToken<List<String>>() {
-                            }.type
-                            modelString = gson.fromJson(serializedObject, type)
-                        }
-                        modelString.add(audioString)
-                        val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
-                        val editor = sharedPreferences.edit()
-                        val gson = Gson()
-                        val json = gson.toJson(modelString)
-                        editor.putString(getString(R.string.aac), json)
-                        editor.apply()
-                    }
-                }
-
-                return true
-            } catch (e: IOException) {
-                return false
-            } finally {
-                if (inputStream != null) {
-                    inputStream.close()
-                }
-
-                if (outputStream != null) {
-                    outputStream.close()
-                }
-            }
-        } catch (e: IOException) {
-            return false
-        }
-    }
-
-    private fun generateImageFromPdf(pdfUri: Uri) {
-        val pageNumber = 0
-        val pdfiumCore = PdfiumCore(this)
-        try {
-            //http://www.programcreek.com/java-api-examples/index.php?api=android.os.ParcelFileDescriptor
-            val fd = contentResolver.openFileDescriptor(pdfUri, "r")
-            val pdfDocument = pdfiumCore.newDocument(fd)
-            pdfiumCore.openPage(pdfDocument, pageNumber)
-            val width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber)
-            val height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber)
-            val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height)
-            saveImage(bmp, pdfUri.toString())
-            pdfiumCore.closeDocument(pdfDocument) // important!
-        } catch (e: Exception) {
-
-        }
-    }
-
-    private fun saveImage(bmp: Bitmap, name: String) {
-        val o = BitmapFactory.Options()
-        o.inJustDecodeBounds = true
-        o.inSampleSize = 6
-        val folder = Environment.getExternalStorageDirectory().toString() + "/PDF"
-        var out: FileOutputStream? = null
-        try {
-            val newFolder = File(folder)
-            if (!newFolder.exists())
-                newFolder.mkdirs()
-            val domain: String? = name.substringAfterLast("/")
-            val file = File(newFolder, "$domain.png")
-            val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
-            var modelString: MutableList<String?> = mutableListOf()
-            val serializedObject = sharedPref.getString(getString(R.string.sliki), null)
-            if (serializedObject != null) {
-                val gson = Gson()
-                val type = object : TypeToken<List<String>>() {
-                }.type
-                modelString = gson.fromJson(serializedObject, type)
-            }
-            modelString.add(file.toString())
-            model.add(file.toString())
-            val sharedPreferences = getSharedPreferences(getString(R.string.preff), MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
-            val gson = Gson()
-            val json = gson.toJson(modelString)
-            editor.putString(getString(R.string.sliki), json)
-            editor.apply()
-            out = FileOutputStream(file)
-
-            val REQUIRED_SIZE = 75
-
-            // Find the correct scale value. It should be the power of 2.
-            var scale = 1
-            while (o.outWidth / scale / 2 >= REQUIRED_SIZE &&
-                o.outHeight / scale / 2 >= REQUIRED_SIZE
-            ) {
-                scale *= 2
-            }
-
-            val o2 = BitmapFactory.Options()
-            o2.inSampleSize = scale;
-            val inputStream = FileInputStream(file)
-
-            inputStream.close()
-
-            // here i override the original image file
-            file.createNewFile()
-            val outputStream = FileOutputStream(file)
-
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream) // bmp is your Bitmap instance
-        } catch (e: Exception) {
-            //todo with exception
-        } finally {
-            try {
-                out?.close()
-            } catch (e: Exception) {
-                //todo with exception
-            }
         }
     }
 

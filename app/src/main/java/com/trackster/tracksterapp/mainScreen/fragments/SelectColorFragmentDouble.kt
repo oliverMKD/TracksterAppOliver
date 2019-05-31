@@ -5,13 +5,11 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.ProgressBar
 import com.trackster.tracksterapp.R
-import com.trackster.tracksterapp.adapters.SelectColorAdapter
 import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.mainScreen.adapter_Double.SelectColorAdapterDouble
 import com.trackster.tracksterapp.model.Colors
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
-
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -24,10 +22,8 @@ class SelectColorFragmentDouble : BaseFragment(), View.OnClickListener {
             R.id.select_manufactor_color -> (activity as SelectTrailerActivity).startNewActivity()
         }
     }
-
     private lateinit var selectColorAdapter: SelectColorAdapterDouble
     lateinit var apiService: PostApi
-    private var trucksList: MutableList<Colors> = mutableListOf()
 
     var compositeDisposableContainer = CompositeDisposable()
 
@@ -36,8 +32,6 @@ class SelectColorFragmentDouble : BaseFragment(), View.OnClickListener {
 
         selectColorAdapter = SelectColorAdapterDouble(activity!!)
         getTrucks()
-
-
     }
 
     companion object {
@@ -69,23 +63,19 @@ class SelectColorFragmentDouble : BaseFragment(), View.OnClickListener {
         apiService = PostApi.create(context!!)
         compositeDisposableContainer.add(
             apiService.getColors(
-                PreferenceUtils.getAuthorizationToken(context!!)
-            )
+                PreferenceUtils.getAuthorizationToken(context!!))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     initRecyclerView(it)
-// Log.d("station", " "+ it[0].location)
                 }, {
-                    // showProgress(false)
-//                Utils.handleApiError(it)
+
                 })
         )
-
     }
 
     override fun onDestroy() {
-        compositeDisposableContainer.clear()
+        compositeDisposableContainer.dispose()
         super.onDestroy()
     }
 }

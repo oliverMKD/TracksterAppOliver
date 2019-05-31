@@ -43,7 +43,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="25dp"
                     android:layout_marginTop="20dp"
-                    android:text="Donec scelerisque augue neque,quis pellentes ue enim volutpat vel.usce eget ultrices odio. Proin efficitur tortor nunc, quis aliquet diam commodo eu."
                     android:textAlignment="viewStart"
                     android:textColor="@color/White"
             />
@@ -77,7 +76,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="18dp"
                         android:layout_marginTop="16dp"
-                        android:text="4,900.00"
                         android:textAlignment="viewStart"
                         android:textColor="@color/White"
                 />
@@ -116,7 +114,6 @@
                         android:layout_height="18dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginStart="25dp"
-                        android:text="Robert"
                         android:textAlignment="viewStart"
                         android:textColor="@color/White"
                 />

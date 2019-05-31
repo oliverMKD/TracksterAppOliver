@@ -6,13 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.trackster.tracksterapp.R
-import com.trackster.tracksterapp.network.responce.ChatResponse
+import com.trackster.tracksterapp.model.History
 import kotlinx.android.synthetic.main.recycler_history.view.*
 
-class HistoryRecyclerAdapter (private  val activity: Activity) : RecyclerView.Adapter<HistoryRecyclerAdapter.HistoryRecyclerViewHolder>() {
+class HistoryRecyclerAdapter(private val activity: Activity) :
+    RecyclerView.Adapter<HistoryRecyclerAdapter.HistoryRecyclerViewHolder>() {
 
 
-    private val list: MutableList<ChatResponse?> = arrayListOf()
+    private val list: MutableList<History?> = arrayListOf()
 
 
     inner class HistoryRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -23,14 +24,15 @@ class HistoryRecyclerAdapter (private  val activity: Activity) : RecyclerView.Ad
         val hisbtn = view.hisbtn!!
 
     }
-    fun setData(list: MutableList<ChatResponse>) {
+
+    fun setData(list: MutableList<History>) {
         this.list.clear()
         this.list.addAll(list)
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): HistoryRecyclerViewHolder =
-        HistoryRecyclerViewHolder(LayoutInflater.from(p0.context).inflate(R.layout.recycler_history,p0,false))
+        HistoryRecyclerViewHolder(LayoutInflater.from(p0.context).inflate(R.layout.recycler_history, p0, false))
 
 
     override fun getItemCount(): Int = list.size
@@ -38,9 +40,14 @@ class HistoryRecyclerAdapter (private  val activity: Activity) : RecyclerView.Ad
     override fun onBindViewHolder(holder: HistoryRecyclerViewHolder, position: Int) {
 
         val load = list[position]
-        holder.date.text = load?.plannedDestinationTime
-        holder.routename.text = load!!.description
-        holder.price.text = load!!.price.toString()
-        holder.miles.text = load!!.distance.toString()
+
+        val loadPrice = load!!.price
+        val loadDescription = load.description
+        val loadDistance = load!!.distance
+
+        holder.routename.text = loadDescription
+        holder.price.text = loadPrice
+        holder.miles.text = loadDistance
+
     }
 }

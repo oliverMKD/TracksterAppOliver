@@ -1,63 +1,66 @@
 package com.trackster.tracksterapp.mainScreen.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ProgressBar
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import android.widget.TextView
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
-import com.trackster.tracksterapp.model.ChatResponse
-import com.trackster.tracksterapp.model.User
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_details.*
-import kotlinx.android.synthetic.main.fragment_profil.*
+import org.json.JSONArray
 
-class DetailsLoad :  BaseFragment() {
+
+class DetailsLoad : BaseFragment() {
 
     lateinit var apiService: PostApi
-    private var userInfo: MutableList<ChatResponse> = mutableListOf()
-    var fragmentPosition: Int = 0
     var compositeDisposableContainer = CompositeDisposable()
     private lateinit var Id: String
+
+    private lateinit var description: String
+    private var mPrice: TextView? = null
+    private lateinit var price: String
+    private var mNewPrice: TextView? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getUserInfo()
+
+        var s = PreferenceUtils.getString(context!!)
+        val array = JSONArray(s)
+        for (i in 0 until array.length()) {
+            val row = array.getJSONObject(i)
+            description = row.getString("description")
+            price = row.getString("price")
+//            mDescr!!.text = description
+//            mPrice!!.setText(priceee)
+        }
+
 
     }
 
-    private fun getUserInfo(){
-
-        apiService= PostApi.create(context!!)
+    @SuppressLint("LogNotTimber")
+    private fun getLoadsInfo() {
+        apiService = PostApi.create(context!!)
         compositeDisposableContainer.add(
             apiService.getDetails(
                 PreferenceUtils.getAuthorizationToken(context!!)
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
                 {
                     Id = it[0].id
-                    desc.setText(it[0] .description)
-                    price.setText(it[0].price)
+                    desc.setText(it[0].description)
+//                    price.setText(it[0].price)
                     broker_name.text = it[0].broker.firstName
                     broker_last_name.text = it[0].broker.lastName
-//                    orignin_name.setText(it[0].pickupAddresses.street)
-//                    delivery_house.setText(it[0].pickupAddresses.street)
-//                    pickup.setText(it[0].pickupAddresses.plannedTime)
-//                    delivery_date.setText(it[0].pickupAddresses.plannedTime)
-
-
-
-                } ,{
-                    Log.d("test","error"+ it.localizedMessage)
+                }, {
+                    Log.d("test", "error" + it.localizedMessage)
                 }
             )
         )
@@ -66,9 +69,16 @@ class DetailsLoad :  BaseFragment() {
     override fun onBackStackChanged() {
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        mPrice = view.findViewById(R.id.desc)
+        mPrice!!.text = description
+        mNewPrice = view.findViewById(R.id.price)
+        mNewPrice!!.text = price
+    }
+
     override fun getProgressBar(): ProgressBar? = null
 
-    override fun getLayoutId(): Int = R.layout.fragment_details
+    override fun getLayoutId(): Int = com.trackster.tracksterapp.R.layout.fragment_details
 
     companion object {
         fun newInstance() = DetailsLoad()
@@ -78,9 +88,4 @@ class DetailsLoad :  BaseFragment() {
         (activity as MainScreenActivity).show()
         super.onDestroy()
     }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
 }
