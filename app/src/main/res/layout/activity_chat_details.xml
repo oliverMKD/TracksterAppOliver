@@ -93,6 +93,7 @@
                 android:layout_height="25dp"
                 android:layout_marginEnd="8dp"
                 android:gravity="top"
+                android:visibility="gone"
                 android:layout_gravity="center_vertical"/>
 
 

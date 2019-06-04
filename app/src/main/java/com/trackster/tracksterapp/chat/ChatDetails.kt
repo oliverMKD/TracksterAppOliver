@@ -147,6 +147,8 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
         unregisterBroadcastReceivers()
     }
 
+
+
     private fun registerBroadcastReceivers() {
         registerReceiver(firebaseMessageBroadcastReceiver, IntentFilter(FIREBASE_BROADCAST))
     }
@@ -747,7 +749,8 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     }
 
     override fun onBackPressed() {
-        startActivity(Intent(this@ChatDetails, MainScreenActivity::class.java))
+       // startActivity(Intent(this@ChatDetails, MainScreenActivity::class.java))
+        finish()
     }
 
     private fun probaPdf(uri: Uri?): File {
