@@ -9,7 +9,6 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.AsyncTask
 import android.support.v4.app.NotificationCompat
-import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.trackster.tracksterapp.R
@@ -19,23 +18,35 @@ import com.trackster.tracksterapp.utils.*
 import java.util.*
 import java.util.concurrent.ExecutionException
 
-abstract class MyFirebaseMessagingService : FirebaseMessagingService() {
+class MyFirebaseMessagingService : FirebaseMessagingService() {
     val TAG = "FirebaseMessagingService"
     private var pendingIntent: PendingIntent? = null
 
-    private lateinit var intent : Intent
-    @SuppressLint("LongLogTag", "WrongThread")
+    private lateinit var intent: Intent
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d(TAG, "Dikirim dari: ${remoteMessage.from}")
+        val id = remoteMessage.data.get(FIREBASE_MESSAGE_PAYLOAD_ID_KEY)
         val message = remoteMessage?.data?.get(FIREBASE_MESSAGE_PAYLOAD_KEY)
         val contactName = remoteMessage?.data?.get(FIREBASE_CONTACT_NAME_PAYLOAD_KEY)
         val contactId = remoteMessage?.data?.get(FIREBASE_CONTACT_ID_PAYLOAD_KEY)
-        val pushNotificationId = remoteMessage?.data?.get(FIREBASE_PUSH_NOTIFICATION_ID_PAYLOAD_KEY)
-        sendBroadcastMessage(FirebaseMessage(message, contactName, contactId?.toInt(), pushNotificationId?.toInt()))
-        if (remoteMessage.notification != null) {
-            showNotification(remoteMessage.notification?.title, remoteMessage.notification?.body)
+        val createTime = remoteMessage.data.get(FIREBASE_PUSH_NOTIFICATION_ID_PAYLOAD_KEY)
+        sendBroadcastMessage(FirebaseMessage(id!!, message!!, contactName!!, contactId!!, createTime!!))
+        if (remoteMessage.data != null) {
+            showNotif()
         }
     }
+
+    private fun showNotif() {
+        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val notificationBuilder = NotificationCompat.Builder(this)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setAutoCancel(true)
+            .setSound(soundUri)
+            .setContentIntent(pendingIntent)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(0, notificationBuilder.build())
+    }
+
     private fun sendBroadcastMessage(firebaseMessage: FirebaseMessage) {
         val intent = Intent(FIREBASE_BROADCAST)
         intent.putExtra(FIREBASE_MESSAGE_KEY, firebaseMessage)
@@ -59,15 +70,25 @@ abstract class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
         if (foreground) { //app in foreground
             intent = Intent(this, ChatDetails::class.java)
-            intent.putExtra("intent_backchat", 1)
+            intent.putExtra(CONTENT_KEY, 1)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            pendingIntent = PendingIntent.getActivity(this, Integer.valueOf(random) /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            pendingIntent = PendingIntent.getActivity(
+                this,
+                Integer.valueOf(random) /* Request code */,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
             startActivity(intent)      // to directly open activity if app is foreground
         } else { //app in background
             intent = Intent(this, ChatDetails::class.java)
-            intent.putExtra("intent_backchat", 1)
+            intent.putExtra(CONTENT_KEY, 1)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-            pendingIntent = PendingIntent.getActivity(this, Integer.valueOf(random) /* Request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            pendingIntent = PendingIntent.getActivity(
+                this,
+                Integer.valueOf(random) /* Request code */,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
         }
 
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -82,6 +103,7 @@ abstract class MyFirebaseMessagingService : FirebaseMessagingService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(0, notificationBuilder.build())
     }
+
     @SuppressLint("StaticFieldLeak")
     private inner class ForegroundCheckTask : AsyncTask<Context, Void, Boolean>() {
 

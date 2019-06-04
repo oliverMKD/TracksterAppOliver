@@ -1,30 +1,25 @@
 package com.trackster.tracksterapp.network
 
 import android.content.Context
-import android.support.v4.media.AudioAttributesCompat
-import com.google.android.gms.maps.model.LatLng
 import com.trackster.tracksterapp.model.*
 import com.trackster.tracksterapp.network.connectivity.ConnectivityInterceptor
 import com.trackster.tracksterapp.network.connectivity.HeaderInterceptor
 import com.trackster.tracksterapp.network.requests.*
-
 import com.trackster.tracksterapp.network.responce.ChatResponse
 import com.trackster.tracksterapp.network.responce.ChatResponseId
-import com.trackster.tracksterapp.network.responce.InitialAccessToken
+import com.trackster.tracksterapp.utils.BASE_URL
 import io.reactivex.Observable
+import io.reactivex.Single
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Converter
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import com.trackster.tracksterapp.utils.BASE_URL
-import io.reactivex.Completable
-import io.reactivex.Single
-import okhttp3.*
-import retrofit2.Converter
-import retrofit2.Response
 import retrofit2.http.*
-import retrofit2.http.Headers
-import java.io.IOException
 import java.lang.reflect.Type
 
 
@@ -59,7 +54,7 @@ interface PostApi {
     @GET("weigh-stations/circle")
     fun getWeighStations(
         @Header("x-auth-token") authorization: String,
-        @Query ("center")  centar : String,
+        @Query("center") centar: String,
         @Query("radius") radius: Int
     ): Single<ArrayList<WeighStation>>
 
@@ -68,41 +63,55 @@ interface PostApi {
 
 
     @GET("/chats/{chatId}")
-    fun getChatById(@Header("x-auth-token") authorization: String,
-                    @Path("chatId") chatId: String) : Single<ChatResponseId>
+    fun getChatById(
+        @Header("x-auth-token") authorization: String,
+        @Path("chatId") chatId: String
+    ): Single<ChatResponseId>
 
     @GET("/users/me")
-    fun getInfoUser(@Header("x-auth-token") authorization : String): Observable<Response<User>>
+    fun getInfoUser(@Header("x-auth-token") authorization: String): Observable<Response<User>>
 
     @Headers("Content-Type: application/json")
     @POST("/users")
-    fun updateUser(@Header("x-auth-token") authorization : String,@Body fbLoginRequest: UserRequest): Observable<Response<User>>
+    fun updateUser(@Header("x-auth-token") authorization: String, @Body fbLoginRequest: UserRequest): Observable<Response<User>>
 
     @GET("/chats")
-    fun getDetails(@Header("x-auth-token") authorization : String): Observable<ArrayList<ChatResponse>>
+    fun getDetails(@Header("x-auth-token") authorization: String): Observable<ArrayList<ChatResponse>>
 
     @GET("/chats")
     fun getHistory(@Header("x-auth-token") authorization: String): Observable<ArrayList<ChatResponse>>
 
     @POST("/chats/{chatId}/push/message")
-    fun postMessage(@Header("x-auth-token") authorization: String,
-                    @Path("chatId") chatId: String, @Body message: Message) : Single<Message>
+    fun postMessage(
+        @Header("x-auth-token") authorization: String,
+        @Path("chatId") chatId: String, @Body message: Message
+    ): Single<Message>
+
     @GET("/admin/truck-colors")
     fun getColors(@Header("x-auth-token") authorization: String): Observable<ArrayList<Colors>>
 
     @Multipart
     @POST("/chats/upload/{chatId}")
-    fun postAudio(@Header("x-auth-token") authorization: String,
-                  @Path("chatId") chatId: String, @Part  image : MultipartBody.Part) : Single<Message>
+    fun postAudio(
+        @Header("x-auth-token") authorization: String,
+        @Path("chatId") chatId: String, @Part image: MultipartBody.Part
+    ): Single<Message>
 
 
     @GET("/chats/{chatId}/files/{filename}")
-    fun getFiles(@Header("x-auth-token") authorization: String,
-                    @Path("chatId") chatId: String, @Path("filename") filename : String ) : Observable<Response<ResponseBody>>
+    fun getFiles(
+        @Header("x-auth-token") authorization: String,
+        @Path("chatId") chatId: String, @Path("filename") filename: String
+    ): Observable<Response<ResponseBody>>
 
     @GET("/chats/{chatId}/files/{filename}")
-    fun getFileById(@Header("x-auth-token") authorization: String,
-                    @Path("chatId") chatId: String, @Path("filename") filename: String) : Observable<Response<ResponseBody>>
+    fun getFileById(
+        @Header("x-auth-token") authorization: String,
+        @Path("chatId") chatId: String, @Path("filename") filename: String
+    ): Observable<Response<ResponseBody>>
+
+    @POST("/notifications/register-device")
+    fun postFirebaseToken(@Header("x-auth-token") authorization: String, @Body deviceToken: String): Observable<Response<ResponseBody>>
 
     companion object Factory {
         fun create(context: Context): PostApi {

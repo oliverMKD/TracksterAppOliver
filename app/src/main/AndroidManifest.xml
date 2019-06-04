@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
           package="com.trackster.tracksterapp">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -33,7 +32,8 @@
                 android:label="@string/title_activity_camera"
                 android:theme="@style/AppTheme.NoActionBar.NoActionBar">
         </activity>
-        <activity android:name=".chat.ChatDetails">
+        <activity android:name=".chat.ChatDetails"
+            android:screenOrientation="portrait">
         </activity>
 
         <provider
@@ -45,19 +45,19 @@
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/provider_paths"/>
         </provider>
+        <service android:name="com.trackster.tracksterapp.firebase.MyFirebaseMessagingService"
+                 android:enabled="true"
+                 android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
 
         <service android:name=".firebase.MyFirebaseInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
-
-        <activity
-                android:name=".currentLoad.CurrentLoadActivity"
-                android:label="@string/title_activity_current_load"
-                android:screenOrientation="portrait"
-                android:theme="@style/AppTheme.NoActionBar">
-        </activity>
         <activity
                 android:name=".mainScreen.MainScreenActivity"
                 android:label="@string/title_activity_main_screen"
@@ -76,11 +76,7 @@
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/google_maps_key"/>
 
-        <service android:name=".firebase.MyFirebaseMessagingService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
+
 
         <activity
                 android:name=".selectTrailer.SelectTrailerActivity"

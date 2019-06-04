@@ -3,9 +3,11 @@ package com.trackster.tracksterapp.chat
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.ExifInterface
@@ -16,8 +18,6 @@ import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.provider.DocumentsContract
-import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -42,7 +42,6 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.adapters.MessageRecyclerAdapter
 import com.trackster.tracksterapp.base.BaseChatActivity
 import com.trackster.tracksterapp.base.TracksterApplication
-import com.trackster.tracksterapp.firebase.FirebaseUtils
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.Contact
 import com.trackster.tracksterapp.model.Files
@@ -149,12 +148,10 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     }
 
     private fun registerBroadcastReceivers() {
-        registerReceiver(broadcastReceiver, IntentFilter(TRY_AGAIN_BROADCAST))
         registerReceiver(firebaseMessageBroadcastReceiver, IntentFilter(FIREBASE_BROADCAST))
     }
 
     private fun unregisterBroadcastReceivers() {
-        unregisterReceiver(broadcastReceiver)
         unregisterReceiver(firebaseMessageBroadcastReceiver)
     }
 
@@ -346,7 +343,8 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
                     }
                     fileName.contains(".png") -> {
                         val pngString = retrofitBetaFile.toString()
-                        val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
+                        val sharedPref =
+                            applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
                         var modelString: MutableList<String?> = mutableListOf()
                         val serializedObject = sharedPref.getString(getString(R.string.sliki), null)
                         if (serializedObject != null) {
@@ -365,7 +363,8 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
                     }
                     fileName.contains(".aac") || fileName.contains(".mp3") -> {
                         val audioString = retrofitBetaFile.toString()
-                        val sharedPref = applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
+                        val sharedPref =
+                            applicationContext.getSharedPreferences(getString(R.string.preff), Context.MODE_PRIVATE)
                         var modelString: MutableList<String?> = mutableListOf()
                         val serializedObject = sharedPref.getString(getString(R.string.aac), null)
                         if (serializedObject != null) {
@@ -505,7 +504,7 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
             R.id.microfon -> {
                 startRecording()
             }
-           // R.id.img_selector_image_view -> addMedia()
+            // R.id.img_selector_image_view -> addMedia()
 
             R.id.cam -> addMedia()
 
@@ -621,7 +620,8 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
         compositeDisposable.add(
             apiService.postAudio(
                 PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails), body)
+                PreferenceUtils.getChatId(this@ChatDetails), body
+            )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -644,7 +644,8 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
         compositeDisposable.add(
             apiService.postAudio(
                 PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails), body)
+                PreferenceUtils.getChatId(this@ChatDetails), body
+            )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -695,7 +696,8 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
         compositeDisposable.add(
             apiService.postMessage(
                 PreferenceUtils.getAuthorizationToken(this@ChatDetails),
-                PreferenceUtils.getChatId(this@ChatDetails), message)
+                PreferenceUtils.getChatId(this@ChatDetails), message
+            )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -804,31 +806,13 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     private var firebaseMessageBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val firebaseMessage = intent.getSerializableExtra(FIREBASE_MESSAGE_KEY) as FirebaseMessage?
-            if (firebaseMessage?.contactID == contact?.id) {
-                getMessages()
-            }
-
-            FirebaseUtils.putPushNotificationId(this@ChatDetails, firebaseMessage?.pushNotificationID)
-        }
-    }
-
-    private var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-//            // try again clicked
-            val message = intent.getSerializableExtra(CONTENT_KEY) as Message
-//            message.additionalData.errorSending = false
-//            message.additionalData.isSending = true
-//            DetailsMediaManager.tmpId = message.additionalData.id
-//            if (DetailsMediaManager.hasMedia(message)) {
-//                hasMedia = true
-//                DetailsMediaManager.tmpUri = Uri.parse(message.additionalData.uri)
-//                DetailsMediaManager.uploadFile = message.additionalData.uploadFile
-//                DetailsMediaManager.fileName = message.additionalData.imageName
+//            if (firebaseMessage?.contactID == contact?.id) {
+            getMessages()
 //            }
-            sendMessage(message)
+
         }
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
