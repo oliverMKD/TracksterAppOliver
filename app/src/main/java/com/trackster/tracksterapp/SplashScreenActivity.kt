@@ -37,18 +37,18 @@ class SplashScreenActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         getHash()
-        Glide.with(this)
-            .load(R.drawable.trucklogo)
-            .centerInside()
-            .into(splash_image)
+//        Glide.with(this)
+//            .load(R.drawable.trucklogo)
+//            .centerInside()
+//            .into(splash_image)
 
 
 
         mDelayHandler = Handler()
-
+        mDelayHandler!!.postDelayed(mRunnable, SPLASH_DELAY)
         checkIfUserIsLogged()
         //Navigate with delay
-        mDelayHandler!!.postDelayed(mRunnable, SPLASH_DELAY)
+
     }
 
     override fun onDestroy() {

@@ -61,4 +61,7 @@
     <dimen name="list_view_divider_height">2dp</dimen>
     <dimen name="stroke_width">0.5dp</dimen>
 
+    <dimen name="activity_horizontal_splash_margin">16dp</dimen>
+    <dimen name="activity_vertical_splash_margin">16dp</dimen>
+
 </resources>

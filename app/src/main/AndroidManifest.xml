@@ -100,7 +100,7 @@
         </activity>
         <activity android:name=".ui.login.trailer.TrailerActivity">
         </activity>
-        <activity android:name=".SplashScreenActivity">
+        <activity android:name=".SplashScreenActivity"   android:theme="@style/SplashTheme"  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
