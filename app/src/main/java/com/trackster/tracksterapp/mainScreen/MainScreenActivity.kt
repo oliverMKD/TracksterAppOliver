@@ -56,6 +56,8 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_screen.*
 import kotlinx.android.synthetic.main.app_bar_main_screen.*
 import kotlinx.android.synthetic.main.nav_header_main_screen.*
+import org.json.JSONArray
+import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
@@ -73,6 +75,10 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     var compositeDisposableContainer = CompositeDisposable()
     var listMessagesCheckSize: MutableList<Message> = mutableListOf()
     var model: ArrayList<String?> = arrayListOf()
+    lateinit var driver: JSONObject
+    private lateinit var firstNameJson: String
+    private lateinit var lastNameJson: String
+
 
     private lateinit var locationCallback: LocationCallback
     // 2
@@ -238,8 +244,22 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         when (p0?.id) {
             R.id.hamburger -> {
                 drawer_layout.openDrawer(Gravity.START)
-                getUserInfo()
+                val s = PreferenceUtils.getString(this@MainScreenActivity)
+                val array = JSONArray(s)
+                for (i in 0 until array.length()) {
+                    val row = array.getJSONObject(i)
+                    driver = row.getJSONObject("driver")
+                    firstNameJson = driver.getString("firstName")
+                    lastNameJson = driver.getString("lastName")
+                    var profilePic = driver.getString("image")
+                    name_user.text = """$firstNameJson$lastNameJson"""
+                    Glide.with(this@MainScreenActivity)
+                        .load(profilePic)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(imageView_Drawer)
+                }
             }
+
             R.id.chat -> {
                 val intent = Intent(this@MainScreenActivity, ChatDetails::class.java)
                 intent.putStringArrayListExtra("testPreLoad", model)
@@ -250,26 +270,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
     }
-
-    private fun getUserInfo() {
-        apiService = PostApi.create(this@MainScreenActivity)
-        compositeDisposableContainer.add(
-            apiService.getInfoUser(
-                PreferenceUtils.getAuthorizationToken(this@MainScreenActivity)
-            ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
-                {
-                    name_user.text = "${it.body()!!.firstName} ${it.body()!!.lastName}"
-                    Glide.with(this@MainScreenActivity)
-                        .load(it.body()!!.image)
-                        .apply(RequestOptions.circleCropTransform())
-                        .into(imageView_Drawer)
-                }, {
-                    handleApiError(it.cause)
-                }
-            )
-        )
-    }
-
 
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
@@ -350,9 +350,20 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     val gson = Gson()
                     val dataJson: String = gson.toJson(it)
                     PreferenceUtils.saveString(this@MainScreenActivity, dataJson)
-                    mapsId = it[0].id
-                    PreferenceUtils.saveChatId(this, mapsId)
-                    getChatById(mapsId)
+//
+                    mapsId = PreferenceUtils.getChatId(this@MainScreenActivity)
+                    if (mapsId!=null){
+                        getChatById(mapsId)
+                    }
+                    else {
+                        val iterator = it.listIterator()
+                        for (item in iterator){
+                            val id : String = item.id
+                            PreferenceUtils.saveChatId(this, id)
+                            getChatById(id)
+                        }
+                    }
+
                 }, {
                     handleApiError(it.cause)
                 })
@@ -715,6 +726,14 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         Toast.makeText(this@MainScreenActivity, "You selected : $name color", Toast.LENGTH_LONG).show()
         fragmentTransaction.remove(selectColorFragment)
         openProfileSettingsFragment()
+        fragmentTransaction.commit()
+    }
+    fun getSelectedLoad(id: String) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        Toast.makeText(this@MainScreenActivity, "You selected : $id route", Toast.LENGTH_LONG).show()
+        fragmentTransaction.remove(historyList)
+        PreferenceUtils.saveChatId(this@MainScreenActivity,id)
         fragmentTransaction.commit()
     }
 }

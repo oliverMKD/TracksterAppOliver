@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
@@ -31,6 +33,7 @@ class ProfileSettings : BaseFragment(), View.OnClickListener {
     private lateinit var firstNameJson: String
     private lateinit var lastNameJson: String
     private lateinit var phone: String
+   private lateinit var profilePic : String
 
 
     var compositeDisposableContainer = CompositeDisposable()
@@ -46,6 +49,7 @@ class ProfileSettings : BaseFragment(), View.OnClickListener {
             lastNameJson = driver.getString("lastName")
             phone = driver.getString("phone")
             emailJson = driver.getString("email")
+            profilePic = driver.getString("image")
         }
     }
 
@@ -123,5 +127,9 @@ class ProfileSettings : BaseFragment(), View.OnClickListener {
         name.setText("$firstNameJson$lastNameJson")
         email.setText(emailJson)
         phone_number.setText(phone)
+        Glide.with(this@ProfileSettings)
+            .load(profilePic)
+            .apply(RequestOptions.circleCropTransform())
+            .into(profile_image)
     }
 }
