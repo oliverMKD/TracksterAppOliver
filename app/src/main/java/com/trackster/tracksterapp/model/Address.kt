@@ -9,6 +9,7 @@ data class Address(
     @SerializedName("street")  var street: String,
     @SerializedName("zipCode") var zipCode: String,
     @SerializedName("plannedTime") var plannedTime: String,
+    @SerializedName("formatted") var formatted: String,
     @SerializedName("location") var location: GeoPoint
 
 

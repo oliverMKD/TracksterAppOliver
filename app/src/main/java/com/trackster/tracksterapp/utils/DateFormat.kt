@@ -10,6 +10,8 @@ enum class DateFormat(val format: String) {
 
     DATE_FORMAT_MESSAGE("MMM dd, HH:mm"),
     DATE_FORMAT_MESSAGE_DETAILS("EEEE, MMMM dd"),
+    DATE_FORMAT_MESSAGE_DELIVERY("dd/ MMMM/ yyyy" ),   /// DATE_FORMAT_MESSAGE_DELIVERY("dd/ MMMM/ yyyy, yyyy 'at' hh:mm a"),
+
     TIME_FORMAT_MESSAGE_DETAILS("HH:mm");
 
 
@@ -87,6 +89,25 @@ enum class DateFormat(val format: String) {
 
             return returnTime
         }
+
+        fun formatDateDelivery (value: String?, dateFormat: DateFormat): String {
+            if (value == null)
+                return ""
+
+            val date: Date?
+            try {
+                date = DateFormat.DATE_FORMAT.parse(value)
+            } catch (e: ParseException) {
+                Log.e("TVChat", String.format(Locale.US, "Could not parse date %s", value))
+                return value
+            }
+
+            return SimpleDateFormat(dateFormat.format, Locale.getDefault()).format(date)
+        }
+
+
+
+
     }
 }
 
