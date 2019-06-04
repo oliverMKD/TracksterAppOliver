@@ -813,10 +813,8 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
         }
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.dispose()
     }
-
 }

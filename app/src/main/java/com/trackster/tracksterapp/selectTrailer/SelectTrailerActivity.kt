@@ -1,5 +1,6 @@
 package com.trackster.tracksterapp.selectTrailer
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -30,14 +31,12 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
     private var mDelayHandler: Handler? = null
     internal val mRunnable: Runnable = Runnable {
         if (!isFinishing) {
-
             goToSelectTruckFragment()
         }
     }
-
-    private val selectTrailerFragment : SelectTrailerFragment = SelectTrailerFragment.newInstance()
-    private val selectTracksFragment : SelectTruckFragment = SelectTruckFragment.newInstance()
-    private val selectColorFragment : SelectColorFragment = SelectColorFragment.newInstance()
+    private val selectTrailerFragment: SelectTrailerFragment = SelectTrailerFragment.newInstance()
+    private val selectTracksFragment: SelectTruckFragment = SelectTruckFragment.newInstance()
+    private val selectColorFragment: SelectColorFragment = SelectColorFragment.newInstance()
 
 
     companion object {
@@ -45,6 +44,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
         const val FRAGMENT_CHOOSE_MORE_ITEMS = "fragment_choose_more_items"
 
     }
+
     private fun openSelectTrailerFragment() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -58,6 +58,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
         fragmentTransaction.commit()
     }
+
     public fun openSelectTruckFragment() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -73,6 +74,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
         fragmentTransaction.commit()
     }
+
     public fun openSelectColorFragment() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -149,20 +151,41 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
         mDelayHandler = Handler()
         mDelayHandler!!.postDelayed(mRunnable, SPLASH_DELAY)
     }
+
     fun getSelectedTruck(id: String) {
         Toast.makeText(this@SelectTrailerActivity, "You selected : " + id + " truck", Toast.LENGTH_LONG).show()
         openSelectColorFragment()
     }
 
-    fun getSelectedColor(name_color : String) {
-        Toast.makeText(this@SelectTrailerActivity, "You selected : " +  name_color +  "color", Toast.LENGTH_LONG).show()
+    fun getSelectedColor(name_color: String) {
+        Toast.makeText(this@SelectTrailerActivity, "You selected : " + name_color + "color", Toast.LENGTH_LONG).show()
         startActivity(Intent(this@SelectTrailerActivity, MainScreenActivity::class.java))
     }
 
     private fun goToSelectTruckFragment() {
         openSelectTruckFragment()
     }
-    public fun startNewActivity(){
+
+    public fun startNewActivity() {
         startActivity(Intent(this@SelectTrailerActivity, MainScreenActivity::class.java))
     }
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+            .setTitle("Exit")
+            .setMessage("Are you sure you want to exit?")
+            .setNegativeButton(android.R.string.no, null)
+            .setPositiveButton(
+                android.R.string.yes
+            ) { _, _ ->
+                val intent = Intent(Intent.ACTION_MAIN)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                intent.addCategory(Intent.CATEGORY_HOME)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+                onDestroy()
+            }.create().show()
+    }
+
 }

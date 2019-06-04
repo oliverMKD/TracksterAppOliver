@@ -182,6 +182,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
         PreferenceUtils.saveAuthorizationToken(this@LoginPane, token)
         startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
+        finish()
 
 //        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS
     }
@@ -245,6 +246,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                     gogbtn!!.visibility = View.INVISIBLE
                     resendcode!!.visibility = View.VISIBLE
                     startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
+                    finish()
                 }
 
                 override fun onCancel() {

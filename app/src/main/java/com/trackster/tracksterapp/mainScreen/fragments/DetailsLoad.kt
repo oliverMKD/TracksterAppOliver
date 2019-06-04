@@ -75,26 +75,6 @@ class DetailsLoad : BaseFragment() {
         }
     }
 
-    @SuppressLint("LogNotTimber")
-    private fun getLoadsInfo() {
-        apiService = PostApi.create(context!!)
-        compositeDisposableContainer.add(
-            apiService.getDetails(
-                PreferenceUtils.getAuthorizationToken(context!!)
-            ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(
-                {
-                    Id = it[0].id
-                    desc.setText(it[0].description)
-//                    price.setText(it[0].price)
-                    broker_name.text = it[0].broker.firstName
-                    broker_last_name.text = it[0].broker.lastName
-                }, {
-                    Log.d("test", "error" + it.localizedMessage)
-                }
-            )
-        )
-    }
-
     override fun onBackStackChanged() {
     }
 
@@ -116,7 +96,6 @@ class DetailsLoad : BaseFragment() {
         var messageDateDelivery = DateFormat.formatDateDelivery(deliveryTime, DateFormat.DATE_FORMAT_MESSAGE_DELIVERY)
         mDeliveryTime!!.text = messageDateDelivery
 
-
     }
 
     override fun getProgressBar(): ProgressBar? = null
@@ -126,6 +105,7 @@ class DetailsLoad : BaseFragment() {
     companion object {
         fun newInstance() = DetailsLoad()
     }
+
 
     override fun onDestroy() {
         (activity as MainScreenActivity).show()

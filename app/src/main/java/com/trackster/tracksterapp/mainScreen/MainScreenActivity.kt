@@ -2,7 +2,9 @@ package com.trackster.tracksterapp.mainScreen
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
@@ -45,7 +47,6 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.cameraToPdf.CameraActivity
 import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.mainScreen.fragments.*
-import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
@@ -74,7 +75,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private lateinit var mapsId: String
     private var mDelayHandler: Handler? = null
     var compositeDisposableContainer = CompositeDisposable()
-    var listMessagesCheckSize: MutableList<Message> = mutableListOf()
     var model: ArrayList<String?> = arrayListOf()
     lateinit var driver: JSONObject
     private lateinit var firstNameJson: String
@@ -754,7 +754,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         fragmentTransaction.remove(historyList)
         PreferenceUtils.removePreference(this@MainScreenActivity, "mess_size")
         PreferenceUtils.saveChatId(this@MainScreenActivity, id)
-        getChatById(id)
+        startActivity(Intent(this@MainScreenActivity, MainScreenActivity::class.java))
         fragmentTransaction.commit()
     }
 

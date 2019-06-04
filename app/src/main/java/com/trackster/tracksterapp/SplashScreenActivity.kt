@@ -59,10 +59,11 @@ class SplashScreenActivity : AppCompatActivity() {
         val userId = PreferenceUtils.getAuthorizationToken(this)
         if(userId!=null && userId.isNotEmpty()){
             startActivity(Intent(this@SplashScreenActivity, MainScreenActivity::class.java))
+            finish()
 
         } else{
-
             startActivity(Intent(this@SplashScreenActivity, LoginPane::class.java))
+            finish()
         }
     }
 
