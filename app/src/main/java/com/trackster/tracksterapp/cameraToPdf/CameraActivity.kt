@@ -85,7 +85,7 @@ class CameraActivity : AppCompatActivity() {
         }
         fab_flash.setBackgroundResource(R.drawable.flash1)
         fab_flash.setOnClickListener {
-                changeFlashState()
+            changeFlashState()
         }
     }
 
@@ -244,7 +244,8 @@ class CameraActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        startActivity(Intent(this@CameraActivity, MainScreenActivity::class.java))
+        super.onBackPressed()
+        finish()
     }
 }
 
