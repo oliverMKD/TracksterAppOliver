@@ -55,10 +55,66 @@ class TrailersRecyclerAdapter(private val activity: Activity) :
         val load = list[position]
         val loadDescription = load!!.name
         holder.price.text = loadDescription
-        Glide.with(activity)
-            .load(R.drawable.trailer)
-            .apply(RequestOptions.circleCropTransform())
-            .into(holder.description);
+
+
+        if (loadDescription == "Dryvan") {
+            Glide.with(activity)
+                .load(R.drawable.dryvan)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        } else if (loadDescription == "Flatbed") {
+            Glide.with(activity)
+                .load(R.drawable.flatbed)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        }
+        else if (loadDescription == "Reefer") {
+            Glide.with(activity)
+                .load(R.drawable.reefer)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        }
+        else if (loadDescription == "Agriculture Equipment Transport Trailers") {
+            Glide.with(activity)
+                .load(R.drawable.agriculture_equipment_transport_railers)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        }
+        else if (loadDescription == "Belt Trailers") {
+            Glide.with(activity)
+                .load(R.drawable.belt_trailers)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        }
+
+        else if (loadDescription == "Beverage Trailers") {
+            Glide.with(activity)
+                .load(R.drawable.beverage_trailers)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        }
+        else if (loadDescription == "Blade / Tower Trailers") {
+            Glide.with(activity)
+                .load(R.drawable.blade_tower_trailers)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        }
+
+        else if (loadDescription == "Boom Dolly Trailers") {
+            Glide.with(activity)
+                .load(R.drawable.boom_dolly_trailers)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        }
+
+        else if (loadDescription == "Enclosed") {
+            Glide.with(activity)
+                .load(R.drawable.enclosed)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.description);
+        }
+
+
         holder.itemView.setOnClickListener {
             if (load != null) {
                 (activity as SelectTrailerActivity).getSelectedTrailer(load.name)
