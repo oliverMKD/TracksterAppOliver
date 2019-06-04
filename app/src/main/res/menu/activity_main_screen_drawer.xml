@@ -12,6 +12,7 @@
                 android:title="My Routes"/>
         <item
                 android:id="@+id/loads"
+                android:visible="false"
                 android:title="My Loads"/>
         <item
                 android:id="@+id/history"
