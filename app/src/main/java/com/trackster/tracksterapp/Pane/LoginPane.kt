@@ -3,10 +3,9 @@ package com.trackster.tracksterapp.Pane
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
-import android.media.Image
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -20,27 +19,21 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.iid.FirebaseInstanceId
 import com.trackster.tracksterapp.R
-import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.requests.FbLoginRequest
 import com.trackster.tracksterapp.network.requests.LoginRequestWithPhone
 import com.trackster.tracksterapp.network.requests.ValidatePhoneRequest
 import com.trackster.tracksterapp.selectTrailer.SelectTrailerActivity
-import com.trackster.tracksterapp.ui.login.trailer.TrailerActivity
 import com.trackster.tracksterapp.utils.PreferenceUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_login_pane.*
 import java.util.*
 
 class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
@@ -65,6 +58,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
     private lateinit var lastLocation: Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var callbackManager: CallbackManager? = null
+    private val compositeDisposable = CompositeDisposable()
 
 
     companion object {
@@ -78,8 +72,6 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        var refreshedToken = FirebaseInstanceId.getInstance().getToken()
-        Log.d("tokenFCM", "FCM token: " + refreshedToken)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         logintext1 = findViewById<TextView>(R.id.logintext)
@@ -152,18 +144,14 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         }
     }
 
-
     override fun onClick(p0: View?) {
 
         when (p0?.id) {
             R.id.loginBtn -> getPhoneNumber()
             R.id.fbtn -> loginFB()
-
             R.id.validatebtn -> validatePhone()
-
         }
     }
-
 
     private fun getPhoneNumber() {
 
@@ -175,24 +163,25 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
         loginbtn!!.visibility = View.INVISIBLE
 
         smstext!!.visibility = View.VISIBLE
-        or!!.visibility=View.INVISIBLE
-        view2!!.visibility=View.INVISIBLE
-        view1!!.visibility=View.INVISIBLE
-        fcb!!.visibility=View.INVISIBLE
-        gogbtn!!.visibility=View.INVISIBLE
-        resendcode!!.visibility=View.VISIBLE
+        or!!.visibility = View.INVISIBLE
+        view2!!.visibility = View.INVISIBLE
+        view1!!.visibility = View.INVISIBLE
+        fcb!!.visibility = View.INVISIBLE
+        gogbtn!!.visibility = View.INVISIBLE
+        resendcode!!.visibility = View.VISIBLE
     }
 
     private fun validatePhone() {
 
         val number = phone1?.text.toString()
         val code = code1?.text.toString()
-        val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6Ik9saXZlciBCb3ppbm92c2tpIEJvemlub3Zza2kiLCJsYXN0TmFtZSI6IkJvemlub3Zza2kiLCJ1c2VyVHlwZSI6NiwiaWF0IjoxNTU5NjQ4ODQ1LCJleHAiOjE1NjAyNTM2NDV9.-BmFlittjBLzE89wcpAw3JP68nqn5PvP2_kVGVdA6D4"
-val id = "5c7ac90b9ce4ba08c29a72b6"
+        val token =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2FjOTBiOWNlNGJhMDhjMjlhNzJiNiIsImNvbXBhbnlJZCI6IjVjNmMwMWI3ZjRlNWYzMWMzYzkxYzc4MCIsImZpcnN0TmFtZSI6Ik9saXZlciBCb3ppbm92c2tpIEJvemlub3Zza2kiLCJsYXN0TmFtZSI6IkJvemlub3Zza2kiLCJ1c2VyVHlwZSI6NiwiaWF0IjoxNTU5NjQ4ODQ1LCJleHAiOjE1NjAyNTM2NDV9.-BmFlittjBLzE89wcpAw3JP68nqn5PvP2_kVGVdA6D4"
+        val id = "5c7ac90b9ce4ba08c29a72b6"
         PreferenceUtils.saveUserId(this@LoginPane, id)
 
-       PreferenceUtils.saveAuthorizationToken(this@LoginPane,token)
-        startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
+        PreferenceUtils.saveAuthorizationToken(this@LoginPane, token)
+        startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
 
 //        validateWithPhone(number, code) // ova ke go aktivirame koga ke vrakja token po SMS
     }
@@ -205,7 +194,7 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-//                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
+                    //                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
 
                 }, {
 
@@ -223,7 +212,7 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-//                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
+                    //                    startActivity(Intent(this@LoginPane, TrailerActivity::class.java))
 
                 }, {
 
@@ -249,12 +238,12 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                     loginbtn!!.visibility = View.INVISIBLE
 
                     smstext!!.visibility = View.VISIBLE
-                    or!!.visibility=View.INVISIBLE
-                    view2!!.visibility=View.INVISIBLE
-                    view1!!.visibility=View.INVISIBLE
-                    fcb!!.visibility=View.INVISIBLE
-                    gogbtn!!.visibility=View.INVISIBLE
-                    resendcode!!.visibility=View.VISIBLE
+                    or!!.visibility = View.INVISIBLE
+                    view2!!.visibility = View.INVISIBLE
+                    view1!!.visibility = View.INVISIBLE
+                    fcb!!.visibility = View.INVISIBLE
+                    gogbtn!!.visibility = View.INVISIBLE
+                    resendcode!!.visibility = View.VISIBLE
                     startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
                 }
 
@@ -276,9 +265,9 @@ val id = "5c7ac90b9ce4ba08c29a72b6"
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    PreferenceUtils.saveAuthorizationToken(this,it.body()!!.token)
-                    PreferenceUtils.saveUserId(this,it.body()!!.id)
-                    startActivity(Intent(this@LoginPane,SelectTrailerActivity::class.java))
+                    PreferenceUtils.saveAuthorizationToken(this, it.body()!!.token)
+                    PreferenceUtils.saveUserId(this, it.body()!!.id)
+                    startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
 
                 }, {
                     Log.d("pane", "error")

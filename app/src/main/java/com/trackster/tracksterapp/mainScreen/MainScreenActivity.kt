@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Address
@@ -28,7 +27,6 @@ import android.view.*
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.facebook.FacebookSdk
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -39,6 +37,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.maps.android.PolyUtil
@@ -116,6 +115,15 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         hamburger.setOnClickListener(this)
         chat.setOnClickListener(this)
         attach.setOnClickListener(this)
+        if (PreferenceUtils.getFirebaseToken(this@MainScreenActivity) == null
+            || PreferenceUtils.getFirebaseToken(this@MainScreenActivity).isEmpty()
+        ) {
+            val refreshedToken = FirebaseInstanceId.getInstance().token
+            Log.d("tokenFCM", "FCM token: " + refreshedToken)
+            PreferenceUtils.saveFirebaseToken(this@MainScreenActivity, refreshedToken!!)
+            authenticateWithFirebase(refreshedToken!!)
+        }
+
 
         floatBtn.setOnClickListener {
 
@@ -168,13 +176,6 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 20 // Y offset
             )
         }
-
-
-
-
-
-
-
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
             R.string.navigation_drawer_open,
@@ -198,7 +199,23 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         createLocationRequest()
 
     }
-    fun firstTimeWindow (){
+
+    private fun authenticateWithFirebase(id: String) {
+        apiService = PostApi.create(this@MainScreenActivity)
+        compositeDisposable.add(
+            apiService.postFirebaseToken(
+                PreferenceUtils.getAuthorizationToken(this), id
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+
+                }, {
+                })
+        )
+    }
+
+    fun firstTimeWindow() {
         val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
         val view = inflater.inflate(R.layout.warning_dialog, null)
@@ -235,6 +252,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         )
 
     }
+
     fun show() {
         attach.visibility = View.VISIBLE
         hamburger.visibility = View.VISIBLE
@@ -354,13 +372,12 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     PreferenceUtils.saveString(this@MainScreenActivity, dataJson)
 //
                     mapsId = PreferenceUtils.getChatId(this@MainScreenActivity)
-                    if (mapsId!=null || !mapsId.isEmpty()){
+                    if (mapsId != null || !mapsId.isEmpty()) {
                         getChatById(mapsId)
-                    }
-                    else {
+                    } else {
                         val iterator = it.listIterator()
-                        for (item in iterator){
-                            val id : String = item.id
+                        for (item in iterator) {
+                            val id: String = item.id
                             PreferenceUtils.saveChatId(this, id)
                             getChatById(id)
                         }
@@ -730,12 +747,13 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         openProfileSettingsFragment()
         fragmentTransaction.commit()
     }
+
     fun getSelectedLoad(id: String) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.remove(historyList)
-        PreferenceUtils.removePreference(this@MainScreenActivity,"mess_size")
-        PreferenceUtils.saveChatId(this@MainScreenActivity,id)
+        PreferenceUtils.removePreference(this@MainScreenActivity, "mess_size")
+        PreferenceUtils.saveChatId(this@MainScreenActivity, id)
         getChatById(id)
         fragmentTransaction.commit()
     }

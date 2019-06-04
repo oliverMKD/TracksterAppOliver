@@ -1,15 +1,9 @@
 package com.trackster.tracksterapp.utils
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import android.text.TextUtils
-import com.facebook.AccessToken
-import com.facebook.login.LoginManager
-import com.google.gson.Gson
-import com.trackster.tracksterapp.network.responce.InitialAccessToken
-import java.util.*
+import com.trackster.tracksterapp.R
 
 object PreferenceUtils {
 
@@ -27,7 +21,8 @@ object PreferenceUtils {
     private const val PNG_SIZE = "png_size"
     private const val AAC_SIZE = "aac_size"
 
-    private fun getPreferences(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private fun getPreferences(context: Context): SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 
     private inline fun SharedPreferences.edit(operation: (SharedPreferences.Editor) -> Unit) {
         val editor = this.edit()
@@ -72,68 +67,89 @@ object PreferenceUtils {
         getPreferences(context)[KEY_AUTH_TOKEN] = token
     }
 
-    fun getAuthorizationToken(context: Context): String = getPreferences(context).getString(KEY_AUTH_TOKEN, "") as String
+    fun getAuthorizationToken(context: Context): String =
+        getPreferences(context).getString(KEY_AUTH_TOKEN, "") as String
+
     fun saveUserId(context: Context, id: String) {
         getPreferences(context)[KEY_USER_ID] = id
     }
+
     fun getUserId(context: Context): String = getPreferences(context).getString(KEY_USER_ID, "") as String
 
     fun saveChatId(context: Context, id: String) {
         getPreferences(context)[KEY_CHAT_ID] = id
     }
+
     fun getChatId(context: Context): String = getPreferences(context).getString(KEY_CHAT_ID, "") as String
 
     fun saveDriverName(context: Context, id: String) {
         getPreferences(context)[KEY_DRIVER_NAME] = id
     }
+
     fun getDriverName(context: Context): String = getPreferences(context).getString(KEY_DRIVER_NAME, "") as String
 
     fun saveBrokerName(context: Context, id: String) {
         getPreferences(context)[KEY_BROKER_NAME] = id
     }
+
     fun getBrokerName(context: Context): String = getPreferences(context).getString(KEY_BROKER_NAME, "") as String
 
     fun saveCarrierName(context: Context, id: String) {
         getPreferences(context)[CARRIER_NAME] = id
     }
+
     fun getCarrierName(context: Context): String = getPreferences(context).getString(CARRIER_NAME, "") as String
 
     fun saveCarrierId(context: Context, id: String) {
         getPreferences(context)[CARRIER_ID] = id
     }
+
     fun getCarrierId(context: Context): String = getPreferences(context).getString(CARRIER_ID, "") as String
 
     fun saveBrokerId(context: Context, id: String) {
         getPreferences(context)[BROKER_ID] = id
     }
+
     fun getBrokerId(context: Context): String = getPreferences(context).getString(BROKER_ID, "") as String
 
     fun saveMessSize(context: Context, id: Int) {
         getPreferences(context)[MESS_SIZE] = id
     }
+
     fun getSize(context: Context): Int? = getPreferences(context).getInt(MESS_SIZE, 0)
 
     fun savePDFSize(context: Context, id: Int) {
         getPreferences(context)[PDF_SIZE] = id
     }
+
     fun getPDFSize(context: Context): Int? = getPreferences(context).getInt(PDF_SIZE, 0)
 
     fun savePNGSize(context: Context, id: Int) {
         getPreferences(context)[PNG_SIZE] = id
     }
+
     fun getPNGSize(context: Context): Int? = getPreferences(context).getInt(PNG_SIZE, 0)
 
     fun saveAudioSize(context: Context, id: Int) {
         getPreferences(context)[AAC_SIZE] = id
     }
+
     fun getAudioSize(context: Context): Int? = getPreferences(context).getInt(AAC_SIZE, 0)
 
     fun saveString(context: Context, id: String) {
         getPreferences(context)["string"] = id
     }
+
     fun getString(context: Context): String = getPreferences(context).getString("string", "") as String
 
-     fun removePreference(context:Context, key:String) {
+    fun saveFirebaseToken(context: Context, id: String) {
+        getPreferences(context)[context.getString(R.string.firebaseToken)] = id
+    }
+
+    fun getFirebaseToken(context: Context): String =
+        getPreferences(context).getString(context.getString(R.string.firebaseToken), "") as String
+
+    fun removePreference(context: Context, key: String) {
         val preferences = getPreferences(context)
         val editor = preferences.edit()
         editor.remove(key)
