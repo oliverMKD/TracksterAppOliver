@@ -25,10 +25,10 @@ class HistoryList : BaseFragment() {
     var compositeDisposableContainer = CompositeDisposable()
     private lateinit var description: String
     private lateinit var price: String
+    private lateinit var chatId: String
     private var distance: Int? = null
     private var lista : MutableList<History> = mutableListOf()
     private lateinit var recyclerHistory: RecyclerView
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +40,9 @@ class HistoryList : BaseFragment() {
             description = row.getString("description")
             price = row.getString("price")
             distance = row.getInt("distance")
+            chatId = row.getString("id")
             val aa = distance.toString()
-            val cc  = History(description,price,aa)
+            val cc  = History(description,price,aa,chatId)
             lista.add(cc)
         }
     }
