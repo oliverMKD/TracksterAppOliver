@@ -100,6 +100,11 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
 
     }
 
+    override fun onBackPressed() {
+
+
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
