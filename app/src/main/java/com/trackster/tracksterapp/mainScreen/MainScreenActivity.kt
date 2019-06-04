@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Address
@@ -27,6 +28,7 @@ import android.view.*
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.facebook.FacebookSdk
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -352,7 +354,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     PreferenceUtils.saveString(this@MainScreenActivity, dataJson)
 //
                     mapsId = PreferenceUtils.getChatId(this@MainScreenActivity)
-                    if (mapsId!=null){
+                    if (mapsId!=null || !mapsId.isEmpty()){
                         getChatById(mapsId)
                     }
                     else {
@@ -731,9 +733,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     fun getSelectedLoad(id: String) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-        Toast.makeText(this@MainScreenActivity, "You selected : $id route", Toast.LENGTH_LONG).show()
         fragmentTransaction.remove(historyList)
+        PreferenceUtils.removePreference(this@MainScreenActivity,"mess_size")
         PreferenceUtils.saveChatId(this@MainScreenActivity,id)
+        getChatById(id)
         fragmentTransaction.commit()
     }
+
 }

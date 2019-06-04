@@ -1,5 +1,6 @@
 package com.trackster.tracksterapp.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
@@ -132,4 +133,10 @@ object PreferenceUtils {
     }
     fun getString(context: Context): String = getPreferences(context).getString("string", "") as String
 
+     fun removePreference(context:Context, key:String) {
+        val preferences = getPreferences(context)
+        val editor = preferences.edit()
+        editor.remove(key)
+        editor.apply()
+    }
 }
