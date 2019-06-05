@@ -15,6 +15,7 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.model.FirebaseMessage
 import com.trackster.tracksterapp.utils.*
+import org.greenrobot.eventbus.EventBus
 import java.util.*
 import java.util.concurrent.ExecutionException
 
@@ -24,15 +25,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private lateinit var intent: Intent
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        val id = remoteMessage.data.get(FIREBASE_MESSAGE_PAYLOAD_ID_KEY)
+        val id = remoteMessage.data.get(FIREBASE_CONTACT_ID_PAYLOAD_KEY)
         val message = remoteMessage?.data?.get(FIREBASE_MESSAGE_PAYLOAD_KEY)
-        val contactName = remoteMessage?.data?.get(FIREBASE_CONTACT_NAME_PAYLOAD_KEY)
-        val contactId = remoteMessage?.data?.get(FIREBASE_CONTACT_ID_PAYLOAD_KEY)
-        val createTime = remoteMessage.data.get(FIREBASE_PUSH_NOTIFICATION_ID_PAYLOAD_KEY)
-        sendBroadcastMessage(FirebaseMessage(id!!, message!!, contactName!!, contactId!!, createTime!!))
-        if (remoteMessage.data != null) {
-            showNotif()
-        }
+//        val contactName = remoteMessage?.data?.get(FIREBASE_CONTACT_NAME_PAYLOAD_KEY)
+//        val contactId = remoteMessage?.data?.get(FIREBASE_CONTACT_ID_PAYLOAD_KEY)
+//        val createTime = remoteMessage.data.get(FIREBASE_PUSH_NOTIFICATION_ID_PAYLOAD_KEY)
+        EventBus.getDefault().post(FirebaseMessage(id!!,message!!))
+//        sendBroadcastMessage(FirebaseMessage(id!!, message!!, contactName!!, contactId!!, createTime!!))
+//        if (remoteMessage.notification != null) {
+//            showNotification(remoteMessage.notification?.title, remoteMessage.notification?.body)
+//        }
     }
 
     private fun showNotif() {

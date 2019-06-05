@@ -108,4 +108,6 @@ dependencies {
 
     //camera
     implementation "com.priyankvasa.android:cameraview-ex:3.5.3-alpha"
+
+    implementation 'org.greenrobot:eventbus:3.0.0'
 }
