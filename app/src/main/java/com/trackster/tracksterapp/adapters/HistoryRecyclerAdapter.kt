@@ -9,6 +9,9 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.model.History
 import kotlinx.android.synthetic.main.recycler_history.view.*
+import android.text.method.TextKeyListener.clear
+
+
 
 class HistoryRecyclerAdapter(private val activity: Activity) :
     RecyclerView.Adapter<HistoryRecyclerAdapter.HistoryRecyclerViewHolder>() {
@@ -30,6 +33,11 @@ class HistoryRecyclerAdapter(private val activity: Activity) :
         this.list.clear()
         this.list.addAll(list)
         notifyDataSetChanged()
+    }
+
+    fun clearData() {
+        list.clear() // clear list
+        notifyDataSetChanged() // let your adapter know about the changes and reload view.
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): HistoryRecyclerViewHolder =
