@@ -33,6 +33,7 @@ class HistoryList : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         historyAdapter = HistoryRecyclerAdapter(activity!!)
+        lista.clear()
         val s = PreferenceUtils.getString(context!!)
         val array = JSONArray(s)
         for (i in 0 until array.length()) {
@@ -80,7 +81,7 @@ class HistoryList : BaseFragment() {
         recyclerHistory.layoutManager = LinearLayoutManager(context)
         recyclerHistory.removeAllViewsInLayout()
         recyclerHistory.adapter = historyAdapter
-        historyAdapter.clearData()
+        historyAdapter.clearData(lista)
         historyAdapter.setData(lista)
     }
 

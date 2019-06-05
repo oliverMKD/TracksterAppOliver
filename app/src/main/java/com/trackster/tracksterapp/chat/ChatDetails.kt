@@ -57,6 +57,8 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import timber.log.Timber
 import java.io.*
 
@@ -80,7 +82,6 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     var listMessagesCheckSize: MutableList<Message> = mutableListOf()
 
 
-    private var contact: Contact? = null
     private var isMessageSendable = false
     private var hasMedia = false
     private var isMediaPortrait = false
@@ -132,7 +133,6 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         isActivityVisible = true
-        registerBroadcastReceivers()
 
         if (TracksterApplication.shouldReload) {
             getMessages()
@@ -144,17 +144,6 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     override fun onPause() {
         super.onPause()
         isActivityVisible = false
-        unregisterBroadcastReceivers()
-    }
-
-
-
-    private fun registerBroadcastReceivers() {
-        registerReceiver(firebaseMessageBroadcastReceiver, IntentFilter(FIREBASE_BROADCAST))
-    }
-
-    private fun unregisterBroadcastReceivers() {
-        unregisterReceiver(firebaseMessageBroadcastReceiver)
     }
 
     private fun initMutualViews() {
@@ -514,7 +503,7 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
 
     }
 
-    fun startRecording() {
+    private fun startRecording() {
         fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             if (requestCode == PERMISSION_REQUEST_CODE) {
@@ -806,14 +795,18 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
         hasMedia = true
     }
 
-    private var firebaseMessageBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val firebaseMessage = intent.getSerializableExtra(FIREBASE_MESSAGE_KEY) as FirebaseMessage?
-//            if (firebaseMessage?.contactID == contact?.id) {
-            getMessages()
-//            }
+    @Subscribe
+     fun onEvent( event : FirebaseMessage) {
+        Toast.makeText(this, "Hey, my message" + event.content, Toast.LENGTH_SHORT).show()
+    }
+    override fun onStart() {
+        super.onStart()
+    EventBus.getDefault().register(this)
+    }
 
-        }
+    override fun onStop() {
+        super.onStop()
+        EventBus.getDefault().unregister(this)
     }
 
     override fun onDestroy() {

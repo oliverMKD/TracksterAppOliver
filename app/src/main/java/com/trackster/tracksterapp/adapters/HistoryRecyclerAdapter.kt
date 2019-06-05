@@ -35,8 +35,8 @@ class HistoryRecyclerAdapter(private val activity: Activity) :
         notifyDataSetChanged()
     }
 
-    fun clearData() {
-        list.clear() // clear list
+    fun clearData(list: MutableList<History>) {
+       this.list.clear() // clear list
         notifyDataSetChanged() // let your adapter know about the changes and reload view.
     }
 

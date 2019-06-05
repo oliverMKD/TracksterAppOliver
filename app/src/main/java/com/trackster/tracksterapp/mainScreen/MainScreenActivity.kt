@@ -755,6 +755,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         PreferenceUtils.removePreference(this@MainScreenActivity, "mess_size")
         PreferenceUtils.saveChatId(this@MainScreenActivity, id)
         startActivity(Intent(this@MainScreenActivity, MainScreenActivity::class.java))
+        finish()
         fragmentTransaction.commit()
     }
 

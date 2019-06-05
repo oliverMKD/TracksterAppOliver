@@ -1,35 +1,50 @@
 {
   "project_info": {
-    "project_number": "588376677284",
-    "firebase_url": "https://truckscope-android.firebaseio.com",
-    "project_id": "truckscope-android",
-    "storage_bucket": "truckscope-android.appspot.com"
+    "project_number": "1016138437423",
+    "firebase_url": "https://truckscope-local.firebaseio.com",
+    "project_id": "truckscope-local",
+    "storage_bucket": "truckscope-local.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:588376677284:android:e2d7f9e64bb71e58",
+        "mobilesdk_app_id": "1:1016138437423:android:e2d7f9e64bb71e58",
         "android_client_info": {
           "package_name": "com.trackster.tracksterapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "588376677284-n6b74u2j90n10r1mffavokn1g5qddu1s.apps.googleusercontent.com",
+          "client_id": "1016138437423-b9mbl20oq3p7i47865tqes9vtqu0aitu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trackster.tracksterapp",
+            "certificate_hash": "d8a35fb171d7b090d676c7cd98fb3f09d246ea59"
+          }
+        },
+        {
+          "client_id": "1016138437423-m5ek8gpbt99c7ue7ocogihtjhv05qlfv.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD2kBqzaanSMkp9iX9J2JFtm1c7LjPFNW4"
+          "current_key": "AIzaSyB4Pp4Vq8zW4K8MrbXpvGDZd5nYW6bYd3w"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "588376677284-n6b74u2j90n10r1mffavokn1g5qddu1s.apps.googleusercontent.com",
+              "client_id": "1016138437423-m5ek8gpbt99c7ue7ocogihtjhv05qlfv.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1016138437423-ab2725kqtcfq9u2t3bqm6hhn2ka3ri8h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zdravkin.syncmaster"
+              }
             }
           ]
         }
