@@ -78,7 +78,9 @@ class HistoryList : BaseFragment() {
     private fun initRecyclerView(lista: MutableList<History>) {
         recyclerHistory.setHasFixedSize(true)
         recyclerHistory.layoutManager = LinearLayoutManager(context)
+        recyclerHistory.removeAllViewsInLayout()
         recyclerHistory.adapter = historyAdapter
+        historyAdapter.clearData()
         historyAdapter.setData(lista)
     }
 
