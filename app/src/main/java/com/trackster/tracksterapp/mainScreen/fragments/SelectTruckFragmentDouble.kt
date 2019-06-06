@@ -76,7 +76,7 @@ class SelectTruckFragmentDouble  : BaseFragment(), View.OnClickListener {
     }
     override fun onClick(p0: View?) {
         when (p0?.id) {
-            R.id.select_manufactor -> (activity as MainScreenActivity).openProfileSettingsFragment()
+            R.id.select_manufactor -> (activity as MainScreenActivity).openProfileSettingsFragmentTruck()
         }
     }
 }

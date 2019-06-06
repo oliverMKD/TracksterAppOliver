@@ -163,8 +163,8 @@ class MessageRecyclerAdapter(private val context: Activity, private var list: Mu
             else -> holder.sent_name!!.text = PreferenceUtils.getDriverName(context)
         }
 
-        if (message.file != null && message.content == null) {
-            if (message.file!!.filename != null && message.content == null) {
+        if (message.file != null  && message.content.isEmpty()) {
+            if (!message.file!!.filename!!.isEmpty() && message.content.isEmpty()) {
                 holder.messageTextView.visibility = View.GONE
                 if (message.file?.filename!!.contains(".pdf") || message.file?.filename!!.contains(".png")) {
                     val sharedPref = getApplicationContext().getSharedPreferences("preff", Context.MODE_PRIVATE)

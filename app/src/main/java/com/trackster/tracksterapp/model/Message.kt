@@ -1,6 +1,9 @@
 package com.trackster.tracksterapp.model
 
-import com.google.gson.annotations.SerializedName
+import android.annotation.TargetApi
+import android.os.Build
+import android.os.Parcel
+import android.os.Parcelable
 import java.io.Serializable
 
 data class Message(
@@ -11,7 +14,7 @@ data class Message(
     var createBy : String,
     var senderId : String,
     var createTime : String,
-    var file: Files?
+   final var file: Files?
 //var isMine : Boolean
 
 ) : Serializable

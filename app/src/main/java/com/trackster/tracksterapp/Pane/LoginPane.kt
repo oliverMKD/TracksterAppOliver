@@ -275,6 +275,7 @@ class LoginPane : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener 
                     PreferenceUtils.saveAuthorizationToken(this, it.body()!!.token)
                     PreferenceUtils.saveUserId(this, it.body()!!.id)
                     startActivity(Intent(this@LoginPane, SelectTrailerActivity::class.java))
+                    finish()
 
                 }, {
                     Log.d("pane", "error")

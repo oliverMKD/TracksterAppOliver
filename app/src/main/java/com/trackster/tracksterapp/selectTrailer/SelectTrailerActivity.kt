@@ -148,8 +148,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
     fun getSelectedTrailer(id: String) {
         Toast.makeText(this@SelectTrailerActivity, "You selected : " + id + " trailer", Toast.LENGTH_LONG).show()
-        mDelayHandler = Handler()
-        mDelayHandler!!.postDelayed(mRunnable, SPLASH_DELAY)
+       goToSelectTruckFragment()
     }
 
     fun getSelectedTruck(id: String) {
@@ -160,6 +159,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
     fun getSelectedColor(name_color: String) {
         Toast.makeText(this@SelectTrailerActivity, "You selected : " + name_color + "color", Toast.LENGTH_LONG).show()
         startActivity(Intent(this@SelectTrailerActivity, MainScreenActivity::class.java))
+        finish()
     }
 
     private fun goToSelectTruckFragment() {
@@ -168,6 +168,7 @@ class SelectTrailerActivity : AppCompatActivity(), OnMapReadyCallback {
 
     public fun startNewActivity() {
         startActivity(Intent(this@SelectTrailerActivity, MainScreenActivity::class.java))
+        finish()
     }
 
     override fun onBackPressed() {

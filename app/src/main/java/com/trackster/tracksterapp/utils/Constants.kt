@@ -1,6 +1,6 @@
 package com.trackster.tracksterapp.utils
 
-const val BASE_URL: String = "http://34.73.188.201:3000/"
+const val BASE_URL: String = "https://app.truckscopeapp.com/"
 const val USER_ID_KEY = "user_id_key"
 const val CONTACT_KEY = "com.tvapps.chat.general.utils.contact_key"
 const val SENDER_KEY = "com.tvapps.chat.general.utils.sender_key"
