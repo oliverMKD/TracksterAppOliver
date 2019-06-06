@@ -2,9 +2,7 @@ package com.trackster.tracksterapp.mainScreen
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
@@ -12,10 +10,7 @@ import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
-import android.os.AsyncTask
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
+import android.os.*
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
@@ -47,6 +42,8 @@ import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.cameraToPdf.CameraActivity
 import com.trackster.tracksterapp.chat.ChatDetails
 import com.trackster.tracksterapp.mainScreen.fragments.*
+import com.trackster.tracksterapp.model.Files
+import com.trackster.tracksterapp.model.Message
 import com.trackster.tracksterapp.network.BaseResponse
 import com.trackster.tracksterapp.network.PostApi
 import com.trackster.tracksterapp.network.connectivity.NoConnectivityException
@@ -61,6 +58,7 @@ import kotlinx.android.synthetic.main.nav_header_main_screen.*
 import org.json.JSONArray
 import org.json.JSONObject
 import retrofit2.HttpException
+import java.io.File
 import java.io.IOException
 import java.net.SocketTimeoutException
 
@@ -79,6 +77,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     lateinit var driver: JSONObject
     private lateinit var firstNameJson: String
     private lateinit var lastNameJson: String
+    val list: ArrayList<Message> = arrayListOf()
+    private var nullFile: Files? = null
+    private var content: String? = null
+    private var nullContent: String? = null
+    private var filename : String? = null
 
 
     private lateinit var locationCallback: LocationCallback
@@ -115,14 +118,14 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         hamburger.setOnClickListener(this)
         chat.setOnClickListener(this)
         attach.setOnClickListener(this)
-        if (PreferenceUtils.getFirebaseToken(this@MainScreenActivity) == null
-            || PreferenceUtils.getFirebaseToken(this@MainScreenActivity).isEmpty()
-        ) {
-            val refreshedToken = FirebaseInstanceId.getInstance().token
-            Log.d("tokenFCM", "FCM token: " + refreshedToken)
-            PreferenceUtils.saveFirebaseToken(this@MainScreenActivity, refreshedToken!!)
-            authenticateWithFirebase(refreshedToken!!)
-        }
+//        if (PreferenceUtils.getFirebaseToken(this@MainScreenActivity) == null
+//            || PreferenceUtils.getFirebaseToken(this@MainScreenActivity).isEmpty()
+//        ) {
+        val refreshedToken = FirebaseInstanceId.getInstance().token
+        Log.d("tokenFCM", "FCM token: " + refreshedToken)
+        PreferenceUtils.saveFirebaseToken(this@MainScreenActivity, refreshedToken!!)
+        authenticateWithFirebase(refreshedToken!!)
+//        }
 
 
         floatBtn.setOnClickListener {
@@ -210,8 +213,11 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 .subscribeOn(Schedulers.io())
                 .subscribe({
 
-                }, {
-                })
+                    Log.d("fcm", "" + it.isSuccessful)
+                },
+                    {
+                        Log.d("fcm", "" + it.localizedMessage)
+                    })
         )
     }
 
@@ -282,7 +288,9 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
             R.id.chat -> {
                 val intent = Intent(this@MainScreenActivity, ChatDetails::class.java)
-                intent.putStringArrayListExtra("testPreLoad", model)
+                val gson = Gson()
+                val json = gson.toJson(list)
+                intent.putExtra("BUNDLE", json)
                 startActivity(intent)
             }
             R.id.attach -> {
@@ -372,7 +380,7 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                     PreferenceUtils.saveString(this@MainScreenActivity, dataJson)
 //
                     mapsId = PreferenceUtils.getChatId(this@MainScreenActivity)
-                    if (mapsId != null || !mapsId.isEmpty()) {
+                    if (mapsId != null && !mapsId.isEmpty() && mapsId != "") {
                         getChatById(mapsId)
                     } else {
                         val iterator = it.listIterator()
@@ -397,6 +405,43 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+
+                    val gson = Gson()
+                    val dataJson: String = gson.toJson(it)
+                    val array = JSONObject(dataJson)
+                    val messages = array.getJSONArray("messages")
+                    for (x in 0 until messages.length()) {
+                        val row11 = messages.getJSONObject(x)
+                        val messageId = row11.getString("id")
+                        if (row11.has("content") && !row11.isNull("content")) {
+                            content = row11.getString("content")
+                        } else {
+                            content = null
+                        }
+                        val senderId = row11.getString("senderId")
+                        val createTime = row11.getString("createTime")
+                        val createBy = row11.getString("createBy")
+                        if (row11.has("file") && !row11.isNull("file")) {
+                            val file = row11.getJSONObject("file")
+                            val id = file.getString("id")
+                            if (file.has("filename") && !row11.isNull("filename")) {
+                                filename = file.getString("filename")
+                                val f = Files(id, filename)
+                                val message = Message(messageId, "", createBy, senderId, createTime, f)
+                                list.add(message)
+                            } else {
+                                val f = Files(id, "")
+                                val message = Message(messageId, "", createBy, senderId, createTime, f)
+                                list.add(message)
+                            }
+                        } else {
+                            val message = Message(messageId, content!!, createBy, senderId, createTime, nullFile)
+                            list.add(message)
+                        }
+
+                    }
+
+//                    }
 
                     val iterator = it.pickupAddress.listIterator()
                     iterator.forEach { item ->
@@ -619,6 +664,36 @@ class MainScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         } else {
             fragmentTransaction.add(R.id.fragment_container, profileSettings)
             fragmentTransaction.addToBackStack("profileSettingsFragment")
+        }
+        fragmentTransaction.commit()
+    }
+
+    public fun openProfileSettingsFragmentColor() {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        if (profileSettings.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, profileSettings)
+            fragmentTransaction.remove(selectColorFragment)
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, profileSettings)
+            fragmentTransaction.addToBackStack("profileSettingsFragment")
+            fragmentTransaction.remove(selectColorFragment)
+
+        }
+        fragmentTransaction.commit()
+    }
+
+    public fun openProfileSettingsFragmentTruck() {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        if (profileSettings.isAdded) {
+            fragmentTransaction.replace(R.id.fragment_container, profileSettings)
+            fragmentTransaction.remove(selectTracksFragment)
+        } else {
+            fragmentTransaction.add(R.id.fragment_container, profileSettings)
+            fragmentTransaction.addToBackStack("profileSettingsFragment")
+            fragmentTransaction.remove(selectTracksFragment)
+
         }
         fragmentTransaction.commit()
     }

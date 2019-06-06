@@ -3,10 +3,8 @@ package com.trackster.tracksterapp.chat
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -31,7 +29,6 @@ import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.util.ViewPreloadSizeProvider
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.itextpdf.text.Document
@@ -43,7 +40,6 @@ import com.trackster.tracksterapp.adapters.MessageRecyclerAdapter
 import com.trackster.tracksterapp.base.BaseChatActivity
 import com.trackster.tracksterapp.base.TracksterApplication
 import com.trackster.tracksterapp.mainScreen.MainScreenActivity
-import com.trackster.tracksterapp.model.Contact
 import com.trackster.tracksterapp.model.Files
 import com.trackster.tracksterapp.model.FirebaseMessage
 import com.trackster.tracksterapp.model.Message
@@ -75,10 +71,11 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     private var sendMessageEditText: EditText? = null
     private var recyclerView: RecyclerView? = null
     private var progressBar: ProgressBar? = null
+    var args : Bundle? = null
 
     private lateinit var adapter: MessageRecyclerAdapter
     private var mutableListMessages: MutableList<Message> = mutableListOf()
-    private var listMessagesPhotos: ArrayList<String> = arrayListOf()
+    private var listMessages: ArrayList<Message> = arrayListOf()
     var listMessagesCheckSize: MutableList<Message> = mutableListOf()
 
 
@@ -114,14 +111,58 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
 
         val intent = intent
-        if (intent.hasExtra("testPreLoad")) {
-            listMessagesPhotos = intent.getStringArrayListExtra("testPreLoad")
-        }
-        val preloadSizeProvider = ViewPreloadSizeProvider<Any>()
-        val modelProvider = MyPreloadModelProvider(listMessagesPhotos, this)
-        preloader = RecyclerViewPreloader(Glide.with(this), modelProvider, preloadSizeProvider, 200 /*maxPreload*/)
+       var messageListAsString =intent.getStringExtra("BUNDLE")
+        val gson = Gson()
+        val type = object:TypeToken<List<Message>>() {
+        }.type
+        listMessages = gson.fromJson(messageListAsString, type)
+//        for (cars in listMessages)
+//        {
+//            Log.i("Car Data", cars.id + "-" + cars.name)
+//        }
         initViews()
-        getMessages()
+//        getMessages()
+//        if (listMessages.size == PreferenceUtils.getSize(this@ChatDetails)) {
+//            Log.d("same list", "" + listMessages.size + " " + listMessagesCheckSize.size)
+//        } else {
+//            val difference = (listMessages.size - PreferenceUtils.getSize(this@ChatDetails)!!)
+//            val list: List<Message> = listMessages.takeLast(difference)
+        val iterator = listMessages.listIterator()
+        iterator.forEach { item ->
+            //                listMessagesCheckSize.add(item)
+//                val preffList = PreferenceUtils.getSize(this@ChatDetails)
+//                val sumList = (preffList!! + 1)
+//                PreferenceUtils.saveMessSize(this@ChatDetails, sumList)
+            if (item.file != null) {
+                if (item.file!!.filename != null) {
+                    doAsync {
+                        getFileFromServer(item.file!!.filename!!)
+                    }.execute()
+                } else {
+                    Log.e("getFileFromServer", "1111")
+                }
+            } else {
+                Log.d("getFileFromServer", "22222")
+            }
+        }
+//        }
+        val thread = object : Thread() {
+            override fun run() {
+                try {
+                    synchronized(this) {
+                        runOnUiThread {
+                            mutableListMessages = listMessages
+                            setData(mutableListMessages)
+                            setData(mutableListMessages)
+                            scrollToBottom()
+                        }
+                    }
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        thread.start()
         initMutualViews()
         initMessageList()
         FILE_RECORDING = "${externalCacheDir.absolutePath}/recorder.aac"
@@ -135,7 +176,7 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
         isActivityVisible = true
 
         if (TracksterApplication.shouldReload) {
-            getMessages()
+//            getMessages()
         } else {
             TracksterApplication.shouldReload = true
         }
@@ -738,7 +779,7 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     }
 
     override fun onBackPressed() {
-       // startActivity(Intent(this@ChatDetails, MainScreenActivity::class.java))
+         startActivity(Intent(this@ChatDetails, MainScreenActivity::class.java))
         finish()
     }
 
@@ -796,12 +837,13 @@ class ChatDetails : BaseChatActivity(), View.OnClickListener {
     }
 
     @Subscribe
-     fun onEvent( event : FirebaseMessage) {
+    fun onEvent(event: FirebaseMessage) {
         Toast.makeText(this, "Hey, my message" + event.content, Toast.LENGTH_SHORT).show()
     }
+
     override fun onStart() {
         super.onStart()
-    EventBus.getDefault().register(this)
+        EventBus.getDefault().register(this)
     }
 
     override fun onStop() {

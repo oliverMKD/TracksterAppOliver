@@ -74,10 +74,8 @@ class SelectColorFragment : BaseFragment(), View.OnClickListener {
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     initRecyclerView(it)
-// Log.d("station", " "+ it[0].location)
                 }, {
-                    // showProgress(false)
-//                Utils.handleApiError(it)
+
                 })
         )
 

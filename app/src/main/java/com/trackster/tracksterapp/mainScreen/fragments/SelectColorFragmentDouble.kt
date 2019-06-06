@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ProgressBar
 import com.trackster.tracksterapp.R
 import com.trackster.tracksterapp.base.BaseFragment
+import com.trackster.tracksterapp.mainScreen.MainScreenActivity
 import com.trackster.tracksterapp.mainScreen.adapter_Double.SelectColorAdapterDouble
 import com.trackster.tracksterapp.model.Colors
 import com.trackster.tracksterapp.network.PostApi
@@ -19,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_select_color.*
 class SelectColorFragmentDouble : BaseFragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0?.id) {
-            R.id.select_manufactor_color -> (activity as SelectTrailerActivity).startNewActivity()
+            R.id.select_manufactor_color -> (activity as MainScreenActivity).openProfileSettingsFragmentColor()
         }
     }
     private lateinit var selectColorAdapter: SelectColorAdapterDouble

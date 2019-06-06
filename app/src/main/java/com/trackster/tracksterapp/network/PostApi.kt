@@ -28,89 +28,89 @@ interface PostApi {
      * Get the list of the pots from the API
      */
     @Headers("Content-Type: application/json")
-    @POST("auth/login/")
+    @POST("api/auth/login/")
     fun login(@Body loginRequest: LoginRequest): Observable<Response<User>>
 
     @Headers("Content-Type: application/json")
-    @POST("auth/facebook/")
+    @POST("api/auth/facebook/")
     fun loginFB(@Body fbLoginRequest: FbLoginRequest): Observable<Response<User>>
 
-    @POST("/auth/phone/")
+    @POST("api/auth/phone/")
     fun loginWithPhone(@Body loginRequestWithPhone: LoginRequestWithPhone): Observable<Response<User>>
 
-    @POST("/auth/phone/")
+    @POST("api/auth/phone/")
     fun validatePhone(@Body validatePhoneRequest: ValidatePhoneRequest): Observable<Response<User>>
 
-    @GET("/admin/trailers/default")
+    @GET("api/admin/trailers/default")
     fun getDefaultTrailers(@Header("x-auth-token") authorization: String): Observable<ArrayList<Trailers>>
 
-    @GET("/admin/trailers/others")
+    @GET("api/admin/trailers/others")
     fun getOtherTrailers(@Header("x-auth-token") authorization: String): Observable<ArrayList<Trailers>>
 
-    @GET("/admin/truck-models")
+    @GET("api/admin/truck-models")
     fun getTrucks(@Header("x-auth-token") authorization: String): Observable<ArrayList<Trucks>>
 
     @Headers("Content-Type:application/x-www-form-urlencoded")
-    @GET("weigh-stations/circle")
+    @GET("api/weigh-stations/circle")
     fun getWeighStations(
         @Header("x-auth-token") authorization: String,
         @Query("center") centar: String,
         @Query("radius") radius: Int
     ): Single<ArrayList<WeighStation>>
 
-    @GET("/chats")
+    @GET("api/chats")
     fun getChats(@Header("x-auth-token") authorization: String): Observable<ArrayList<ChatResponse>>
 
 
-    @GET("/chats/{chatId}")
+    @GET("api/chats/{chatId}")
     fun getChatById(
         @Header("x-auth-token") authorization: String,
         @Path("chatId") chatId: String
     ): Single<ChatResponseId>
 
-    @GET("/users/me")
+    @GET("api/users/me")
     fun getInfoUser(@Header("x-auth-token") authorization: String): Observable<Response<User>>
 
     @Headers("Content-Type: application/json")
-    @POST("/users")
+    @POST("api/users")
     fun updateUser(@Header("x-auth-token") authorization: String, @Body fbLoginRequest: UserRequest): Observable<Response<User>>
 
-    @GET("/chats")
+    @GET("api/chats")
     fun getDetails(@Header("x-auth-token") authorization: String): Observable<ArrayList<ChatResponse>>
 
-    @GET("/chats")
+    @GET("api/chats")
     fun getHistory(@Header("x-auth-token") authorization: String): Observable<ArrayList<ChatResponse>>
 
-    @POST("/chats/{chatId}/push/message")
+    @POST("api/chats/{chatId}/push/message")
     fun postMessage(
         @Header("x-auth-token") authorization: String,
         @Path("chatId") chatId: String, @Body message: Message
     ): Single<Message>
 
-    @GET("/admin/truck-colors")
+    @GET("api/admin/truck-colors")
     fun getColors(@Header("x-auth-token") authorization: String): Observable<ArrayList<Colors>>
 
     @Multipart
-    @POST("/chats/upload/{chatId}")
+    @POST("api/chats/upload/{chatId}")
     fun postAudio(
         @Header("x-auth-token") authorization: String,
         @Path("chatId") chatId: String, @Part image: MultipartBody.Part
     ): Single<Message>
 
 
-    @GET("/chats/{chatId}/files/{filename}")
+    @GET("api/chats/{chatId}/files/{filename}")
     fun getFiles(
         @Header("x-auth-token") authorization: String,
         @Path("chatId") chatId: String, @Path("filename") filename: String
     ): Observable<Response<ResponseBody>>
 
-    @GET("/chats/{chatId}/files/{filename}")
+    @GET("api/chats/{chatId}/files/{filename}")
     fun getFileById(
         @Header("x-auth-token") authorization: String,
         @Path("chatId") chatId: String, @Path("filename") filename: String
     ): Observable<Response<ResponseBody>>
 
-    @POST("/notifications/register-device")
+    @POST("api/notifications/register-device")
     fun postFirebaseToken(@Header("x-auth-token") authorization: String, @Body deviceToken: String): Observable<Response<ResponseBody>>
 
     companion object Factory {
